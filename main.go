@@ -2,10 +2,8 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/CanobbioE/reelo/inputs"
 )
 
 func main() {
-	fmt.Printf("%T\n", inputs.CurrentYear)
+	fmt.Printf("REELO: an ELO ranking for mathematic games")
 }
