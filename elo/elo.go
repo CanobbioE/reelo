@@ -1,8 +1,13 @@
 package elo
 
 func Reelo(name, surname string) (reelo int) {
-	// search all years
-	// do stuff like in the mail
-	// gg you did it
+	// for y range years
+	// if y isEmpty reelo = avg(pastFullYears)/2
+	// if y isFull
+	// cc = sum(Dmax)/Emax * Tmax
+	// reelo = (cc * sum(D+E*K)/avgOfAvgCat) * 10000
+	// 	if y is first full
+	// 	reelo = (reelo + reelo/2)/2
+	// reelo = reelo * Kaging
 	return reelo
 }
