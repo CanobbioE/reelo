@@ -6,9 +6,12 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	rdb "github.com/CanobbioE/reelo/db"
 )
 
 var FolderPath = "./ranks"
+var db = rdb.DB()
 
 // parseRankingFile reads a ranking from the correct file using the specified
 // format. The file's name must be "year_category.txt"
@@ -40,6 +43,7 @@ type Format struct {
 	City                   int
 }
 
+// newFormat returns a new format based on the slice of string passed
 func newFormat(ff []string) *Format {
 	return &Format{
 		Name:      indexOf(ff, "nome"),
@@ -51,6 +55,7 @@ func newFormat(ff []string) *Format {
 	}
 }
 
+// indexOf returns the position of the pattern's first occurency inside the ss slice
 func indexOf(ss []string, pattern string) int {
 	for i, s := range ss {
 		if s == pattern {
@@ -60,10 +65,21 @@ func indexOf(ss []string, pattern string) int {
 	return -1
 }
 
+// updateDb updates the database by adding all the data read from a single row
+// of the Ranking's file
 func updateDb(data []string, f *Format) {
-	// if !db.contains("giocatore", nome, cognome)
-	// 	db.add("giocatore", nome, cognome)
-	// 	db.add("risultato", eserciizi, punteggio, tempo)
-	// 	ottieni riferimento a GIOCHI trmite anno e categoria
-	// 	db.add("partecipazione", giocatore, risultato, giochi)
+	var time = "0"
+	var pId int
+	// Add the player information only if he doesn't already exist in the db
+	if !rdb.ContainsPlayer(db, data[f.Name], data[f.Surname]) {
+		pId = rdb.Add(db, "giocatore", data[f.Name], data[f.Surname])
+	} else {
+		pId = 0 // select id from giocatore where nome = cognome and cognome = surname
+	}
+	if f.Time != -1 {
+		time = data[f.Time]
+	}
+	rId := rdb.Add(db, "risultato", data[f.Exercises], data[f.Score], time)
+	// TODO ottieni riferimento a GIOCHI trmite anno e categoria
+	rdb.Add(db, "partecipazione", pId, rId, "giochiID")
 }
