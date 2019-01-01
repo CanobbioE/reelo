@@ -33,6 +33,7 @@ func DB() *sql.DB {
 	return db
 }
 
+// ContainsPlayer verufies if a player is already in the database
 func ContainsPlayer(db *sql.DB, name, surname string) bool {
 	q := `
 	SELECT id
@@ -59,46 +60,46 @@ func Add(db *sql.DB, table string, params ...interface{}) int {
 	switch table {
 	case "giocatore":
 		s = `
-	INSERT INTO Giocatore (nome, cognome, reelo)
-	VALUES (%s, %s, 0)
-	`
+INSERT INTO Giocatore (nome, cognome, reelo)
+VALUES (%s, %s, 0)
+`
 		q1 = fmt.Sprintf(s, params)
 		s = `
-	SELECT id FROM Giocatore
-	WHERE nome = %s AND cognome = %s
-	`
+SELECT id FROM Giocatore
+WHERE nome = %s AND cognome = %s
+`
 		q2 = fmt.Sprintf(s, params)
 
 	case "risultato":
 		s = `
-		INSERT INTO Risultato (tempo, esercizi, punteggio)
-		VALUES (%d, %d, %d)
-		`
+INSERT INTO Risultato (tempo, esercizi, punteggio)
+VALUES (%d, %d, %d)
+`
 		q1 = fmt.Sprintf(s, params)
 
 		s = `
-		SELECT MAX(id) FROM Risultato
-		WHERE tempo = %d AND esercizi = %d AND punteggio = %d
-		`
+SELECT MAX(id) FROM Risultato
+WHERE tempo = %d AND esercizi = %d AND punteggio = %d
+`
 		q2 = fmt.Sprintf(s, params)
 
 	case "partecipazione":
 		s = `
-		INSERT INTO Partecipazione (giocatore, giochi, risultato, sede)
-		VALUES (%d, %d, %d, %s)
+INSERT INTO Partecipazione (giocatore, giochi, risultato, sede)
+VALUES (%d, %d, %d, %s)
 		`
 		q1 = fmt.Sprintf(s, params)
 
 	case "giochi":
 		s = `
-		INSERT INTO Giochi (anno, categoria)
-		VALUES (%d, %s)
+INSERT INTO Giochi (anno, categoria)
+VALUES (%d, %s)
 		`
 		q1 = fmt.Sprintf(s, params)
 
 		s = `
-		SELECT id FROM Giochi
-		WHERE anno = %d AND categoria = %s
+SELECT id FROM Giochi
+WHERE anno = %d AND categoria = %s
 		`
 		q2 = fmt.Sprintf(s, params)
 	}
