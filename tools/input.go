@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	rdb "github.com/CanobbioE/reelo/db"
 )
 
-var FolderPath = "./ranks"
-var db = rdb.DB()
+const RANK_PATH = "./ranks"
 
 // parseRankingFile reads a ranking from the correct file using the specified
 // format. The file's name must be "year_category.txt"
 func parseRankingFile(year int, category, format string) {
-	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", FolderPath, year, year, category)
+	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", RANK_PATH, year, year, category)
 	file, err := os.Open(filePath)
 	if err != nil {
 		log.Fatal(err)
@@ -25,6 +25,7 @@ func parseRankingFile(year int, category, format string) {
 
 	f := newFormat(strings.Split(strings.ToLower(format), " "))
 
+	// Here we do stuff and things with the input
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		data := strings.Split(scanner.Text(), " ")
@@ -35,51 +36,34 @@ func parseRankingFile(year int, category, format string) {
 	}
 }
 
-// Format represents the format used in a ranking file.
-// Each field represents an information's index inside a line of the file.
-type Format struct {
-	Exercises, Score, Time int
-	Name, Surname          int
-	City                   int
-}
-
-// newFormat returns a new format based on the slice of string passed
-func newFormat(ff []string) *Format {
-	return &Format{
-		Name:      indexOf(ff, "nome"),
-		Surname:   indexOf(ff, "cognome"),
-		City:      indexOf(ff, "sede"),
-		Exercises: indexOf(ff, "esercizi"),
-		Score:     indexOf(ff, "punteggio"),
-		Time:      indexOf(ff, "tempo"),
-	}
-}
-
-// indexOf returns the position of the pattern's first occurency inside the ss slice
-func indexOf(ss []string, pattern string) int {
-	for i, s := range ss {
-		if s == pattern {
-			return i
-		}
-	}
-	return -1
-}
-
 // updateDb updates the database by adding all the data read from a single row
 // of the Ranking's file
 func updateDb(data []string, f *Format) {
-	var time = "0"
-	var pId int
+	var pId, time int
+	db := rdb.DB()
+	defer db.Close()
 	// Add the player information only if he doesn't already exist in the db
 	if !rdb.ContainsPlayer(db, data[f.Name], data[f.Surname]) {
 		pId = rdb.Add(db, "giocatore", data[f.Name], data[f.Surname])
 	} else {
-		pId = 0 // select id from giocatore where nome = cognome and cognome = surname
+		q := `
+		SELECT id FROM Giocatore
+		WHERE nome = ? AND cognome = ?
+		`
+		err := db.QueryRow(q, data[f.Name], data[f.Surname]).Scan(&pId)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+	// Sometime the time is not specified in the ranking file
 	if f.Time != -1 {
-		time = data[f.Time]
+		var err error
+		time, err = strconv.Atoi(data[f.Time])
+		if err != nil {
+			time = 0
+		}
 	}
-	rId := rdb.Add(db, "risultato", data[f.Exercises], data[f.Score], time)
+	rId := rdb.Add(db, "risultato", time, data[f.Exercises], data[f.Score])
 	// TODO ottieni riferimento a GIOCHI trmite anno e categoria
 	rdb.Add(db, "partecipazione", pId, rId, "giochiID")
 }
