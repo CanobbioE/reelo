@@ -23,13 +23,18 @@ func parseRankingFile(year int, category, format string) {
 	}
 	defer file.Close()
 
+	// add the current year+category to the db
+	db := rdb.DB()
+	gId := rdb.Add(db, "giochi", year, category)
+	db.Close()
+
 	f := newFormat(strings.Split(strings.ToLower(format), " "))
 
 	// Here we do stuff and things with the input
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		data := strings.Split(scanner.Text(), " ")
-		updateDb(data, f)
+		updateDb(data, f, gId)
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
@@ -37,8 +42,8 @@ func parseRankingFile(year int, category, format string) {
 }
 
 // updateDb updates the database by adding all the data read from a single row
-// of the Ranking's file
-func updateDb(data []string, f *Format) {
+// of the Ranking's file.
+func updateDb(data []string, f *Format, gId int) {
 	var pId, time int
 	db := rdb.DB()
 	defer db.Close()
@@ -64,6 +69,5 @@ func updateDb(data []string, f *Format) {
 		}
 	}
 	rId := rdb.Add(db, "risultato", time, data[f.Exercises], data[f.Score])
-	// TODO ottieni riferimento a GIOCHI trmite anno e categoria
-	rdb.Add(db, "partecipazione", pId, rId, "giochiID")
+	rdb.Add(db, "partecipazione", pId, gId, rId)
 }
