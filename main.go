@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-const root = "./html/"
+const HTML_PATH = "./html/"
 
 type Page struct {
 	Title string
@@ -17,7 +17,7 @@ type Page struct {
 
 // loadPage loads a the page with the given title
 func loadPage(title string) (*Page, error) {
-	filename := root + title + ".txt"
+	filename := HTML_PATH + title + ".txt"
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -27,13 +27,13 @@ func loadPage(title string) (*Page, error) {
 
 // renderTemplate draws the html page
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, _ := template.ParseFiles(root + tmpl + ".html")
+	t, _ := template.ParseFiles(HTML_PATH + tmpl + ".html")
 	t.Execute(w, p)
 }
 
-// makeHandler returns a http Handler Func
 var validPath = regexp.MustCompile("([a-zA-Z0-9]+)")
 
+// makeHandler returns a http Handler Func
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
@@ -55,6 +55,7 @@ func todo(w http.ResponseWriter, r *http.Request, title string) {
 }
 
 func main() {
+	// TODO: serve all the pages
 	http.HandleFunc("/todo/", makeHandler(todo))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
