@@ -17,7 +17,7 @@ const RANK_PATH = "./ranks"
 var db *rdb.DB
 
 func init() {
-	db := rdb.NewDB()
+	db = rdb.NewDB()
 }
 
 // parseRankingFile reads a ranking from the correct file using the specified
@@ -52,10 +52,10 @@ func parseRankingFile(year int, category, format string) {
 func updateDb(ctx context.Context, data []string, f *Format, gID int) {
 	var pID int
 	// Add the player information only if he doesn't already exist in the db
-	if !db.ContainsPlayer(ctx, db, data[f.Name], data[f.Surname]) {
+	if !db.ContainsPlayer(ctx, data[f.Name], data[f.Surname]) {
 		pID = db.Add(ctx, "giocatore", data[f.Name], data[f.Surname])
 	} else {
-		pID = db.RetrievePlayerID(ctx, db, data[f.Name], data[f.Surname])
+		pID = db.RetrievePlayerID(ctx, data[f.Name], data[f.Surname])
 	}
 	// Sometime the time is not specified in the ranking file
 	time, err := strconv.Atoi(data[f.Time])
