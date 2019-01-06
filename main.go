@@ -35,7 +35,11 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 
 // makeHandler returns a http Handler Func
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+<<<<<<< HEAD
 	validPath := regexp.MustCompile("^/(home|ranks|upload)?")
+=======
+	var validPath = regexp.MustCompile("([a-zA-Z0-9]+)")
+>>>>>>> 4e63e6008cde37481a4dff4d7d3b8f52f7cdfbc7
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {

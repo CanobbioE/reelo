@@ -1,5 +1,6 @@
 package elo
 
+// Reelo returns the points for a given user calculated with a custom algorithm.
 func Reelo(name, surname string) (reelo int) {
 	// for y range years
 	// if y isEmpty reelo = avg(pastFullYears)/2
