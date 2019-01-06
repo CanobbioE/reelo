@@ -14,14 +14,7 @@ import (
 
 const RANK_PATH = "./ranks"
 
-var db *rdb.DB
-
-func init() {
-	db, err := rdb.NewDB()
-	if err != nil {
-		log.Fatal("Couldn't open database. ", err)
-	}
-}
+var db = rdb.NewDB()
 
 // parseRankingFile reads a ranking from the correct file using the specified
 // format. The file's name must be in the format of "year_category.txt"
@@ -40,6 +33,11 @@ func parseRankingFile(year int, category, format string) {
 	f := newFormat(strings.Split(strings.ToLower(format), " "))
 
 	// Here we do stuff and things with the input
+	/* TODO:
+	- spot and fix multiple names/surnames
+	- identify cities (use list)
+	- identify homonyms (or don't, Cesco doesn't really care)
+	*/
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		data := strings.Split(scanner.Text(), " ")
@@ -48,18 +46,21 @@ func parseRankingFile(year int, category, format string) {
 			log.Fatal(err)
 		}
 	}
+	db.Close()
 }
 
 // updateDb updates the database by adding all the data read from a single row
 // of the Ranking's file.
 func updateDb(ctx context.Context, data []string, f *Format, gID int) {
 	var pID int
+
 	// Add the player information only if he doesn't already exist in the db
-	if !db.ContainsPlayer(ctx, db, data[f.Name], data[f.Surname]) {
+	if !db.ContainsPlayer(ctx, data[f.Name], data[f.Surname]) {
 		pID = db.Add(ctx, "giocatore", data[f.Name], data[f.Surname])
 	} else {
-		pID = db.RetrievePlayerID(ctx, db, data[f.Name], data[f.Surname])
+		pID = db.RetrievePlayerID(ctx, data[f.Name], data[f.Surname])
 	}
+
 	// Sometime the time is not specified in the ranking file
 	time, err := strconv.Atoi(data[f.Time])
 	if err != nil || f.Time != -1 {

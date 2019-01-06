@@ -23,6 +23,11 @@ type DB struct {
 	db *sql.DB
 }
 
+// Close closes the database
+func (databse *DB) Close() {
+	databse.db.Close()
+}
+
 // NewDB returns the databse used for this program.
 // REMEMBER TO CLOSE IT!
 func NewDB() *DB {
