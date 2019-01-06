@@ -2,6 +2,7 @@ package tools
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -13,9 +14,19 @@ import (
 
 const RANK_PATH = "./ranks"
 
+var db *rdb.DB
+
+func init() {
+	db, err := rdb.NewDB()
+	if err != nil {
+		log.Fatal("Couldn't open database. ", err)
+	}
+}
+
 // parseRankingFile reads a ranking from the correct file using the specified
 // format. The file's name must be in the format of "year_category.txt"
 func parseRankingFile(year int, category, format string) {
+	ctx := context.Background()
 	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", RANK_PATH, year, year, category)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -24,9 +35,7 @@ func parseRankingFile(year int, category, format string) {
 	defer file.Close()
 
 	// add the current year+category to the db
-	db := rdb.DB()
-	gID := rdb.Add(db, "giochi", year, category)
-	db.Close()
+	gID := db.Add(ctx, "giochi", year, category)
 
 	f := newFormat(strings.Split(strings.ToLower(format), " "))
 
@@ -34,7 +43,7 @@ func parseRankingFile(year int, category, format string) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		data := strings.Split(scanner.Text(), " ")
-		updateDb(data, f, gID)
+		updateDb(ctx, data, f, gID)
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
@@ -43,31 +52,20 @@ func parseRankingFile(year int, category, format string) {
 
 // updateDb updates the database by adding all the data read from a single row
 // of the Ranking's file.
-func updateDb(data []string, f *Format, gID int) {
-	var pID, time int
-	db := rdb.DB()
-	defer db.Close()
+func updateDb(ctx context.Context, data []string, f *Format, gID int) {
+	var pID int
 	// Add the player information only if he doesn't already exist in the db
-	if !rdb.ContainsPlayer(db, data[f.Name], data[f.Surname]) {
-		pID = rdb.Add(db, "giocatore", data[f.Name], data[f.Surname])
+	if !db.ContainsPlayer(ctx, db, data[f.Name], data[f.Surname]) {
+		pID = db.Add(ctx, "giocatore", data[f.Name], data[f.Surname])
 	} else {
-		q := `
-		SELECT id FROM Giocatore
-		WHERE nome = ? AND cognome = ?
-		`
-		err := db.QueryRow(q, data[f.Name], data[f.Surname]).Scan(&pID)
-		if err != nil {
-			log.Fatal(err)
-		}
+		pID = db.RetrievePlayerID(ctx, db, data[f.Name], data[f.Surname])
 	}
 	// Sometime the time is not specified in the ranking file
-	if f.Time != -1 {
-		var err error
-		time, err = strconv.Atoi(data[f.Time])
-		if err != nil {
-			time = 0
-		}
+	time, err := strconv.Atoi(data[f.Time])
+	if err != nil || f.Time != -1 {
+		time = 0
 	}
-	rID := rdb.Add(db, "risultato", time, data[f.Exercises], data[f.Score])
-	rdb.Add(db, "partecipazione", pID, gID, rID)
+
+	rID := db.Add(ctx, "risultato", time, data[f.Exercises], data[f.Score])
+	db.Add(ctx, "partecipazione", pID, gID, rID)
 }
