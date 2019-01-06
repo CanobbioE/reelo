@@ -1,7 +1,7 @@
 /* What to do in each page:
  * "Home" should just show the intro to the reelo system.
  * "Ranks" should fetch the reelo data from the db (if requested re-run the reelo algorithm)
- * "Upload" should recive a ranking file and a format as input and recalculate the reelo socre.
+ * "Upload" should recive a ranking file and a format as input and recalculate the reelo socre. (should call a /save/)
  * " " should redirect to Home
  */
 package main
@@ -24,6 +24,7 @@ type Page struct {
 }
 
 // loadPage loads a the page with the given title
+// TODO: Probably there's no need for the body to be saved in .txt
 func loadPage(title string) (*Page, error) {
 	filename := HTML_PATH + title + ".txt"
 	body, err := ioutil.ReadFile(filename)
@@ -52,6 +53,7 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
+// TODO different handers
 func handler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
