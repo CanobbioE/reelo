@@ -1,3 +1,9 @@
+/* What to do in each page:
+ * "Home" should just show the intro to the reelo system.
+ * "Ranks" should fetch the reelo data from the db (if requested re-run the reelo algorithm)
+ * "Upload" should recive a ranking file and a format as input and recalculate the reelo socre.
+ * " " should redirect to Home
+ */
 package main
 
 import (
@@ -46,7 +52,6 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
-// TODO
 func handler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
