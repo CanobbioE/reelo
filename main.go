@@ -8,7 +8,9 @@ import (
 	"regexp"
 )
 
-const HTML_PATH = "./html/"
+const ROOT = "."
+const HTML_PATH = ROOT + "/html/"
+const LAYOUT = HTML_PATH + "layout.html"
 
 type Page struct {
 	Title string
@@ -27,35 +29,36 @@ func loadPage(title string) (*Page, error) {
 
 // renderTemplate draws the html page
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, _ := template.ParseFiles(HTML_PATH + tmpl + ".html")
-	t.Execute(w, p)
+	t, _ := template.ParseFiles(HTML_PATH+tmpl+".html", LAYOUT)
+	t.ExecuteTemplate(w, "layout", p)
 }
-
-var validPath = regexp.MustCompile("([a-zA-Z0-9]+)")
 
 // makeHandler returns a http Handler Func
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	validPath := regexp.MustCompile("^/(home|ranks|upload)?")
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
 			http.NotFound(w, r)
 			return
 		}
-		fn(w, r, m[2])
+		fn(w, r, m[1])
 	}
 }
 
 // TODO
-func todo(w http.ResponseWriter, r *http.Request, title string) {
+func handler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage(title)
 	if err != nil {
 		return
 	}
-	renderTemplate(w, "todo", p)
+	renderTemplate(w, title, p)
 }
 
 func main() {
-	// TODO: serve all the pages
-	http.HandleFunc("/todo/", makeHandler(todo))
+	http.HandleFunc("/home", makeHandler(handler))
+	http.HandleFunc("/ranks", makeHandler(handler))
+	http.HandleFunc("/upload", makeHandler(handler))
+	http.HandleFunc("/", makeHandler(handler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
