@@ -1,4 +1,4 @@
-package tools
+package parse
 
 // Format represents the format used in a ranking file.
 // Each field represents an information's index inside a line of the file.

@@ -1,4 +1,4 @@
-package tools
+package parse
 
 import (
 	"bufio"
@@ -17,10 +17,7 @@ const RANK_PATH = "./ranks"
 var db *rdb.DB
 
 func init() {
-	db, err := rdb.NewDB()
-	if err != nil {
-		log.Fatal("Couldn't open database. ", err)
-	}
+	db := rdb.NewDB()
 }
 
 // parseRankingFile reads a ranking from the correct file using the specified
