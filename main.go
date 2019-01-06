@@ -31,10 +31,9 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 	t.Execute(w, p)
 }
 
-var validPath = regexp.MustCompile("([a-zA-Z0-9]+)")
-
 // makeHandler returns a http Handler Func
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	var validPath = regexp.MustCompile("([a-zA-Z0-9]+)")
 	return func(w http.ResponseWriter, r *http.Request) {
 		m := validPath.FindStringSubmatch(r.URL.Path)
 		if m == nil {
