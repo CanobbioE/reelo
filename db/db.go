@@ -44,12 +44,12 @@ func NewDB() *DB {
 	return &database
 }
 
-// ContainsPlayer verufies if a player is already in the database
+// ContainsPlayer verifies if a player is already in the database
 func (database *DB) ContainsPlayer(ctx context.Context, name, surname string) bool {
 	q := `
-	SELECT id
-	FROM giocatore
-	WHERE nome = ? AND cognome = ?
+SELECT id
+FROM giocatore
+WHERE nome = ? AND cognome = ?
 	`
 	rows, err := database.db.QueryContext(ctx, q, name, surname)
 	if err != nil {
@@ -144,8 +144,8 @@ func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
 func (database *DB) RetrievePlayerID(ctx context.Context, name, surname string) int {
 	var pID int
 	q := `
-		SELECT id FROM Giocatore
-		WHERE nome = ? AND cognome = ?
+SELECT id FROM Giocatore
+WHERE nome = ? AND cognome = ?
 		`
 	err := database.db.QueryRow(q, name, surname).Scan(&pID)
 	if err != nil {
