@@ -28,11 +28,12 @@ type dataLine struct {
 	Exercises int
 	Points    int
 	Time      int
+	Category  string
 }
 
 // parseRankingFile reads a ranking from the correct file using the specified
 // format. The file's name must be in the format of "year_category.txt"
-func readRankingFile(year int, category string, format Format) {
+func readRankingFile(year int, category string, format Format) dataAll {
 	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", RANK_PATH, year, year, category)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -42,21 +43,23 @@ func readRankingFile(year int, category string, format Format) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		// TODO: commenting this since we need to rewrite almost all of this.
-		//data := strings.Split(scanner.Text(), " ")
-		//updateDb(ctx, data, format, gID)
-		parseLine(format, scanner.Text())
+		singleLine := parseLine(format, scanner.Text())
+		singleLine.Category = category
+
+		results[year] = append(results[year], singleLine)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
+
+	return results
 }
 
-func parseLine(format Format, input string) {
+func parseLine(format Format, input string) dataLine {
 	splitted := strings.Split(input, " ")
 	var result dataLine
 
-	fmt.Println(input)
+	//fmt.Println(input)
 
 	// Handling base case.
 	// Otherwise it means there are fields with two or more words.
@@ -79,37 +82,18 @@ func parseLine(format Format, input string) {
 				result.City = strings.Title(value)
 			case "città(provincia)":
 				// TODO delete provincia from the input
+				// sometimes there's a space between the city and the parenthesys
+				// if a city is a province, then there's no parenthesis.
 				result.City = strings.Title(value)
 			}
 			if err != nil {
-				log.Fatal("Could not convert data.", err)
+				log.Fatal("Could not convert data. The input is: ", input, err)
 			}
 		}
-		fmt.Println(result)
+		//fmt.Println(result)
 	} else {
-		log.Print("Not implemented")
+		//log.Print("Not implemented")
 	}
-	fmt.Println()
+	//fmt.Println()
+	return result
 }
-
-/*
-// updateDb updates the database by adding all the data read from a single row
-// of the Ranking's file.
-func updateDb(ctx context.Context, data []string, f Format, gID int) {
-	var pID int
-	// Add the player information only if he doesn't already exist in the db
-	if !db.ContainsPlayer(ctx, data[f.Name], data[f.Surname]) {
-		pID = db.Add(ctx, "giocatore", data[f.Name], data[f.Surname])
-	} else {
-		pID = db.RetrievePlayerID(ctx, data[f.Name], data[f.Surname])
-	}
-	// Sometime the time is not specified in the ranking file
-	time, err := strconv.Atoi(data[f.Time])
-	if err != nil || f.Time != -1 {
-		time = 0
-	}
-
-	rID := db.Add(ctx, "risultato", time, data[f.Exercises], data[f.Score])
-	db.Add(ctx, "partecipazione", pID, gID, rID)
-}
-*/
