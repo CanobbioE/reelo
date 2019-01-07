@@ -1,0 +1,71 @@
+{
+	"formats":[
+    {
+	"year":2002,
+	"format":"Cognome, Nome, Città, esercizi, punti, tempo"
+	},
+	{
+	"year":2003,
+	"format":"Cognome, Nome, esercizi, punti, tempo"
+	},
+	{
+	"year":2004,
+	"format":"Cognome, Nome, esercizi, punti, Città"
+	},
+	{
+	"year":2005,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2006,
+	"format":"cognome, nome, città, esercizi, punti"
+	},
+	{
+	"year":2007,
+	"format":"cognome, nome, città, esercizi, punti"
+	},
+	{
+	"year":2008,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2009,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2010,
+	"format":"cognome, nome, città, esercizi, punti"
+	},
+	{
+	"year":2011,
+	"format":"cognome, nome, città, esercizi, punti"
+	},
+	{
+	"year":2012,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2013,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2014,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2015,
+	"format":"cognome, nome, città, esercizi, punti"
+	},
+	{
+	"year":2016,
+	"format":"Cognome, Nome, città(provincia), esercizi, punti"
+	},
+	{
+	"year":2017,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	},
+	{
+	"year":2018,
+	"format":"Cognome, Nome, città, esercizi, punti"
+	}
+]}
