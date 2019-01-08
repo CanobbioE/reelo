@@ -54,7 +54,25 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 }
 
 // TODO different handers
-func handler(w http.ResponseWriter, r *http.Request, title string) {
+func homeHandler(w http.ResponseWriter, r *http.Request, title string) {
+	p, err := loadPage("home")
+	if err != nil {
+		return
+	}
+	renderTemplate(w, "home", p)
+}
+
+func ranksHandler(w http.ResponseWriter, r *http.Request, title string) {
+	// TODO: load ranking
+	p, err := loadPage(title)
+	if err != nil {
+		return
+	}
+	renderTemplate(w, title, p)
+}
+
+func uploadHandler(w http.ResponseWriter, r *http.Request, title string) {
+	// TODO: login?
 	p, err := loadPage(title)
 	if err != nil {
 		return
@@ -63,9 +81,9 @@ func handler(w http.ResponseWriter, r *http.Request, title string) {
 }
 
 func main() {
-	http.HandleFunc("/home", makeHandler(handler))
-	http.HandleFunc("/ranks", makeHandler(handler))
-	http.HandleFunc("/upload", makeHandler(handler))
-	http.HandleFunc("/", makeHandler(handler))
+	http.HandleFunc("/home", makeHandler(homeHandler))
+	http.HandleFunc("/ranks", makeHandler(ranksHandler))
+	http.HandleFunc("/upload", makeHandler(uploadHandler))
+	http.HandleFunc("/", makeHandler(homeHandler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
