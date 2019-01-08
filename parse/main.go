@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -44,7 +43,7 @@ func main() {
 		}
 	}
 
-	fmt.Print(results)
+	//fmt.Print(results)
 }
 
 func findYears() []int {

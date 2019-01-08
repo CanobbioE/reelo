@@ -78,13 +78,11 @@ func parseLine(format Format, input string) dataLine {
 				result.Points, err = strconv.Atoi(value)
 			case "tempo":
 				result.Time, err = strconv.Atoi(value)
-			case "città":
-				result.City = strings.Title(value)
-			case "città(provincia)":
-				// TODO delete provincia from the input
-				// sometimes there's a space between the city and the parenthesys
-				// if a city is a province, then there's no parenthesis.
-				result.City = strings.Title(value)
+			case "città", "città(provincia)":
+				city := strings.Split(strings.Title(value), "(")
+				result.City = city[0]
+			default:
+				log.Println("Unsupported format", fName)
 			}
 			if err != nil {
 				log.Fatal("Could not convert data. The input is: ", input, err)
@@ -92,6 +90,7 @@ func parseLine(format Format, input string) dataLine {
 		}
 		//fmt.Println(result)
 	} else {
+		fmt.Println(input)
 		//log.Print("Not implemented")
 	}
 	//fmt.Println()

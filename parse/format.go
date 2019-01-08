@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var possibleFormats = map[string]interface{}{
+var possibleFormats = map[string]struct{}{
 	"cognome":          struct{}{},
 	"nome":             struct{}{},
 	"esercizi":         struct{}{},
