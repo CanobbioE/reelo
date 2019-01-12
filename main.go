@@ -8,7 +8,6 @@ package main
 
 import (
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
@@ -24,13 +23,9 @@ type Page struct {
 }
 
 // loadPage loads a the page with the given title
-// TODO: Probably there's no need for the body to be saved in .txt
+// TODO this is useless atm
 func loadPage(title string) (*Page, error) {
-	filename := HTML_PATH + title + ".txt"
-	body, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
+	body := []byte("")
 	return &Page{Title: title, Body: body}, nil
 }
 
@@ -53,7 +48,6 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 	}
 }
 
-// TODO different handers
 func homeHandler(w http.ResponseWriter, r *http.Request, title string) {
 	p, err := loadPage("home")
 	if err != nil {
@@ -64,6 +58,8 @@ func homeHandler(w http.ResponseWriter, r *http.Request, title string) {
 
 func ranksHandler(w http.ResponseWriter, r *http.Request, title string) {
 	// TODO: load ranking
+	// select Nome, Cognome, reelo from Giocatore
+	// inseriscili nella pagina
 	p, err := loadPage(title)
 	if err != nil {
 		return
@@ -71,6 +67,8 @@ func ranksHandler(w http.ResponseWriter, r *http.Request, title string) {
 	renderTemplate(w, title, p)
 }
 
+// TODO: maybe uploading is useless, we can do that from the server terminal
+// the web service doesn't really need to be used by anyone.. maybe
 func uploadHandler(w http.ResponseWriter, r *http.Request, title string) {
 	// TODO: login?
 	p, err := loadPage(title)
