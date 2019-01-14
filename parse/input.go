@@ -87,8 +87,69 @@ func parseLine(format Format, input string) dataLine {
 			}
 		}
 	} else {
-		//log.Printf("Found an exception. Len got: %d, exp %d.", len(splitted), len(format))
-		fmt.Println(input)
+		isDoubleCity := false
+
+		for _, c := range doubleNameCities {
+			if strings.Contains(input, c) {
+				cIndex := format["città"]
+				cWords := len(strings.Split(c, " "))
+
+				// checking if the multi word city is the only parameter with more than one word
+				log.Printf("Line with multi word city found. City is %s.", c)
+
+				if len(splitted) == len(format)+cWords-1 {
+					log.Printf("Should be only parameter w/ multiple words.")
+					log.Printf("Line is %v", splitted)
+					isDoubleCity = true
+
+					for fName, fIndex := range format {
+						// Handling index that come after the double words
+						index := fIndex
+						if fIndex > cIndex {
+							index = fIndex + cWords - 1
+						}
+
+						var err error
+						var value string
+
+						switch fName {
+						case "cognome":
+							value = strings.Title(strings.ToLower(splitted[index]))
+							log.Printf("Surname value: %s, index: %d", value, index)
+							result.Surname = value
+						case "nome":
+							value = strings.Title(strings.ToLower(splitted[index]))
+							log.Printf("Name value: %s, index: %d", value, index)
+							result.Name = value
+						case "esercizi":
+							result.Exercises, err = strconv.Atoi(splitted[index])
+						case "punti":
+							result.Points, err = strconv.Atoi(splitted[index])
+						case "tempo":
+							result.Time, err = strconv.Atoi(splitted[index])
+						case "città", "città(provincia)":
+							for i := 0; i < cWords; i++ {
+								value = value + " " + splitted[index+i]
+							}
+							value = strings.Title(strings.ToLower(value))
+							log.Printf("City value: %s, index: %d", value, index)
+							result.City = value
+						default:
+							log.Println("Unsupported format", fName)
+						}
+						if err != nil {
+							log.Printf("Len of the line is %d", len(splitted))
+							log.Printf("Could not convert data. The input is: '%s' %v", input, err)
+						}
+					}
+				}
+			}
+		}
+
+		if !isDoubleCity {
+			log.Printf("Found an exception. Len got: %d, exp %d.", len(splitted), len(format))
+			fmt.Println(input)
+		}
 	}
 	return result
 }
