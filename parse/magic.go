@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -122,26 +121,4 @@ var Rews = []rewriter{
 		}
 		return s.Err()
 	},
-}
-
-var expectedSize int
-
-var cities_test = []string{
-	"REGGIO CALABRIA",
-	"CASTEL BOLOGNESE",
-}
-
-var Orig = "FOO BAR(LOL) 13 54 GELA\r\nAAA BBB 15 73 MILANO" + `
-CCC DDD(NOPE) 15 78 REGGIO
-CALABRIA
-EEE FFF 87 21 LODI
-ERICA
-MARIA GERTRUDE HHH 21 32 SOMPAZZO`
-
-func main_magic() {
-	r, err := RunRewriters(Rews, strings.NewReader(Orig))
-	if err != nil {
-		panic(err)
-	}
-	io.Copy(os.Stdout, r)
 }

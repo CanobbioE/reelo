@@ -11,6 +11,8 @@ import (
 
 const RANK_PATH = "../ranks"
 
+var expectedSize int
+
 type dataLine struct {
 	Name      string
 	Surname   string
@@ -110,30 +112,24 @@ func parseLine(format Format, input string) dataLine {
 						}
 
 						var err error
-						var value string
+						value := splitted[index]
 
 						switch fName {
 						case "cognome":
-							value = strings.Title(strings.ToLower(splitted[index]))
-							log.Printf("Surname value: %s, index: %d", value, index)
-							result.Surname = value
+							result.Surname = strings.Title(strings.ToLower(value))
 						case "nome":
-							value = strings.Title(strings.ToLower(splitted[index]))
-							log.Printf("Name value: %s, index: %d", value, index)
-							result.Name = value
+							result.Name = strings.Title(strings.ToLower(value))
 						case "esercizi":
-							result.Exercises, err = strconv.Atoi(splitted[index])
+							result.Exercises, err = strconv.Atoi(value)
 						case "punti":
-							result.Points, err = strconv.Atoi(splitted[index])
+							result.Points, err = strconv.Atoi(value)
 						case "tempo":
-							result.Time, err = strconv.Atoi(splitted[index])
+							result.Time, err = strconv.Atoi(value)
 						case "città", "città(provincia)":
-							for i := 0; i < cWords; i++ {
+							for i := 1; i < cWords; i++ {
 								value = value + " " + splitted[index+i]
 							}
-							value = strings.Title(strings.ToLower(value))
-							log.Printf("City value: %s, index: %d", value, index)
-							result.City = value
+							result.City = strings.Title(strings.ToLower(value))
 						default:
 							log.Println("Unsupported format", fName)
 						}
