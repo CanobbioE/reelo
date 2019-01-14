@@ -77,17 +77,17 @@ func parseLine(format Format, input string) dataLine {
 			case "tempo":
 				result.Time, err = strconv.Atoi(value)
 			case "città", "città(provincia)":
-				city := strings.Split(strings.Title(value), "(")
-				result.City = city[0]
+				result.City = value
 			default:
 				log.Println("Unsupported format", fName)
 			}
 			if err != nil {
 				log.Printf("Len of the line is %d", len(splitted))
-				log.Fatalf("Could not convert data. The input is: '%s' %v", input, err)
+				log.Printf("Could not convert data. The input is: '%s' %v", input, err)
 			}
 		}
 	} else {
+		//log.Printf("Found an exception. Len got: %d, exp %d.", len(splitted), len(format))
 		fmt.Println(input)
 	}
 	return result

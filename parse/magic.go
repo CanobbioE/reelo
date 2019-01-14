@@ -57,6 +57,16 @@ var Rews = []rewriter{
 		}
 		return s.Err()
 	},
+	// Remove double spaces
+	func(w io.Writer, r io.Reader) error {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			r := strings.Replace(s.Text(), "  ", " ", -1)
+			w.Write([]byte(r))
+			w.Write([]byte{'\n'})
+		}
+		return s.Err()
+	},
 	// Fix newlines inbetween words
 	func(w io.Writer, r io.Reader) error {
 		s := bufio.NewScanner(r)
@@ -88,8 +98,8 @@ var Rews = []rewriter{
 
 			// Sometimes name and surname are glue together and joining below won't work
 			for _, c := range cities {
-				if strings.HasSuffix(combined, c) {
-					log.Printf("Found city %s, not going to join below.", c)
+				if strings.Contains(combined, c) {
+					log.Printf("Found city %s, in line %s. not going to join below.", c, combined)
 					w.Write([]byte{'\n'})
 					w.Write([]byte(text))
 					continue scanning
