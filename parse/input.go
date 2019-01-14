@@ -33,6 +33,9 @@ func readRankingFile(year int, category string, format Format) {
 
 	// Modifying lines in order to work around human errors
 	expectedSize = len(format)
+	log.Printf("Reading file of year %d, category %s\n", year, category)
+	log.Printf("Expected line length is: %d\n", expectedSize)
+	log.Printf("Format is: %v\n", format)
 	r, err := RunRewriters(Rews, bufio.NewReader(file))
 	if err != nil {
 		panic(err)
@@ -80,7 +83,8 @@ func parseLine(format Format, input string) dataLine {
 				log.Println("Unsupported format", fName)
 			}
 			if err != nil {
-				log.Fatal("Could not convert data. The input is: ", input, err)
+				log.Printf("Len of the line is %d", len(splitted))
+				log.Fatalf("Could not convert data. The input is: '%s' %v", input, err)
 			}
 		}
 	} else {

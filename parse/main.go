@@ -45,7 +45,6 @@ func main() {
 		inputFormat := retrieveFormat(year, formats)
 		format := newFormat(inputFormat)
 		for _, category := range categories {
-			log.Printf("Reading file of year %d, category %s\n", year, category)
 			readRankingFile(year, category, format)
 		}
 	}

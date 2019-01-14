@@ -70,15 +70,16 @@ var Rews = []rewriter{
 				prev = text
 				continue
 			}
-			log.Printf("found short line: %q", text)
+			log.Printf("Found short line: %q, exp size %d", text, expectedSize)
+			log.Printf("Count of words is: %d", (strings.Count(text, " ") + 1))
 			combined := prev + " " + text
 			// TODO: Replace cities with last column
 			for _, c := range doubleNameCities {
 				if !strings.HasSuffix(combined, c) {
-					log.Printf("%q doesn't end with %q", combined, c)
+					//log.Printf("%q doesn't end with %q", combined, c)
 					continue
 				}
-				log.Printf("found city: %s", c)
+				log.Printf("Found city: %s", c)
 				w.Write([]byte{' '})
 				w.Write([]byte(text))
 				prev = "" // I don't want to perform double joins
