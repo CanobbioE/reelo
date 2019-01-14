@@ -64,7 +64,7 @@ var Rews = []rewriter{
 	scanning:
 		for s.Scan() {
 			text := strings.TrimSpace(s.Text())
-			if strings.Count(text, " ") >= expectedSize {
+			if (strings.Count(text, " ") + 1) >= expectedSize {
 				w.Write([]byte{'\n'})
 				w.Write([]byte(text))
 				prev = text
