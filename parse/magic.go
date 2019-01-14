@@ -85,13 +85,30 @@ var Rews = []rewriter{
 				prev = "" // I don't want to perform double joins
 				continue scanning
 			}
-			log.Printf("Joining below: %q", text)
+
+			// Sometimes name and surname are glue together and joining below won't work
+			for _, c := range cities {
+				if strings.HasSuffix(combined, c) {
+					log.Printf("Found city %s, not going to join below.", c)
+					w.Write([]byte{'\n'})
+					w.Write([]byte(text))
+					continue scanning
+				}
+			}
+
 			w.Write([]byte{'\n'})
 			w.Write([]byte(text))
-			w.Write([]byte{' '})
+
 			s.Scan()
-			prev = text + s.Text()
-			w.Write([]byte(s.Text()))
+			// Joining below only if it is not the last line of the file
+			if s.Text() != "" {
+				w.Write([]byte{' '})
+
+				prev = text + " " + s.Text()
+				w.Write([]byte(s.Text()))
+
+				log.Printf("Joining below: '%q, result: '%q'", text, prev)
+			}
 		}
 		return s.Err()
 	},
