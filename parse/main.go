@@ -13,6 +13,12 @@ type dataAll map[int][]dataLine
 // TODO: really don't like this, but I'm tired. Will move it around later.
 var results = make(dataAll)
 
+func init() {
+	log.Println("Getting cities")
+	getCities()
+	log.Println("Got cities")
+}
+
 func main() {
 	/*
 			TODO: this doesn't work if a category is not present
@@ -39,6 +45,7 @@ func main() {
 		inputFormat := retrieveFormat(year, formats)
 		format := newFormat(inputFormat)
 		for _, category := range categories {
+			log.Printf("Reading file of year %d, category %s\n", year, category)
 			readRankingFile(year, category, format)
 		}
 	}
