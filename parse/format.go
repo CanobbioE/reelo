@@ -39,6 +39,9 @@ func newFormat(input []string) Format {
 		if _, ok := possibleFormats[value]; !ok {
 			log.Fatalf("format value %s not recognized.", value)
 		}
+		if value == "città(provincia)" {
+			value = "città"
+		}
 		format[value] = index
 	}
 	return format

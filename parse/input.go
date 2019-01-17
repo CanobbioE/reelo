@@ -65,35 +65,14 @@ func parseLine(format Format, input string) dataLine {
 	// Otherwise it means there are fields with two or more words.
 	if len(splitted) == len(format) {
 		for fName, index := range format {
-			var err error
-			value := strings.Title(strings.ToLower(splitted[index]))
-			switch fName {
-			case "cognome":
-				result.Surname = value
-			case "nome":
-				result.Name = value
-			case "esercizi":
-				result.Exercises, err = strconv.Atoi(value)
-			case "punti":
-				result.Points, err = strconv.Atoi(value)
-			case "tempo":
-				result.Time, err = strconv.Atoi(value)
-			case "città", "città(provincia)":
-				result.City = value
-			default:
-				log.Println("Unsupported format", fName)
-			}
-			if err != nil {
-				log.Printf("Len of the line is %d", len(splitted))
-				log.Printf("Could not convert data. The input is: '%s' %v", input, err)
-			}
+			result = assignField(splitted[index], fName, result)
 		}
 	} else {
-		isDoubleCity := false
+		isOnlyDoubleCity := false
 
-		for _, c := range doubleNameCities {
+		for _, c := range cities {
 			if strings.Contains(input, c) {
-				cIndex := format["città"]
+				cIndex, ok := format["città"]
 				cWords := len(strings.Split(c, " "))
 
 				// checking if the multi word city is the only parameter with more than one word
@@ -102,50 +81,55 @@ func parseLine(format Format, input string) dataLine {
 				if len(splitted) == len(format)+cWords-1 {
 					log.Printf("Should be only parameter w/ multiple words.")
 					log.Printf("Line is %v", splitted)
-					isDoubleCity = true
+					isOnlyDoubleCity = true
 
 					for fName, fIndex := range format {
 						// Handling index that come after the double words
 						index := fIndex
-						if fIndex > cIndex {
+						if fIndex > cIndex && ok {
 							index = fIndex + cWords - 1
 						}
 
-						var err error
 						value := splitted[index]
-
-						switch fName {
-						case "cognome":
-							result.Surname = strings.Title(strings.ToLower(value))
-						case "nome":
-							result.Name = strings.Title(strings.ToLower(value))
-						case "esercizi":
-							result.Exercises, err = strconv.Atoi(value)
-						case "punti":
-							result.Points, err = strconv.Atoi(value)
-						case "tempo":
-							result.Time, err = strconv.Atoi(value)
-						case "città", "città(provincia)":
+						if fName == "città" {
 							for i := 1; i < cWords; i++ {
 								value = value + " " + splitted[index+i]
 							}
-							result.City = strings.Title(strings.ToLower(value))
-						default:
-							log.Println("Unsupported format", fName)
 						}
-						if err != nil {
-							log.Printf("Len of the line is %d", len(splitted))
-							log.Printf("Could not convert data. The input is: '%s' %v", input, err)
-						}
+						result = assignField(value, fName, result)
 					}
 				}
 			}
 		}
 
-		if !isDoubleCity {
+		if !isOnlyDoubleCity {
 			log.Printf("Found an exception. Len got: %d, exp %d.", len(splitted), len(format))
 			fmt.Println(input)
 		}
+	}
+	return result
+}
+
+func assignField(value, fName string, result dataLine) dataLine {
+	var err error
+	switch fName {
+	case "cognome":
+		result.Surname = strings.Title(strings.ToLower(value))
+	case "nome":
+		result.Name = strings.Title(strings.ToLower(value))
+	case "esercizi":
+		result.Exercises, err = strconv.Atoi(value)
+	case "punti":
+		result.Points, err = strconv.Atoi(value)
+	case "tempo":
+		result.Time, err = strconv.Atoi(value)
+	case "città", "città(provincia)":
+		result.City = strings.Title(strings.ToLower(value))
+	default:
+		log.Println("Unsupported format", fName)
+	}
+	if err != nil {
+		log.Printf("Could not convert data. The input is: '%s' %v", value, err)
 	}
 	return result
 }
