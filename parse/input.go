@@ -56,8 +56,8 @@ func readRankingFile(year int, category string, format Format) {
 		log.Fatal(err)
 	}
 }
-
 func parseLine(format Format, input string) dataLine {
+	//input = strings.ToLower(input)
 	splitted := strings.Split(input, " ")
 	var result dataLine
 
@@ -69,8 +69,9 @@ func parseLine(format Format, input string) dataLine {
 		}
 	} else {
 		isOnlyDoubleCity := false
+		isOnlyDoubleName := false
 
-		for _, c := range cities {
+		for _, c := range doubleNameCities {
 			if strings.Contains(input, c) {
 				cIndex, ok := format["città"]
 				cWords := len(strings.Split(c, " "))
@@ -102,7 +103,39 @@ func parseLine(format Format, input string) dataLine {
 			}
 		}
 
-		if !isOnlyDoubleCity {
+		for _, n := range doubleWordNames {
+			if strings.Contains(strings.ToLower(input), strings.ToLower(n)) {
+				nIndex, ok := format["nome"]
+				nWords := len(strings.Split(n, " "))
+
+				// checking if the multi word name is the only parameter with more than one word
+				log.Printf("Line with multi word name found. Name is %s.", n)
+
+				if len(splitted) == len(format)+nWords-1 {
+					log.Printf("Should be only parameter w/ multiple words.")
+					log.Printf("Line is %v", splitted)
+					isOnlyDoubleName = true
+
+					for fName, fIndex := range format {
+						// Handling index that come after the double words
+						index := fIndex
+						if fIndex > nIndex && ok {
+							index = fIndex + nWords - 1
+						}
+
+						value := splitted[index]
+						if fName == "nome" {
+							for i := 1; i < nWords; i++ {
+								value = value + " " + splitted[index+i]
+							}
+						}
+						result = assignField(value, fName, result)
+					}
+				}
+			}
+		}
+
+		if !isOnlyDoubleCity && !isOnlyDoubleName {
 			log.Printf("Found an exception. Len got: %d, exp %d.", len(splitted), len(format))
 			fmt.Println(input)
 		}

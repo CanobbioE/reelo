@@ -21,7 +21,7 @@ func getCities() {
 	for scanner.Scan() {
 		city := strings.Split(scanner.Text(), ",")
 
-		cities = append(cities, city[0])
+		cities = append(cities, strings.ToLower(city[0]))
 
 		if strings.ContainsAny(city[0], " ") {
 			doubleNameCities = append(doubleNameCities, city[0])
