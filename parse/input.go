@@ -73,7 +73,7 @@ func parseLine(format Format, input string) dataLine {
 
 		for _, c := range doubleNameCities {
 			if strings.Contains(input, c) {
-				cIndex, ok := format["città"]
+				cIndex := format["città"]
 				cWords := len(strings.Split(c, " "))
 
 				// checking if the multi word city is the only parameter with more than one word
@@ -85,19 +85,7 @@ func parseLine(format Format, input string) dataLine {
 					isOnlyDoubleCity = true
 
 					for fName, fIndex := range format {
-						// Handling index that come after the double words
-						index := fIndex
-						if fIndex > cIndex && ok {
-							index = fIndex + cWords - 1
-						}
-
-						value := splitted[index]
-						if fName == "città" {
-							for i := 1; i < cWords; i++ {
-								value = value + " " + splitted[index+i]
-							}
-						}
-						result = assignField(value, fName, result)
+						result = extractValue(fName, "città", fIndex, cIndex, cWords, splitted, result)
 					}
 				}
 			}
@@ -105,7 +93,7 @@ func parseLine(format Format, input string) dataLine {
 
 		for _, n := range doubleWordNames {
 			if strings.Contains(strings.ToLower(input), strings.ToLower(n)) {
-				nIndex, ok := format["nome"]
+				nIndex := format["nome"]
 				nWords := len(strings.Split(n, " "))
 
 				// checking if the multi word name is the only parameter with more than one word
@@ -117,19 +105,7 @@ func parseLine(format Format, input string) dataLine {
 					isOnlyDoubleName = true
 
 					for fName, fIndex := range format {
-						// Handling index that come after the double words
-						index := fIndex
-						if fIndex > nIndex && ok {
-							index = fIndex + nWords - 1
-						}
-
-						value := splitted[index]
-						if fName == "nome" {
-							for i := 1; i < nWords; i++ {
-								value = value + " " + splitted[index+i]
-							}
-						}
-						result = assignField(value, fName, result)
+						result = extractValue(fName, "nome", fIndex, nIndex, nWords, splitted, result)
 					}
 				}
 			}
@@ -141,6 +117,22 @@ func parseLine(format Format, input string) dataLine {
 		}
 	}
 	return result
+}
+
+func extractValue(fName, wanted string, fIndex, cIndex, cWords int, splitted []string, result dataLine) dataLine {
+	// Handling index that come after the double words
+	index := fIndex
+	if fIndex > cIndex {
+		index = fIndex + cWords - 1
+	}
+
+	value := splitted[index]
+	if fName == wanted {
+		for i := 1; i < cWords; i++ {
+			value = value + " " + splitted[index+i]
+		}
+	}
+	return assignField(value, fName, result)
 }
 
 func assignField(value, fName string, result dataLine) dataLine {
