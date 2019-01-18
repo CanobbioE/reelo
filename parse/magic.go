@@ -98,7 +98,7 @@ var Rews = []rewriter{
 			// Sometimes name and surname are glue together and joining below won't work
 			for _, c := range cities {
 				if strings.Contains(combined, c) {
-					log.Printf("Found city %s, in line %s. not going to join below.", c, combined)
+					log.Printf("Found city %s, in line %s. Not going to join below.", c, combined)
 					w.Write([]byte{'\n'})
 					w.Write([]byte(text))
 					continue scanning

@@ -56,105 +56,99 @@ func readRankingFile(year int, category string, format Format) {
 		log.Fatal(err)
 	}
 }
+
 func parseLine(format Format, input string) dataLine {
 	//input = strings.ToLower(input)
 	splitted := strings.Split(input, " ")
 	var result dataLine
 
-	// Handling base case.
-	// Otherwise it means there are fields with two or more words.
-	if len(splitted) == len(format) {
-		for fName, index := range format {
-			result = assignField(splitted[index], fName, result)
-		}
-	} else {
-		isOnlyDoubleCity := false
-		isOnlyDoubleName := false
+	var index int
+	var deltaName int
+	var deltaCity int
+	var deltaSurname int
 
-		for _, c := range doubleNameCities {
-			if strings.Contains(input, c) {
-				cIndex := format["città"]
-				cWords := len(strings.Split(c, " "))
+	if input == "" {
+		return result
+	}
 
-				// checking if the multi word city is the only parameter with more than one word
-				log.Printf("Line with multi word city found. City is %s.", c)
+	if len(splitted) < len(format) {
+		fmt.Println(input)
+		return result
+	}
 
-				if len(splitted) == len(format)+cWords-1 {
-					log.Printf("Should be only parameter w/ multiple words.")
-					log.Printf("Line is %v", splitted)
-					isOnlyDoubleCity = true
+	// going in numerical order
+	// TODO: consider if it's worth inverting format's key value order
+	for i := 0; i < len(format); i++ {
+		for fName, fIndex := range format {
+			if i == fIndex {
+				index = fIndex + deltaName + deltaCity + deltaSurname
 
-					for fName, fIndex := range format {
-						result = extractValue(fName, "città", fIndex, cIndex, cWords, splitted, result)
+				var err error
+				switch fName {
+				case "cognome":
+					for _, c := range commonSurnamePrefix {
+						if strings.ToLower(splitted[index]) == strings.ToLower(c) {
+							log.Printf("Line with multi word surname found. Prefix is %s.", c)
+							log.Printf("Line is %v", splitted)
+
+							// Assuming the surname has only 2 words.
+							deltaSurname = 1
+							value := extractValue(fName, index, deltaSurname, splitted, result)
+							result.Surname = strings.Title(strings.ToLower(value))
+						}
 					}
+
+				case "nome":
+					for _, c := range doubleWordNames {
+						if strings.Contains(strings.ToLower(input), " "+strings.ToLower(c)+" ") {
+							log.Printf("Line with multi word name found. Name is %s.", c)
+							log.Printf("Line is %v", splitted)
+
+							deltaName = len(strings.Split(c, " ")) - 1
+							value := extractValue(fName, index, deltaName, splitted, result)
+							result.Name = strings.Title(strings.ToLower(value))
+						}
+					}
+
+				case "esercizi":
+					result.Exercises, err = strconv.Atoi(splitted[index])
+
+				case "punti":
+					result.Points, err = strconv.Atoi(splitted[index])
+
+				case "tempo":
+					result.Time, err = strconv.Atoi(splitted[index])
+
+				case "città", "città(provincia)":
+					for _, c := range doubleNameCities {
+						if strings.Contains(input, c) {
+							log.Printf("Line with multi word city found. City is %s.", c)
+							log.Printf("Line is %v", splitted)
+
+							deltaCity = len(strings.Split(c, " ")) - 1
+							value := extractValue(fName, index, deltaCity, splitted, result)
+							result.City = strings.Title(strings.ToLower(value))
+						}
+					}
+
+				default:
+					log.Println("Unsupported format", fName)
+				}
+				if err != nil {
+					log.Printf("Could not convert data. The input is: %v", err)
+					fmt.Println(input)
 				}
 			}
-		}
-
-		for _, n := range doubleWordNames {
-			if strings.Contains(strings.ToLower(input), strings.ToLower(n)) {
-				nIndex := format["nome"]
-				nWords := len(strings.Split(n, " "))
-
-				// checking if the multi word name is the only parameter with more than one word
-				log.Printf("Line with multi word name found. Name is %s.", n)
-
-				if len(splitted) == len(format)+nWords-1 {
-					log.Printf("Should be only parameter w/ multiple words.")
-					log.Printf("Line is %v", splitted)
-					isOnlyDoubleName = true
-
-					for fName, fIndex := range format {
-						result = extractValue(fName, "nome", fIndex, nIndex, nWords, splitted, result)
-					}
-				}
-			}
-		}
-
-		if !isOnlyDoubleCity && !isOnlyDoubleName {
-			log.Printf("Found an exception. Len got: %d, exp %d.", len(splitted), len(format))
-			fmt.Println(input)
 		}
 	}
 	return result
 }
 
-func extractValue(fName, wanted string, fIndex, cIndex, cWords int, splitted []string, result dataLine) dataLine {
-	// Handling index that come after the double words
-	index := fIndex
-	if fIndex > cIndex {
-		index = fIndex + cWords - 1
-	}
-
+func extractValue(fName string, index, delta int, splitted []string, result dataLine) string {
 	value := splitted[index]
-	if fName == wanted {
-		for i := 1; i < cWords; i++ {
-			value = value + " " + splitted[index+i]
-		}
+	for i := 1; i < delta+1; i++ {
+		value = value + " " + splitted[index+i]
 	}
-	return assignField(value, fName, result)
-}
 
-func assignField(value, fName string, result dataLine) dataLine {
-	var err error
-	switch fName {
-	case "cognome":
-		result.Surname = strings.Title(strings.ToLower(value))
-	case "nome":
-		result.Name = strings.Title(strings.ToLower(value))
-	case "esercizi":
-		result.Exercises, err = strconv.Atoi(value)
-	case "punti":
-		result.Points, err = strconv.Atoi(value)
-	case "tempo":
-		result.Time, err = strconv.Atoi(value)
-	case "città", "città(provincia)":
-		result.City = strings.Title(strings.ToLower(value))
-	default:
-		log.Println("Unsupported format", fName)
-	}
-	if err != nil {
-		log.Printf("Could not convert data. The input is: '%s' %v", value, err)
-	}
-	return result
+	return value
 }

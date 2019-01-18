@@ -1,8 +1,21 @@
 package main
 
+var commonSurnamePrefix = []string{
+	"de",
+	"di",
+	"da",
+	"dello",
+	"del",
+	"della",
+	"la",
+	"dal",
+	"le",
+}
+
 var doubleWordNames = []string{
 	"pier maria",
 	"rosa maria",
+	"francesco saverio",
 	"sabrina sharon",
 	"alberto maria",
 	"alioshka michele",
@@ -96,6 +109,7 @@ var doubleWordNames = []string{
 	"mario manuel",
 	"mario o.",
 	"matteo pio",
+	"micheal norbert",
 	"michael norbert",
 	"michele luigi",
 	"michele r.",
