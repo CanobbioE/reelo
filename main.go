@@ -3,6 +3,7 @@
  * "Ranks" should fetch the reelo data from the db (if requested re-run the reelo algorithm)
  * "Upload" should recive a ranking file and a format as input and recalculate the reelo socre. (should call a /save/)
  * " " should redirect to Home
+ * TODO: A page to force calculating reelo
  */
 package main
 
