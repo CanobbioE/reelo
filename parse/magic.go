@@ -56,6 +56,16 @@ var Rews = []rewriter{
 		}
 		return s.Err()
 	},
+	// Remove "H.C."
+	func(w io.Writer, r io.Reader) error {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			r := strings.Replace(s.Text(), " H.C. ", " ", -1)
+			w.Write([]byte(r))
+			w.Write([]byte{'\n'})
+		}
+		return s.Err()
+	},
 	// Remove double spaces
 	func(w io.Writer, r io.Reader) error {
 		s := bufio.NewScanner(r)
