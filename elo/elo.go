@@ -11,6 +11,7 @@ var db = rdb.NewDB()
 const STARTING_YEAR = 2002
 
 // Reelo returns the points for a given user calculated with a custom algorithm.
+// TODO: Reelo should not make DB calls
 func Reelo(name, surname string) (reelo int) {
 	defer db.Close()
 	results := db.GetResults(context.Background(), name, surname)
