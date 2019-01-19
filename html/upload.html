@@ -1,0 +1,28 @@
+{{ define "content" }}
+<div class="bg-info container-fluid">
+	Utilizza questa pagina per inserire un file classifica con estensione ".txt" e nome in formato "anno_categoria". Le categorie possibili sono: C1, C2, L1, L2, GP. <br>
+	Utilizza l'apposita sezione per specificare la disposizione dei dati all'interno del file. (e.g. "nome cognome sede punteggio tempo")<br>
+</div>
+<br>
+<form action="upload" method="POST">
+	<div class="form-group">
+		<label for="fileInput">Documento classifica in ".txt":</label>
+		<input type="file" class="form-control-file" accept=".txt" id="fileInput">
+	</div>
+
+	<div class="form-group">
+		<label for="category">Categoria:</label><br>
+		<input type="textarea" placeholder="categoria (e.g. C1)" id="category">
+
+		<label for="year">Anno:</label><br>
+		<input type="textarea" placeholder="anno (e.g. 2018)" id="year">
+
+		<label for="format">Formato dei dati:</label><br>
+		<input type="textarea" placeholder="nome cognome esercizi tempo sede punteggio" id="format">
+	</div>
+
+	<div class="form-group row">
+		<button type="submit" class="btn btn-primary">Carica</button>
+	</div>
+</form>
+{{ end }}

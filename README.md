@@ -5,12 +5,9 @@ Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's
 - Front-end
 - Input verification
 - Input fixing
-- Fixing the "newline problem"
 - Put everything together
 - Implement the actual algorithm
 - TESTING!!!
-- Deploy on server
-- Open source?
 
 ## Credits
 - Ideation: Cesco Reale

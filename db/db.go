@@ -23,6 +23,11 @@ type DB struct {
 	db *sql.DB
 }
 
+// Close closes the database
+func (databse *DB) Close() {
+	databse.db.Close()
+}
+
 // NewDB returns the databse used for this program.
 // REMEMBER TO CLOSE IT!
 func NewDB() *DB {
@@ -39,12 +44,12 @@ func NewDB() *DB {
 	return &database
 }
 
-// ContainsPlayer verufies if a player is already in the database
+// ContainsPlayer verifies if a player is already in the database
 func (database *DB) ContainsPlayer(ctx context.Context, name, surname string) bool {
 	q := `
-	SELECT id
-	FROM giocatore
-	WHERE nome = ? AND cognome = ?
+SELECT id
+FROM giocatore
+WHERE nome = ? AND cognome = ?
 	`
 	rows, err := database.db.QueryContext(ctx, q, name, surname)
 	if err != nil {
@@ -139,12 +144,47 @@ func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
 func (database *DB) RetrievePlayerID(ctx context.Context, name, surname string) int {
 	var pID int
 	q := `
-		SELECT id FROM Giocatore
-		WHERE nome = ? AND cognome = ?
+SELECT id FROM Giocatore
+WHERE nome = ? AND cognome = ?
 		`
 	err := database.db.QueryRow(q, name, surname).Scan(&pID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return pID
+}
+
+// GetResults retrives all the results a player had in all the years he partecipated
+func (database *DB) GetResults(ctx context.Context, name, surname string) (results []Result) {
+	q := `
+	SELECT R.tempo, R.esercizi, R.punteggio, G.anno, G.categoria
+	FROM Giocatore U
+	JOIN Partecipazione P ON P.giocatore = U.id
+	JOIN Risultato R ON R.id = P.risultato
+	JOIN Giochi G ON G.id = P.giochi
+	WHERE U.Nome = ? AND U.Cognome = ?
+`
+	rows, err := database.db.QueryContext(ctx, q, name, surname)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		r := Result{}
+		err := rows.Scan(&r.Time, &r.Exercises, &r.Score, &r.Year, &r.Category)
+		if err != nil {
+			log.Fatal(err)
+		}
+		results = append(results, r)
+	}
+	return results
+}
+
+type Result struct {
+	Time      int
+	Exercises int
+	Score     int
+	Year      int
+	Category  string
 }
