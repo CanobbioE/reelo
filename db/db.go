@@ -181,6 +181,11 @@ func (database *DB) GetResults(ctx context.Context, name, surname string) (resul
 	return results
 }
 
+// TODO Since all the following functions recovers information that could be
+// obtained by manipulating the Result array returned by the GetResults function
+// we should refactor all of this as a datatype, be careul to not overdo it:
+// using SQL is really efficient compared to iterating over data structures
+// avg, min and max functions should be DB based.
 type Result struct {
 	Time      int
 	Exercises int
@@ -199,18 +204,22 @@ func (database *DB) GetExercises(name, surname string, year int) int {
 	return 0
 }
 
+// TODO: implement GetCategory
 func (database *DB) GetCategory(name, surname string, year int) string {
 	return "nope"
 }
 
+// TODO: implement GetAvgScoresOfCategories
 func (database *DB) GetAvgScoresOfCategories(year int) float64 {
 	return 0
 }
 
+// TODO: implement GetAvgScore
 func (database *DB) GetAvgScore(year int, category string) float64 {
 	return 0
 }
 
+// TODO: implement GetMaxScore
 func (database *DB) GetMaxScore(year int, category string) float64 {
 	return 0
 }
