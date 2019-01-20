@@ -188,3 +188,29 @@ type Result struct {
 	Year      int
 	Category  string
 }
+
+// TODO implement GetScore
+func (database *DB) GetScore(name, surname string, year int) int {
+	return 0
+}
+
+//TODO implement GetExercises
+func (database *DB) GetExercises(name, surname string, year int) int {
+	return 0
+}
+
+func (database *DB) GetCategory(name, surname string, year int) string {
+	return "nope"
+}
+
+func (database *DB) GetAvgScoresOfCategories(year int) float64 {
+	return 0
+}
+
+func (database *DB) GetAvgScore(year int, category string) float64 {
+	return 0
+}
+
+func (database *DB) GetMaxScore(year int, category string) float64 {
+	return 0
+}
