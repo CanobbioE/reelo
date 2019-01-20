@@ -5,16 +5,21 @@ type exercises struct {
 	end   int
 }
 
+//TODO: "Scores" should be something like "Exercises each category has to complete"
 type Scores map[string]exercises
 
+// StartOfCategory returns the number of the first exercise for the specified year and category
 func StartOfCategory(year int, category string) int {
 	return allScores[year][category].start
 }
 
+// EndOfCategory returns the number of the last exercise for the specified year and category
 func EndOfCategory(year int, category string) int {
 	return allScores[year][category].end
 }
 
+// I don't really like this but...
+// This grants clear access to data
 var allScores = map[int]Scores{
 	2002: scores2002,
 	2003: scores2003,
@@ -34,6 +39,8 @@ var allScores = map[int]Scores{
 	2017: scores2017,
 	2018: scores2018,
 }
+
+// TODO: double-check all the start/end values
 
 var scores2002 = Scores{
 	"C1": exercises{
