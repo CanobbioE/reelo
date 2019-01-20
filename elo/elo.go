@@ -75,7 +75,7 @@ func Reelo(name, surname string) (reelo float64) {
 		}
 
 		// Aging:
-		// Most recent scores should weight more than past year's ones
+		// Most recent scores should weight more than past years ones
 		agingFactor := 1 - 5/72*math.Log2(float64(lastKnownYear-year+1))
 		baseScore = baseScore * agingFactor
 
