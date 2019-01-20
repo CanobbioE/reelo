@@ -1,6 +1,9 @@
 package elo
 
 import (
+	"math"
+	"time"
+
 	rdb "github.com/CanobbioE/reelo/db"
 )
 
@@ -14,47 +17,47 @@ const ANTI_EXPLOIT = 0.9
 const NP_PENALTY = 0.9
 
 // Reelo returns the points for a given user calculated with a custom algorithm.
-func Reelo(name, surname string) (reelo int) {
-	// TODO: Reelo should not make DB calls
-	/* TODO: transalte this to code
-	// lastKnownCategory
-	// lastKnownYear
-	count = 0
+// TODO: Reelo should not make DB calls
+func Reelo(name, surname string) (reelo float64) {
+	var count, lastKnownYear int
+	var lastKnownCategory string
 
+	// TODO: fix the for loop's range
+	for _, year := range []int{2002, 2018} {
+		// Variables names are chosen accordingly to the formula provided by the scientific committee
+		category := db.GetCategory(name, surname, year)
 
-	for _, year := range allYears() {
-		cat = getCat(name, surname, year)
-		T = startOfCategory(cat, year)
-		N = endOfCategory(cat, year)
-		eMax = T-N +1
-		dMax = maxScoreForCategory(cat, year)
-		D = sum(Di)
-		E = numExSolved()
+		t := StartOfCategory(year, category)
+		n := EndOfCategory(year, category)
+		eMax := t - n + 1
+		dMax := MaxScoreForCategory(year, category)
+		d := db.GetScore(name, surname, year)
+		e := db.GetExercises(name, surname, year)
 
-		baseScore =  D + E * K_EXERCISES
+		baseScore := float64(d + e*K_EXERCISES)
 
-		if FINALE INTERNAZIONALE {
-			baseScore = baseScore * P_FINAL
+		// if FINALE INTERNAZIONALE {
+		//    baseScore = baseScore * P_FINAL
+		// }
+
+		for i := 1; i <= t-1; i++ {
+			errorFactor := float64(1-d) + float64(e*K_EXERCISES)/float64((K_EXERCISES*eMax+dMax))
+			difficultyFactor := float64(i) / float64(n+1)
+			nonResolutionProbability := 1 - errorFactor*difficultyFactor
+			baseScore += float64(K_EXERCISES+i) * nonResolutionProbability
 		}
 
-		for i = 1; i <= T-1; i++ {
-			// TODO ask if error factor can be calculated using baseScore (prob parigi)
-			errorFactor = 1 - D + E * K_EXERCISES / (K_EXERCISES * eMax + dMax)
-			difficultyFactor = i/(N+1)
-			nonResolutionProbability = 1 - errorFactor * difficultyFactor)
-			baseScore += (K_EXERCISES + i) * nonResolutionProbability
-		}
-
-		baseScore = baseScore / avgScoresOfCategories(year)
+		baseScore = baseScore / db.GetAvgScoresOfCategories(year)
 		baseScore = baseScore * MULTIPLICATIVE_FACTOR
 
-		if lastKnownCategory > cat { // passaggio di categoria
-			oldAvg = avgOfScores(year, cat)
-			newAvg = avgOfScores(year, lastKnownCat)
-			newMax = maxOfScores(year, lastKnownCat)
-			scoreOfYear = baseScore
+		// TODO: actually check for category promotion
+		if lastKnownCategory > category {
+			oldAvg := db.GetAvgScore(year, category)
+			newAvg := db.GetAvgScore(year, lastKnownCategory)
+			newMax := db.GetMaxScore(year, lastKnownCategory)
+			scoreOfYear := baseScore
 
-			convertedScore = scoreOfYear * newAvg / oldAvg
+			convertedScore := scoreOfYear * newAvg / oldAvg
 			if convertedScore > newMax {
 				convertedScore = newMax
 			}
@@ -62,22 +65,21 @@ func Reelo(name, surname string) (reelo int) {
 			baseScore = convertedScore
 		}
 
-		agingFactor = 1 - 5/72 * math.Log2(lastKnownYear-year+1)
+		agingFactor := 1 - 5/72*math.Log2(float64(lastKnownYear-year+1))
 		baseScore = baseScore * agingFactor
 
 		reelo = reelo + baseScore
 		count++
 	}
 
-	reelo = reelo / count
+	reelo = reelo / float64(count)
 
-	if count == 1 && lastKnwonYear == time.Now().Year() {
+	if count == 1 && lastKnownYear == time.Now().Year() {
 		reelo = reelo * ANTI_EXPLOIT
 	}
 
-	if NO RESULT INT THE LAST YEAR {
-		reelo = reelo * NP_PENALTY
-	}
-	*/
+	// if NO RESULT IN THE LAST YEAR {
+	//    reelo = reelo * NP_PENALTY
+	// }
 	return reelo
 }
