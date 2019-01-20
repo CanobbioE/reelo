@@ -18,6 +18,16 @@ func EndOfCategory(year int, category string) int {
 	return allScores[year][category].end
 }
 
+// MaxScoreForCategory returns the maximum score obtainable in a category
+func MaxScoreForCategory(year int, category string) (maxScore int) {
+	start := StartOfCategory(year, category)
+	end := EndOfCategory(year, category)
+	for i := start; i <= end; i++ {
+		maxScore += i
+	}
+	return maxScore
+}
+
 // I don't really like this but...
 // This grants clear access to data
 var allScores = map[int]Scores{
