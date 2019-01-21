@@ -1,4 +1,4 @@
-package main
+package parse
 
 import (
 	"bufio"
@@ -11,7 +11,7 @@ var cities []string
 var doubleNameCities []string
 
 func getCities() {
-	file, err := os.Open("locations")
+	file, err := os.Open("../parse/locations")
 	if err != nil {
 		log.Fatal("Couldn't open file.", err)
 	}

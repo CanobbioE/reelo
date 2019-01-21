@@ -1,4 +1,4 @@
-package main
+package parse
 
 import (
 	"log"
@@ -7,11 +7,10 @@ import (
 	"strconv"
 )
 
-// map[year][]dataLine
-type dataAll map[int][]dataLine
+type DataAll []User
 
 // TODO: really don't like this, but I'm tired. Will move it around later.
-var results = make(dataAll)
+var results DataAll
 
 func init() {
 	log.Println("Getting cities")
@@ -19,7 +18,7 @@ func init() {
 	log.Println("Got cities")
 }
 
-func main() {
+func GetUsers() DataAll {
 	/*
 			TODO: this doesn't work if a category is not present
 		 	or if there is another category in the folder.
@@ -49,6 +48,7 @@ func main() {
 		}
 	}
 
+	return results
 	//fmt.Print(results)
 }
 

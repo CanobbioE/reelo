@@ -1,4 +1,4 @@
-package main
+package parse
 
 import (
 	"bufio"
@@ -13,7 +13,7 @@ const RANK_PATH = "../ranks"
 
 var expectedSize int
 
-type dataLine struct {
+type User struct {
 	Name      string
 	Surname   string
 	City      string
@@ -21,6 +21,7 @@ type dataLine struct {
 	Points    int
 	Time      int
 	Category  string
+	Year      int
 }
 
 // parseRankingFile reads a ranking from the correct file using the specified
@@ -49,17 +50,18 @@ func readRankingFile(year int, category string, format Format) {
 	for scanner.Scan() {
 		singleLine := parseLine(format, scanner.Text())
 		singleLine.Category = category
+		singleLine.Year = year
 
-		results[year] = append(results[year], singleLine)
+		results = append(results, singleLine)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func parseLine(format Format, input string) dataLine {
+func parseLine(format Format, input string) User {
 	splitted := strings.Split(input, " ")
-	var result dataLine
+	var result User
 
 	var index int
 	var deltaName int
@@ -146,7 +148,7 @@ func parseLine(format Format, input string) dataLine {
 	return result
 }
 
-func extractValue(fName string, index, delta int, splitted []string, result dataLine) string {
+func extractValue(fName string, index, delta int, splitted []string, result User) string {
 	value := splitted[index]
 	for i := 1; i < delta+1; i++ {
 		value = value + " " + splitted[index+i]
