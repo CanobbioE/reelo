@@ -20,25 +20,8 @@ func init() {
 }
 
 func main() {
-	/*
-			TODO: this doesn't work if a category is not present
-		 	or if there is another category in the folder.
-			We could use readDir for this without enforcing the folder structure
-
-			files, err := ioutil.ReadDir(".")
-		    if err != nil {
-		        log.Fatal(err)
-		    }
-
-		    for _, file := range files {
-		        fmt.Println(file.Name())
-		    }
-
-			But for now I'm going to just iterate dumbly
-	*/
-
-	formats := readFormats()
-	years := findYears()
+	formats := readFormats() // []struct{int, string}
+	years := findYears()     // []int
 	categories := []string{"C1", "C2", "GP", "L1", "L2"}
 
 	for _, year := range years {
@@ -48,10 +31,11 @@ func main() {
 			readRankingFile(year, category, format)
 		}
 	}
-
-	//fmt.Print(results)
+	// TODO: use result to populate db
 }
 
+// findYears walk through the ranking folders and returns an array of integer
+// representing all the years that has to be processed.
 func findYears() []int {
 	var years []int
 	err := filepath.Walk(RANK_PATH, func(path string, info os.FileInfo, err error) error {

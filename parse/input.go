@@ -9,10 +9,13 @@ import (
 	"strings"
 )
 
+// RANK_PATH is the ranking folder's path
 const RANK_PATH = "../ranks"
 
 var expectedSize int
 
+// dataLine represents all the information that could be contained in a single
+// line of a ranking file.
 type dataLine struct {
 	Name      string
 	Surname   string
@@ -24,7 +27,7 @@ type dataLine struct {
 }
 
 // parseRankingFile reads a ranking from the correct file using the specified
-// format. The file's name must be in the format of "year_category.txt"
+// format. The file's name is expected to be like "year_category.txt"
 func readRankingFile(year int, category string, format Format) {
 	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", RANK_PATH, year, year, category)
 	file, err := os.Open(filePath)
@@ -42,7 +45,6 @@ func readRankingFile(year int, category string, format Format) {
 	if err != nil {
 		panic(err)
 	}
-	//io.Copy(os.Stdout, r)
 
 	// Parsing each line to save it into the right struct
 	scanner := bufio.NewScanner(r)
@@ -57,6 +59,8 @@ func readRankingFile(year int, category string, format Format) {
 	}
 }
 
+// parseLine parse the input string against the specified format and populates
+// a dataLine.
 func parseLine(format Format, input string) dataLine {
 	splitted := strings.Split(input, " ")
 	var result dataLine
@@ -76,6 +80,7 @@ func parseLine(format Format, input string) dataLine {
 		return result
 	}
 
+	// Iterating through the struct fields
 	// going in numerical order
 	// TODO: consider if it's worth inverting format's key value order
 	for i := 0; i < len(format); i++ {

@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// possibleFormats is just a quick hash-set
 var possibleFormats = map[string]struct{}{
 	"cognome":          struct{}{},
 	"nome":             struct{}{},
@@ -18,10 +19,13 @@ var possibleFormats = map[string]struct{}{
 	"città(provincia)": struct{}{},
 }
 
+// yrFrmt pairs a year with its format
 type yrFrmt struct {
 	Year int    `json:"year"`
 	Frmt string `json:"format"`
 }
+
+// allFormats represents an array of yrFrmts
 type allFormats struct {
 	Formats []yrFrmt `json:"formats"`
 }
@@ -30,7 +34,7 @@ type allFormats struct {
 // Each element of the map links to the index of the column's number.
 type Format map[string]int
 
-// newFormat returns a new format based on the slice of string passed
+// newFormat returns a new format based on the specified slice of strings
 func newFormat(input []string) Format {
 	format := make(map[string]int)
 
@@ -47,6 +51,8 @@ func newFormat(input []string) Format {
 	return format
 }
 
+// readFormats reads a json file containing the input's format
+// used by each year's ranking file and saves them in an array of yrFrmt
 func readFormats() allFormats {
 	file, err := os.Open(RANK_PATH + "/formats.json")
 	if err != nil {
@@ -66,6 +72,8 @@ func readFormats() allFormats {
 	return result
 }
 
+// retriveFormat retrives the format from an array of yrFrmt (input)
+// and returns an array containing all the format's fields for a given year
 func retrieveFormat(year int, input allFormats) []string {
 	for _, value := range input.Formats {
 		if value.Year == year {
