@@ -28,10 +28,6 @@ const styles = theme => ({
 });
 
 function ClippedDrawer(props) {
-	/**
-	 * 2019/03/04 created Gerardo
-	 */
-
 	const {classes} = props;
 
 	return (

@@ -1,13 +1,6 @@
-import {
-	Grid,
-	Typography,
-	Table,
-	TableRow,
-	TableBody,
-	TableCell,
-	TableHead,
-} from '@material-ui/core';
+import {Grid, Typography} from '@material-ui/core';
 import React from 'react';
+import {RanksTable} from '../components/RanksTable';
 
 export default function Ranks(props) {
 	const rows = [
@@ -18,28 +11,11 @@ export default function Ranks(props) {
 
 	const labels = ['Nome', 'Cognome', 'Reelo'];
 
-	const renderHeader = () =>
-		labels.map(label => <TableCell> {label} </TableCell>);
-
-	const renderRows = () =>
-		rows.map(row => (
-			<TableRow key={row.id}>
-				<TableCell>{row.name}</TableCell>
-				<TableCell>{row.surname}</TableCell>
-				<TableCell>{row.reelo}</TableCell>
-			</TableRow>
-		));
-
 	return (
 		<Grid container justify="center">
 			<Grid item xs={10}>
 				<Typography variant="h4">Classifiche</Typography>
-				<Table>
-					<TableHead>
-						<TableRow>{renderHeader()}</TableRow>
-					</TableHead>
-					<TableBody>{renderRows()}</TableBody>
-				</Table>
+				<RanksTable rows={rows} labels={labels} />
 			</Grid>
 		</Grid>
 	);
