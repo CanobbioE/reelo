@@ -9,7 +9,7 @@ import {
 
 export const RanksTable = props => {
 	const renderHeader = () =>
-		props.labels.map(label => <TableCell> {label} </TableCell>);
+		props.labels.map(label => <TableCell key={label}> {label} </TableCell>);
 
 	const renderRows = () =>
 		props.rows.map(row => (
