@@ -7,10 +7,12 @@ import (
 	"strconv"
 )
 
-type DataAll []User
+// DataAll represents a collection of data divided by year
+// map[year][]dataLine
+type DataAll map[int][]dataLine
 
 // TODO: really don't like this, but I'm tired. Will move it around later.
-var results DataAll
+var results = make(DataAll)
 
 func init() {
 	log.Println("Getting cities")
@@ -18,24 +20,8 @@ func init() {
 	log.Println("Got cities")
 }
 
-func GetUsers() DataAll {
-	/*
-			TODO: this doesn't work if a category is not present
-		 	or if there is another category in the folder.
-			We could use readDir for this without enforcing the folder structure
-
-			files, err := ioutil.ReadDir(".")
-		    if err != nil {
-		        log.Fatal(err)
-		    }
-
-		    for _, file := range files {
-		        fmt.Println(file.Name())
-		    }
-
-			But for now I'm going to just iterate dumbly
-	*/
-
+// All parses all files in the ranks folder
+func All() DataAll {
 	formats := readFormats()
 	years := findYears()
 	categories := []string{"C1", "C2", "GP", "L1", "L2"}
@@ -49,7 +35,6 @@ func GetUsers() DataAll {
 	}
 
 	return results
-	//fmt.Print(results)
 }
 
 func findYears() []int {

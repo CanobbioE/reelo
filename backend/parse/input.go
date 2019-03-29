@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -59,7 +60,8 @@ func readRankingFile(year int, category string, format Format) {
 	}
 }
 
-func parseLine(format Format, input string) User {
+func parseLine(format Format, input string) dataLine {
+	input = strings.ToLower(input)
 	splitted := strings.Split(input, " ")
 	var result User
 
@@ -67,7 +69,6 @@ func parseLine(format Format, input string) User {
 	var deltaName int
 	var deltaCity int
 	var deltaSurname int
-	var flagSurname bool
 
 	if input == "" {
 		return result
@@ -78,6 +79,7 @@ func parseLine(format Format, input string) User {
 		return result
 	}
 
+	log.Println(input)
 	// going in numerical order
 	// TODO: consider if it's worth inverting format's key value order
 	for i := 0; i < len(format); i++ {
@@ -89,28 +91,38 @@ func parseLine(format Format, input string) User {
 				switch fName {
 				case "cognome":
 					for _, c := range commonSurnamePrefix {
-						if strings.ToLower(splitted[index]) == strings.ToLower(c) {
+						if splitted[index] == c {
 							//log.Printf("Line with multi word surname found. Prefix is %s.", c)
 							//log.Printf("Line is %v", splitted)
 
 							// Assuming the surname has only 2 words.
 							deltaSurname = 1
 							value := extractValue(fName, index, deltaSurname, splitted, result)
-							result.Surname = strings.Title(strings.ToLower(value))
-							flagSurname = true
+							result.Surname = strings.Title(value)
 						}
 					}
 
 				case "nome":
 					for _, c := range doubleWordNames {
 						// because of 'DE MARIA LAURA' I inserted the flag, but this excludes whoever has double surname/name
-						if strings.Contains(strings.ToLower(input), " "+strings.ToLower(c)+" ") && !flagSurname {
-							//log.Printf("Line with multi word name found. Name is %s.", c)
+						exceptions := []string{
+							"de maria",
+							"de marco",
+						}
+						var excFlag bool
+						for _, exc := range exceptions {
+							if strings.Contains(input, exc) {
+								excFlag = true
+							}
+						}
+
+						if strings.Contains(input, " "+c+" ") && !excFlag {
+							log.Printf("Line with multi word name found. Name is %s.", c)
 							//log.Printf("Line is %v", splitted)
 
 							deltaName = len(strings.Split(c, " ")) - 1
 							value := extractValue(fName, index, deltaName, splitted, result)
-							result.Name = strings.Title(strings.ToLower(value))
+							result.Name = strings.Title(value)
 						}
 					}
 
@@ -125,13 +137,22 @@ func parseLine(format Format, input string) User {
 
 				case "città", "città(provincia)":
 					for _, c := range doubleNameCities {
-						if strings.Contains(input, c) {
+						if strings.Contains(input, strings.ToLower(c)) {
 							//log.Printf("Line with multi word city found. City is %s.", c)
 							//log.Printf("Line is %v", splitted)
 
-							deltaCity = len(strings.Split(c, " ")) - 1
+							if strings.Contains(input, "finalista parigi") {
+								r := regexp.MustCompile("finalista parigi [0-9]{4}")
+								if r.MatchString(input) {
+									deltaCity = 2
+								} else {
+									deltaCity = 1
+								}
+							} else {
+								deltaCity = len(strings.Split(c, " ")) - 1
+							}
 							value := extractValue(fName, index, deltaCity, splitted, result)
-							result.City = strings.Title(strings.ToLower(value))
+							result.City = strings.Title(value)
 						}
 					}
 
