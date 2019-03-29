@@ -1,4 +1,3 @@
-// Author: Edoardo Canobbio
 import {createMuiTheme} from '@material-ui/core/styles';
 
 import red from '@material-ui/core/colors/red';
@@ -9,10 +8,10 @@ const theme = createMuiTheme({
 	},
 	palette: {
 		primary: {
-			main: '#3A405A',
+			main: '#f5f5f5',
 		},
 		secondary: {
-			main: '#FAFAFA',
+			main: '#f5f5f5',
 		},
 
 		error: red,

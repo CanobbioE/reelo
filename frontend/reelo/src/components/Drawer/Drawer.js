@@ -5,21 +5,16 @@ import Drawer from '@material-ui/core/Drawer';
 import BarApp from '../MyAppBar';
 import DrawerList from './DrawerList';
 
-const drawerWidth = '13%';
+const drawerWidth = '15%';
 
 const styles = theme => ({
 	root: {
 		display: 'flex',
 		flexGrow: 1,
 	},
-	menuButton: {
-		marginLeft: -12,
-		marginRight: 20,
-	},
-	spazio: {
-		marginTop: 64,
-		marginLeft: 'auto',
-		marginRight: 'auto',
+	spacing: {
+		marginTop: '8%',
+		width: '100%',
 	},
 	drawer: {
 		width: drawerWidth,
@@ -28,10 +23,6 @@ const styles = theme => ({
 	drawerPaper: {
 		width: drawerWidth,
 		backgroundColor: theme.palette.secondary.main,
-	},
-	content: {
-		flexGrow: 1,
-		padding: theme.spacing.unit * 3,
 	},
 	toolbar: theme.mixins.toolbar,
 });
@@ -55,7 +46,7 @@ function ClippedDrawer(props) {
 				<div className={classes.toolbar} />
 				<DrawerList />
 			</Drawer>
-			<div className={classes.spazio}>{props.children}</div>
+			<div className={classes.spacing}>{props.children}</div>
 		</div>
 	);
 }
