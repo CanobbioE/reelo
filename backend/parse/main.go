@@ -8,8 +8,8 @@ import (
 )
 
 // DataAll represents a collection of data divided by year
-// map[year][]dataLine
-type DataAll map[int][]dataLine
+// map[year][]User
+type DataAll map[int][]User
 
 // TODO: really don't like this, but I'm tired. Will move it around later.
 var results = make(DataAll)
@@ -41,8 +41,10 @@ func findYears() []int {
 	var years []int
 	err := filepath.Walk(RANK_PATH, func(path string, info os.FileInfo, err error) error {
 		// TODO: improve this function.
-		if path != "../ranks" && path != "../ranks/formats" && len(path) < 14 {
-			year, err := strconv.Atoi(path[9:13])
+		if path != "./ranks" && path != "./ranks/formats" && len(path) < 14 {
+			log.Println(path)
+			year, err := strconv.Atoi(path[len("ranks/"):])
+
 			if err != nil {
 				log.Fatal("Error parsing years.", err)
 			}

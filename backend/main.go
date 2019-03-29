@@ -23,6 +23,7 @@ func main() {
 
 // Stuff does things
 func Stuff(w http.ResponseWriter, r *http.Request) {
+	// TODO: import to db
 	fmt.Println(parse.All())
 }
 

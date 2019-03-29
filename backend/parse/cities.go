@@ -14,7 +14,7 @@ var doubleNameCities []string
 // and saves it in two arrays based on the number of words it
 // is composed by
 func getCities() {
-	file, err := os.Open("../parse/locations")
+	file, err := os.Open("./parse/locations")
 	if err != nil {
 		log.Fatal("Couldn't open file.", err)
 	}

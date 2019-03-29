@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const RANK_PATH = "../ranks"
+const RANK_PATH = "./ranks"
 
 var expectedSize int
 
@@ -53,14 +53,14 @@ func readRankingFile(year int, category string, format Format) {
 		singleLine.Category = category
 		singleLine.Year = year
 
-		results = append(results, singleLine)
+		results[year] = append(results[year], singleLine)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func parseLine(format Format, input string) dataLine {
+func parseLine(format Format, input string) User {
 	input = strings.ToLower(input)
 	splitted := strings.Split(input, " ")
 	var result User
