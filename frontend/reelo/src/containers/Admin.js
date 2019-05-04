@@ -7,7 +7,7 @@ import {connect} from 'react-redux';
 function Admin(props) {
 	const login = event => {
 		event.preventDefault();
-		props.onSubmit();
+		props.signin('admin-canna', 'citrosodina');
 	};
 
 	return (

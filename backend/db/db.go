@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"crypto/sha256"
 	"database/sql"
 	"fmt"
 	"log"
@@ -34,13 +35,13 @@ func (databse *DB) Close() {
 func NewDB() *DB {
 	db, err := sql.Open(DB_DRIVER, dataSourceName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error opening the database: %s", err)
 	}
 	database := DB{
 		db: db,
 	}
 	if err := db.PingContext(context.Background()); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error connecting to the database: %s", err)
 	}
 	return &database
 }
@@ -223,4 +224,15 @@ func (database *DB) GetAvgScore(year int, category string) float64 {
 // TODO: implement GetMaxScore
 func (database *DB) GetMaxScore(year int, category string) float64 {
 	return 0
+}
+
+// TODO: implement GetCreds
+func GetCreds(username string) (string, error) {
+	if username == "admin-canna" {
+		hashPassword := sha256.New()
+		hashPassword.Write([]byte("citrosodina"))
+		toRet := hashPassword.Sum(nil)
+		return string(toRet), nil
+	}
+	return "", fmt.Errorf("user not found")
 }

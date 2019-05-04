@@ -6,8 +6,7 @@ import {
 	SIGNIN_FORM_RESET,
 	AUTH_USER,
 	AUTH_ERROR,
-	AUTH_LOADING,
-} from '../helpers/Types';
+} from '../utils/Types';
 import Globals from '../config/Globals';
 
 export const updateSigninEmail = email => {
@@ -24,10 +23,11 @@ export const updatePassword = password => {
 	};
 };
 
-export const signin = (email, password, callback) => async dispatch => {
+export const signin = (email, password) => async dispatch => {
+	console.log(email);
 	try {
 		const response = await axios.post(
-			`${Globals.baseURL}/${Globals.API.login}`,
+			`${Globals.baseURL}${Globals.API.login}`,
 			{
 				email,
 				password,
@@ -40,8 +40,8 @@ export const signin = (email, password, callback) => async dispatch => {
 		dispatch({
 			type: SIGNIN_FORM_RESET,
 		});
+		console.log('success');
 		localStorage.setItem('token', response.headers.authorization);
-		callback();
 	} catch (e) {
 		dispatch({
 			type: AUTH_ERROR,

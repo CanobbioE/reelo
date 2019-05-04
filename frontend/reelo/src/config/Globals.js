@@ -3,7 +3,7 @@ export default class Globals {
 
 	// All the APIs endpoints
 	static API = {
-		login: '/login',
+		login: '/admin',
 	};
 
 	// All the routes in this app
