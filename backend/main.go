@@ -1,13 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
+	rdb "github.com/CanobbioE/reelo/backend/db"
 	"github.com/CanobbioE/reelo/backend/parse"
-
 	"github.com/gorilla/mux"
 )
 
@@ -23,8 +23,19 @@ func main() {
 
 // Stuff does things
 func Stuff(w http.ResponseWriter, r *http.Request) {
+	db := rdb.NewDB()
+	dataAll := parse.All()
+	for year, lines := range dataAll {
+		for _, line := range lines {
+			playerID := db.Add(context.Background(), "giocatore", line.name, line.surname, 0)
+			resultID := db.Add(context.Background(), "risultato", line.tempo, line.esercizi, line.punteggio)
+			gameID := db.Add(context.Background(), "giochi", year, line.categoria)
+			db.Add(context.Background(), "partecipazione", playerID, gameID, resultID, line.sede)
+
+		}
+	}
+
 	// TODO: import to db
-	fmt.Println(parse.All())
 }
 
 // GetRanks returns a list of all the ranks in the database

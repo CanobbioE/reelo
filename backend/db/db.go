@@ -19,6 +19,7 @@ const (
 
 var dataSourceName = DB_USER + ":" + DB_PASS + "@" + DB_HOST + "/" + DB_NAME
 
+// DB is a wrapper for the sql.DB
 type DB struct {
 	db *sql.DB
 }
@@ -122,7 +123,7 @@ WHERE anno = %d AND categoria = %s
 // The first one inserts a row in the DB and the second one gets the ID of the
 // inserted row. The id is then returned.
 func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
-	// everything here is terrible btw
+	// TODO: everything here is terrible btw
 	result, err := database.db.ExecContext(ctx, q1)
 	if err != nil {
 		log.Fatal(err)
@@ -182,8 +183,8 @@ func (database *DB) GetResults(ctx context.Context, name, surname string) (resul
 }
 
 // TODO Since all the following functions recovers information that could be
-// obtained by manipulating the Result array returned by the GetResults function
-// we should refactor all of this as a datatype, be careul to not overdo it:
+// obtained by manipulating the Result array returned GetResults,
+// we should refactor all of this as a datatype. Be careul to not overdo it:
 // using SQL is really efficient compared to iterating over data structures
 // avg, min and max functions should be DB based.
 type Result struct {

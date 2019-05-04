@@ -11,6 +11,7 @@ import Globals from './config/Globals';
 import reducers from './reducers';
 import Home from './containers/Home';
 import Ranks from './containers/Ranks';
+import Admin from './containers/Admin';
 import Upload from './containers/Upload';
 
 import './index.css';
@@ -34,6 +35,7 @@ class Router extends Component {
 								<Route exact path={Globals.routes.home} component={Home} />
 								<Route exact path={Globals.routes.ranks} component={Ranks} />
 								<Route exact path={Globals.routes.upload} component={Upload} />
+								<Route exact path={Globals.routes.admin} component={Admin} />
 							</div>
 						</ClippedDrawer>
 					</BrowserRouter>
