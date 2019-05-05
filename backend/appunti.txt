@@ -1,0 +1,51 @@
+2002
+	Cognome, Nome, Città, esercizi, punti, tempo
+
+2003
+	Cognome, Nome, esercizi, punti, tempo
+
+2004
+	Cognome, Nome, esercizi, punti, Città
+
+2005
+	Cognome, Nome, città, esercizi, punti
+
+2006
+	#, cognome, nome, città, eserciazi, punti
+
+2007
+	#, cognome, nome, città, esercizi, punti
+
+2008
+	Cognome, Nome, città, esercizi, punti
+
+2009
+	Cognome, Nome, città, esercizi, punti
+
+2010
+	#, cognome, nome, città, esercizi, punti
+
+2011
+	#, cognome, nome, città, esercizi, punti
+
+2012
+	Cognome, Nome, città, esercizi, punti
+
+2013
+	Cognome, Nome, città, esercizi, punti
+
+2014
+	Cognome, Nome, città, esercizi, punti
+
+2015
+	#, cognome, nome, città, esercizi, punti
+
+2016
+	Cognome, Nome, città(provincia), esercizi, punti
+
+2017
+	Cognome, Nome, città, esercizi, punti
+
+2018
+	Cognome, Nome, città, esercizi, punti
+

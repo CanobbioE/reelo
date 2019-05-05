@@ -14,3 +14,11 @@
 # Ignoring ranks
 *.zip
 # ranks
+# node modules
+node_modules/
+node_modules/*
+
+# node modules
+node_modules/
+node_modules/*
+
