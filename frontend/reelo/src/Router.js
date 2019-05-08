@@ -13,6 +13,7 @@ import Home from './containers/Home';
 import Ranks from './containers/Ranks';
 import Admin from './containers/Admin';
 import Upload from './containers/Upload';
+import EditAlgorithm from './containers/EditAlgorithm';
 
 import './index.css';
 
@@ -36,6 +37,7 @@ class Router extends Component {
 								<Route exact path={Globals.routes.ranks} component={Ranks} />
 								<Route exact path={Globals.routes.upload} component={Upload} />
 								<Route exact path={Globals.routes.admin} component={Admin} />
+								<Route exact path={Globals.routes.varchange} component={EditAlgorithm} />
 							</div>
 						</ClippedDrawer>
 					</BrowserRouter>

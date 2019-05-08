@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+
+  reelo-db:
+    image postgres
+  container_name: reelo-db
+  ports:
+    - 5432:5432
+  volumes:
+    - ./backend/db/reelo.sql:/docker-entrypoint-initdb.d/reelo.sql:ro
+  environment:
+    POSTGRES_USER: reeloUser
+    POSTGRES_PASSWORD: password
+
+  reelo-be:
+    image: canobbioe/reelo-be
+    ports:
+      - 8080:8080
+    depends_on:
+      - reelo-db
+    enviroment:
+      - DB_DRIVER=mysql
+      - DB_USER=reeloUser
+      - DB_PASSWORD=password
+      - DB_NAME=reelo
+      - DB_HOST=reelo-db
+      - DB_PORT=5432
+
+  reelo-fe:
+    image: canobbioe/reelo-fe
+    container_name: reelo-fe
+    ports:
+      - 80:80
+    depends_on:
+      - reelo-be
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+

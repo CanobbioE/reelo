@@ -4,6 +4,7 @@ import {withStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import BarApp from '../MyAppBar';
 import DrawerList from './DrawerList';
+import {connect} from 'react-redux';
 
 const drawerWidth = '15%';
 
@@ -40,7 +41,7 @@ function ClippedDrawer(props) {
 					paper: classes.drawerPaper,
 				}}>
 				<div className={classes.toolbar} />
-				<DrawerList />
+				<DrawerList isAuthenticated={props.auth.authenticated} />
 			</Drawer>
 			<div className={classes.spacing}>{props.children}</div>
 		</div>
@@ -51,4 +52,11 @@ ClippedDrawer.propTypes = {
 	classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(ClippedDrawer);
+// Using redux in this component is ok because it is actually more a container
+function mapStateToProps({auth}) {
+	return {auth};
+}
+
+const composedComponent = connect(mapStateToProps);
+
+export default withStyles(styles)(composedComponent(ClippedDrawer));
