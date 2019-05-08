@@ -40,4 +40,9 @@ CREATE TABLE Partecipazione (
 	FOREIGN KEY (risultato) REFERENCES Risultato(id) ON DELETE SET NULL
 );
 
-
+DROP TABLE IF EXISTS Utenti;
+CREATE TABLE Utenti (
+	nomeutente varchar(255),
+	parolachiave varchar(255),
+	PRIMARY KEY (nomeutente)
+);

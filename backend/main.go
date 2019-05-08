@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -22,19 +23,21 @@ func main() {
 	router.HandleFunc("/ranks", GetRanks).Methods("GET")
 	router.HandleFunc("/admin", Login).Methods("POST", "OPTIONS")
 
-	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(router)))
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(
+		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
+		handlers.AllowedOrigins([]string{"*"}))(router)))
 }
 
 // Login writes jwt in the HTTP response
+// TODO refactoring
 func Login(w http.ResponseWriter, r *http.Request) {
-	log.Println("Received")
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
 		http.Error(w, "can't read body", http.StatusBadRequest)
 		return
 	}
-	log.Println("DEBUG 1")
 
 	type cred struct {
 		Username string `json:"email"`
@@ -59,9 +62,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("DEBUG 2")
-	log.Println(c)
-	expPassword, err := rdb.GetCreds(c.Username)
+	db := rdb.NewDB()
+
+	expPassword, err := db.GetPassword(context.Background(), c.Username)
 	if err != nil {
 		// TODO: can't compare this error
 		if err == fmt.Errorf("user not found") {
@@ -88,7 +91,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				ExpiresAt: expirationTime.Unix(),
 			},
 		}
-		log.Println("DEBUG 3")
 
 		// Declare the token with the algorithm used for signing, and the claims
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -100,7 +102,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println("DEBUG 4")
 		// Finally, we set the client cookie for "token" as the JWT we just generated
 		// we also set an expiry time which is the same as the token itself
 		http.SetCookie(w, &http.Cookie{
@@ -112,7 +113,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		log.Println("Logged in!")
 		return
 	}
-	log.Println("DEBUG 5")
 	http.Error(w, "can't login", http.StatusUnauthorized)
 	return
 }

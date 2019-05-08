@@ -1,21 +1,29 @@
 import {Grid} from '@material-ui/core';
 import React from 'react';
 import LoginForm from '../components/LoginForm';
-import {updateSigninEmail, updatePassword, signin, signout} from '../actions';
+import {updateEmail, updatePassword, signin} from '../actions';
 import {connect} from 'react-redux';
+import Globals from '../config/Globals';
 
-function Admin(props) {
+const Admin = props => {
 	const login = event => {
 		event.preventDefault();
-		props.signin('admin-canna', 'citrosodina');
+		props.signin(props.loginForm.email, props.loginForm.password);
+		props.history.push(Globals.routes.home);
 	};
 
 	return (
 		<Grid container justify="center">
-			<LoginForm onSubmit={login} />
+			<LoginForm
+				onPasswordChange={props.updatePassword}
+				onEmailChange={props.updateEmail}
+				onSubmit={login}
+				emailValue={props.loginForm.email}
+				passwordValue={props.loginForm.password}
+			/>
 		</Grid>
 	);
-}
+};
 
 function mapStateToProps({loginForm}) {
 	return {loginForm};
@@ -24,10 +32,9 @@ function mapStateToProps({loginForm}) {
 const composedComponent = connect(
 	mapStateToProps,
 	{
-		updateSigninEmail,
+		updateEmail,
 		updatePassword,
 		signin,
-		signout,
 	},
 );
 
