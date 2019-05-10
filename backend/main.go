@@ -21,3 +21,12 @@ func main() {
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
 		handlers.AllowedOrigins([]string{"*"}))(router)))
 }
+
+// TODO: implement middleware
+func requireAuth(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("Authorization")
+	if token == "" {
+		log.Println("missing token")
+		http.Error(w, "missing token", http.StatusUnauthorized)
+	}
+}
