@@ -4,11 +4,12 @@ import (
 	"math"
 	"time"
 
-	rdb "github.com/CanobbioE/reelo/db"
+	rdb "github.com/CanobbioE/reelo/backend/db"
 )
 
 var db = rdb.NewDB()
 
+// TODO: fetch this from db
 const STARTING_YEAR = 2002
 const K_EXERCISES = 20
 const P_FINAL = 1.5
