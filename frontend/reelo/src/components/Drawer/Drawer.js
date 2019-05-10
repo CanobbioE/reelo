@@ -30,7 +30,6 @@ const styles = theme => ({
 
 function ClippedDrawer(props) {
 	const {classes} = props;
-
 	return (
 		<div className={classes.root}>
 			<BarApp />

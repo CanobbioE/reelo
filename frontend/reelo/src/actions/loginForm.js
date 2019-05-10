@@ -34,13 +34,12 @@ export const signin = (email, password) => async dispatch => {
 		);
 		dispatch({
 			type: AUTH_USER,
-			payload: response.headers.authorization,
+			payload: response.data,
 		});
 		dispatch({
 			type: SIGNIN_FORM_RESET,
 		});
-		console.log('success');
-		localStorage.setItem('token', response.headers.authorization);
+		localStorage.setItem('token', response.data);
 	} catch (e) {
 		dispatch({
 			type: AUTH_ERROR,
