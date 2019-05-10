@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import Globals from '../config/Globals';
-import connect from 'react-redux';
+import {connect} from 'react-redux';
 
 export default ChildComponent => {
 	const ComposedComponent = props => {
@@ -9,8 +9,8 @@ export default ChildComponent => {
 		}, []);
 
 		const shouldNavigateAway = () => {
-			if (!this.props.auth) {
-				this.props.history.push(Globals.routes.home);
+			if (!props.auth) {
+				props.history.push(Globals.routes.home);
 			}
 		};
 
