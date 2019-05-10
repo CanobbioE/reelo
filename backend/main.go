@@ -14,7 +14,7 @@ func main() {
 
 	router.HandleFunc("/ranks", controllers.GetRanks).Methods("GET")
 	router.HandleFunc("/admin", controllers.Login).Methods("POST", "OPTIONS")
-	router.HandleFunc("/upload", controllers.CreateRankingFile).Methods("POST")
+	router.HandleFunc("/upload", controllers.Upload).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(
 		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
