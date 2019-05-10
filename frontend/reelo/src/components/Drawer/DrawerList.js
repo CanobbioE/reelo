@@ -9,20 +9,31 @@ function DrawerList(props) {
 	return (
 		<List>
 			<ListItem button component={Link} to={Globals.routes.home} key={'home'}>
-				<ListItemText primary={'Inizio'} />
+				<ListItemText primary={'Informazioni'} />
 			</ListItem>
 
 			<ListItem button component={Link} to={Globals.routes.ranks} key={'ranks'}>
 				<ListItemText primary={'Classifiche'} />
 			</ListItem>
+			{props.isAuthenticated && (
+				<ListItem
+					button
+					component={Link}
+					to={Globals.routes.upload}
+					key={'upload'}>
+					<ListItemText primary={'Caricamento'} />
+				</ListItem>
+			)}
 
-			<ListItem
-				button
-				component={Link}
-				to={Globals.routes.upload}
-				key={'upload'}>
-				<ListItemText primary={'Upload'} />
-			</ListItem>
+			{props.isAuthenticated && (
+				<ListItem
+					button
+					component={Link}
+					to={Globals.routes.varchange}
+					key={'varchange'}>
+					<ListItemText primary={'Modifica algoritmo'} />
+				</ListItem>
+			)}
 		</List>
 	);
 }

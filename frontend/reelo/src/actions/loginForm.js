@@ -9,7 +9,7 @@ import {
 } from '../utils/Types';
 import Globals from '../config/Globals';
 
-export const updateSigninEmail = email => {
+export const updateEmail = email => {
 	return {
 		type: EMAIL_SIGNIN_CHANGED,
 		payload: email,
@@ -24,7 +24,6 @@ export const updatePassword = password => {
 };
 
 export const signin = (email, password) => async dispatch => {
-	console.log(email);
 	try {
 		const response = await axios.post(
 			`${Globals.baseURL}${Globals.API.login}`,
@@ -35,13 +34,12 @@ export const signin = (email, password) => async dispatch => {
 		);
 		dispatch({
 			type: AUTH_USER,
-			payload: response.headers.authorization,
+			payload: response.data,
 		});
 		dispatch({
 			type: SIGNIN_FORM_RESET,
 		});
-		console.log('success');
-		localStorage.setItem('token', response.headers.authorization);
+		localStorage.setItem('token', response.data);
 	} catch (e) {
 		dispatch({
 			type: AUTH_ERROR,
@@ -59,5 +57,4 @@ export const signout = () => dispatch => {
 		type: AUTH_USER,
 		payload: '',
 	});
-	//callback();
 };

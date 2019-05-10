@@ -12,5 +12,6 @@ export default class Globals {
 		ranks: '/classifiche',
 		upload: '/carica',
 		admin: '/amministrazione',
+		varchange: '/modifica-algoritmo',
 	};
 }
