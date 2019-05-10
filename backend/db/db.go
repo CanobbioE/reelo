@@ -6,19 +6,16 @@ import (
 	"fmt"
 	"log"
 
-	// This blank import is a standard practice w/ sql drivers
-	_ "github.com/go-sql-driver/mysql"
+	mysql "github.com/go-sql-driver/mysql"
 )
 
 const (
 	dbDriver = "mysql"
-	dbUser   = "reeloUser"
-	dbPass   = "password"
+	user     = "reeloUser"
+	password = "password"
+	host     = "localhost:3306"
 	dbName   = "reelo"
-	dbHost   = "localhost"
 )
-
-var dataSourceName = dbUser + ":" + dbPass + "@" + dbHost + "/" + dbName
 
 // DB is a wrapper for the sql.DB
 type DB struct {
@@ -33,6 +30,14 @@ func (database *DB) Close() {
 // NewDB returns the databse used for this program.
 // REMEMBER TO CLOSE IT!
 func NewDB() *DB {
+	dbConfig := mysql.NewConfig()
+	dbConfig.User = user
+	dbConfig.Passwd = password
+	dbConfig.Addr = host
+	dbConfig.DBName = dbName
+	dbConfig.Net = "tcp"
+	dataSourceName := dbConfig.FormatDSN()
+
 	db, err := sql.Open(dbDriver, dataSourceName)
 	if err != nil {
 		log.Fatalf("Error opening the database: %s", err)
@@ -218,9 +223,9 @@ func (database *DB) GetMaxScore(year int, category string) float64 {
 // return string(hashPassword.Sum(nil))
 func (database DB) GetPassword(ctx context.Context, username string) (string, error) {
 	var hash string
-	q := `SELECT password FROM Utenti WHERE nomeutente = ?`
-
+	q := `SELECT parolachiave FROM Utenti WHERE nomeutente = ?`
 	err := database.db.QueryRow(q, username).Scan(&hash)
+	fmt.Println(hash)
 	if err != nil {
 		return hash, err
 	}
