@@ -17,17 +17,6 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
-  # reelo-db:
-  #   image: postgres
-  #   container_name: reelo-db
-  #   ports:
-  #     - 5432:5432
-  #   volumes:
-  #     - ./backend/db/reelo.sql:/docker-entrypoint-initdb.d/reelo.sql:ro
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-
   reelo-be:
     image: canobbioe/reelo-be
     ports:
@@ -40,7 +29,7 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=reelo
       - DB_HOST=reelo-db
-      - DB_PORT=5432
+    command: ./reelo
 
   reelo-fe:
     image: canobbioe/reelo-fe

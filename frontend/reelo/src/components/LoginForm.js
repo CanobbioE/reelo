@@ -14,6 +14,7 @@ export default function LoginForm(props) {
 		<form onSubmit={props.onSubmit}>
 			<Grid item xs={12}>
 				<TextField
+					required
 					type="email"
 					label="Posta elettronica"
 					value={props.emailValue}
@@ -22,6 +23,7 @@ export default function LoginForm(props) {
 			</Grid>
 			<Grid item xs={12}>
 				<TextField
+					required
 					type="password"
 					label="Parola chiave"
 					value={props.passwordValue}
