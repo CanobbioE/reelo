@@ -1,32 +1,38 @@
 package services
 
 import (
-	"bytes"
-	"fmt"
+	"io"
+	"log"
 	"strconv"
 	"strings"
 
 	"github.com/CanobbioE/reelo/backend/api"
+	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/utils/parse"
 )
 
 // ParseFileWithInfo reads the content of a buffer and verifies its correctness
 // and tries to parse each line into an entity to be saved in the database
 // appending the data defined in the upload info
-// TODO: implements it
-func ParseFileWithInfo(buf bytes.Buffer, info api.UploadInfo) error {
+// TODO: implement this
+func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
+	db := rdb.NewDB()
+	var results []parse.LineInfo
 	year, err := strconv.Atoi(info.Year)
 	if err != nil {
 		return err
 	}
 	category := strings.ToUpper(info.Category)
-	format := info.Format
+	format := parse.NewFormat(strings.Split(info.Format, " "))
 	isParis := info.IsParis
 
-	// TODO: remove this
-	fmt.Println(year, category, format, isParis)
+	// TODO: this is the warning we want to return to the front end
+	results, warning := parse.File(fileReader, format, year, category)
+	if warning != nil {
+		log.Printf("parse.File returned warning: %v\n", warning)
+		return warning
+	}
 
-	contents := buf.String()
-	fmt.Println(contents)
-	buf.Reset()
+	db.InserRankingFile(results, year, category, isParis)
 	return nil
 }

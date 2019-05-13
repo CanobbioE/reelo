@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/CanobbioE/reelo/backend/utils/parse"
 	mysql "github.com/go-sql-driver/mysql"
 )
 
@@ -230,4 +231,8 @@ func (database DB) GetPassword(ctx context.Context, username string) (string, er
 		return hash, err
 	}
 	return hash, nil
+}
+
+// InserRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
+func (database DB) InserRankingFile(file []parse.LineInfo, year int, category string, isParis bool) {
 }

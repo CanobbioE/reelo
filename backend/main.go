@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// TODO: on init check db integrity and recover data from files (data = formats, cities, parse.All)
 func main() {
 	router := mux.NewRouter()
 
