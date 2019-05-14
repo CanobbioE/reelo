@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"io"
 	"log"
 	"strconv"
@@ -17,6 +18,7 @@ import (
 // TODO: implement this
 func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
 	db := rdb.NewDB()
+	defer db.Close()
 	var results []parse.LineInfo
 	year, err := strconv.Atoi(info.Year)
 	if err != nil {
@@ -29,10 +31,10 @@ func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
 	// TODO: this is the warning we want to return to the front end
 	results, warning := parse.File(fileReader, format, year, category)
 	if warning != nil {
-		log.Printf("parse.File returned warning: %v\n", warning)
+		log.Printf("parse.File() returned warning: %v\n", warning)
 		return warning
 	}
 
-	db.InserRankingFile(results, year, category, isParis)
+	db.InserRankingFile(context.Background(), results, year, category, isParis)
 	return nil
 }

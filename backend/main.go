@@ -5,11 +5,20 @@ import (
 	"net/http"
 
 	"github.com/CanobbioE/reelo/backend/controllers"
+	"github.com/CanobbioE/reelo/backend/utils/parse"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
-// TODO: on init check db integrity and recover data from files (data = formats, cities, parse.All)
+func init() {
+	log.Println("Initializing app...")
+	// TODO: Check db integrity
+	// TODO: Call parse.All() if we have stuff in Ranks folder
+	// TODO: Fetch costants from db
+	parse.GetCities()
+	log.Println("Initialized")
+}
+
 func main() {
 	router := mux.NewRouter()
 

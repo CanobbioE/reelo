@@ -71,32 +71,32 @@ func (database *DB) ContainsPlayer(ctx context.Context, name, surname string) bo
 // The id of the newly added row is returned for further reference.
 // Possible tables are: 'giocatore', 'risultato', 'partecipazione', 'giochi'
 func (database *DB) Add(ctx context.Context, table string, params ...interface{}) int {
-	var q1, q2, s string
+	var q1, q2 string
 
 	switch table {
 	case "giocatore":
-		s = `INSERT INTO Giocatore (nome, cognome, reelo) VALUES (%s, %s, 0)`
-		q1 = fmt.Sprintf(s, params)
-		s = `SELECT id FROM Giocatore WHERE nome = %s AND cognome = %s`
-		q2 = fmt.Sprintf(s, params)
+		q1 = fmt.Sprintf("INSERT INTO Giocatore (nome, cognome, reelo)"+
+			" VALUES (\"%s\", \"%s\", 0)", params...)
+		q2 = fmt.Sprintf("SELECT id FROM Giocatore"+
+			" WHERE nome = %s AND cognome = %s", params...)
 
 	case "risultato":
-		s = `INSERT INTO Risultato (tempo, esercizi, punteggio) VALUES (%d, %d, %d)`
-		q1 = fmt.Sprintf(s, params)
+		q1 = fmt.Sprintf("INSERT INTO Risultato (tempo, esercizi, punteggio)"+
+			" VALUES (%d, %d, %d)", params...)
 
-		s = `SELECT MAX(id) FROM Risultato WHERE tempo = %d AND esercizi = %d AND punteggio = %d`
-		q2 = fmt.Sprintf(s, params)
+		q2 = fmt.Sprintf("SELECT MAX(id) FROM Risultato "+
+			"WHERE tempo = %d AND esercizi = %d AND punteggio = %d", params...)
 
 	case "partecipazione":
-		s = `INSERT INTO Partecipazione (giocatore, giochi, risultato, sede) VALUES (%d, %d, %d, %s)`
-		q1 = fmt.Sprintf(s, params)
+		q1 = fmt.Sprintf("INSERT INTO Partecipazione (giocatore, giochi, risultato, sede) "+
+			"VALUES (%d, %d, %d, \"%s\")", params...)
 
 	case "giochi":
-		s = `INSERT INTO Giochi (anno, categoria) VALUES (%d, %s)`
-		q1 = fmt.Sprintf(s, params)
+		q1 = fmt.Sprintf("INSERT INTO Giochi (anno, categoria)"+
+			" VALUES (%d, \"%s\")", params...)
 
-		s = `SELECT id FROM Giochi WHERE anno = %d AND categoria = %s`
-		q2 = fmt.Sprintf(s, params)
+		q2 = fmt.Sprintf("SELECT id FROM Giochi"+
+			" WHERE anno = %d AND categoria = %s", params...)
 	}
 	return int(database.performAndReturn(ctx, q1, q2))
 }
@@ -108,7 +108,7 @@ func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
 	// TODO: everything here is terrible btw
 	result, err := database.db.ExecContext(ctx, q1)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error performing query:\n%s\n%v\n", q1, err)
 	}
 	// Try to get the id with the built in function
 	id, err := result.LastInsertId()
@@ -117,7 +117,7 @@ func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
 			// Try to get the id with a query
 			err := database.db.QueryRowContext(ctx, q2).Scan(&id)
 			if err != nil {
-				log.Fatal(err)
+				log.Printf("Error retrieving ID with:\n%s\n%v\n", q2, err)
 			}
 		}
 	}
@@ -234,5 +234,15 @@ func (database DB) GetPassword(ctx context.Context, username string) (string, er
 }
 
 // InserRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
-func (database DB) InserRankingFile(file []parse.LineInfo, year int, category string, isParis bool) {
+func (database DB) InserRankingFile(ctx context.Context, file []parse.LineInfo, year int, category string, isParis bool) {
+	gamesID := database.Add(ctx, "giochi", year, category)
+	for _, line := range file {
+		city := line.City
+		if isParis {
+			city = "Paris"
+		}
+		playerID := database.Add(ctx, "giocatore", line.Name, line.Surname)
+		resultsID := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points)
+		database.Add(ctx, "partecipazione", playerID, gamesID, resultsID, city)
+	}
 }

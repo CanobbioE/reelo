@@ -50,7 +50,6 @@ func parseLine(format Format, input string) LineInfo {
 		return result
 	}
 
-	log.Println(input)
 	// going in numerical order
 	// TODO: consider if it's worth inverting format's key value order
 	for i := 0; i < len(format); i++ {
@@ -61,6 +60,7 @@ func parseLine(format Format, input string) LineInfo {
 				var err error
 				switch fName {
 				case "cognome":
+					result.Surname = strings.Title(splitted[index])
 					for _, c := range commonSurnamePrefix {
 						if splitted[index] == c {
 							//log.Printf("Line with multi word surname found. Prefix is %s.", c)
@@ -74,6 +74,7 @@ func parseLine(format Format, input string) LineInfo {
 					}
 
 				case "nome":
+					result.Name = strings.Title(splitted[index])
 					for _, c := range doubleWordNames {
 						// because of 'DE MARIA LAURA' I inserted the flag, but this excludes whoever has double surname/name
 						exceptions := []string{
@@ -107,6 +108,7 @@ func parseLine(format Format, input string) LineInfo {
 					result.Time, err = strconv.Atoi(splitted[index])
 
 				case "città", "città(provincia)":
+					result.City = strings.Title(splitted[index])
 					for _, c := range doubleNameCities {
 						if strings.Contains(input, strings.ToLower(c)) {
 							//log.Printf("Line with multi word city found. City is %s.", c)

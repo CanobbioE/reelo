@@ -307,4 +307,5 @@ var doubleWordNames = []string{
 	"wen jinc",
 	"wen qian",
 	"younis jarir",
+	"bon gloria",
 }

@@ -18,7 +18,6 @@ const ANTI_EXPLOIT = 0.9
 const NP_PENALTY = 0.9
 
 // Reelo returns the points for a given user calculated with a custom algorithm.
-// TODO: Reelo should not make DB calls
 // TODO: Handle Internationa Finals
 // TODO: from the DB recover: lastKnownYear, lastKnownCategory
 func Reelo(name, surname string) (reelo float64) {
@@ -28,7 +27,8 @@ func Reelo(name, surname string) (reelo float64) {
 
 	// TODO: fix the for loop's range
 	for _, year := range []int{2002, 2018} {
-		// Variables names are chosen accordingly to the formula provided by the scientific committee
+		// Variables names are chosen accordingly to the formula
+		// provided by the scientific committee
 		category := db.GetCategory(name, surname, year)
 
 		t := StartOfCategory(year, category)
@@ -46,7 +46,7 @@ func Reelo(name, surname string) (reelo float64) {
 
 		// Categories homogenization:
 		// For each exercises a player is not supposed to solve we calculate
-		// her/his the probabilty of solving it.
+		// her/his probabilty of solving it.
 		for i := 1; i <= t-1; i++ {
 			errorFactor := 1 - float64(d+e*K_EXERCISES)/float64((K_EXERCISES*eMax+dMax))
 			difficultyFactor := float64(i) / float64(n+1)

@@ -43,6 +43,6 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("TODO: %v", err), http.StatusInternalServerError)
 		return
 	}
-
+	log.Printf("\n\nFile parsed succesfully\n")
 	return
 }
