@@ -14,7 +14,6 @@ import (
 	rdb "github.com/CanobbioE/reelo/backend/db"
 )
 
-// TODO: fetch this from db
 var (
 	startingYear           = 2002
 	exercisesCostant       = 20.0
