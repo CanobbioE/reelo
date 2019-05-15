@@ -61,7 +61,7 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 
 func findYears() []int {
 	var years []int
-	err := filepath.Walk(rankPath, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(RankPath, func(path string, info os.FileInfo, err error) error {
 		// TODO: improve this function.
 		if path != "./ranks" && path != "./ranks/formats" && len(path) < 14 {
 			log.Println(path)

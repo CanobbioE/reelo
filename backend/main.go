@@ -1,5 +1,9 @@
 package main
 
+/* TODOs to ask to scientific committee
+ * Double check category order
+ * How to handle paris (do I exclude results from paris on every query?
+ */
 import (
 	"log"
 	"net/http"

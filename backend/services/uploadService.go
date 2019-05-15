@@ -2,8 +2,10 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 
@@ -37,4 +39,24 @@ func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
 
 	db.InserRankingFile(context.Background(), results, year, category, isParis)
 	return nil
+}
+
+// SaveRankingFile saves the specified reader in a file named "year_category.txt"
+func SaveRankingFile(src io.Reader, year, category string, isParis bool) error {
+	prefix := parse.RankPath
+	if isParis {
+		prefix = fmt.Sprintf("%s/paris", parse.RankPath)
+	}
+	dstPath := fmt.Sprintf("%s/%s_%s.txt", prefix, year, strings.ToUpper(category))
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }

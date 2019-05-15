@@ -54,7 +54,7 @@ func NewFormat(input []string) Format {
 // readFormats reads a json file containing the input's format
 // used by each year's ranking file and saves them in an array of yrFrmt
 func readFormats() allFormats {
-	file, err := os.Open(rankPath + "/formats.json")
+	file, err := os.Open(RankPath + "/formats.json")
 	if err != nil {
 		log.Fatal("Couldn't open formats file.", err)
 	}

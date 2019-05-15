@@ -1,5 +1,8 @@
 package parse
 
+// RankPath specifies where the ranking files are stored
+const RankPath = "./ranks"
+
 // This is used in magic.go
 var expectedSize int
 

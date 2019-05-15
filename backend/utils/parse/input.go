@@ -10,13 +10,11 @@ import (
 	"strings"
 )
 
-const rankPath = "./ranks"
-
 // readRankingFile reads a ranking from the correct file using the specified
 // format. The file's name must be in the format of "year_category.txt"
 func readRankingFile(year int, category string, format Format) ([]LineInfo, error) {
 	var result []LineInfo
-	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", rankPath, year, year, category)
+	filePath := fmt.Sprintf("%s/%d/%d_%s.txt", RankPath, year, year, category)
 	file, err := os.Open(filePath)
 	if err != nil {
 		return result, err

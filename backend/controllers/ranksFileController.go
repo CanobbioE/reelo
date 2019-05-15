@@ -44,5 +44,13 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Printf("\n\nFile parsed succesfully\n")
+
+	err = services.SaveRankingFile(file, uploadInfo.Year, uploadInfo.Category, uploadInfo.IsParis)
+	if err != nil {
+		log.Printf("Error saving the file: %v", err)
+		http.Error(w, "can't save file", http.StatusInternalServerError)
+	}
+	// TODO services.SaveRankingFormat()
+	services.CalculateAllReelo()
 	return
 }
