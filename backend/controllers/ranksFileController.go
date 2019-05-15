@@ -18,7 +18,7 @@ func GetRanks(w http.ResponseWriter, r *http.Request) {
 // Upload creates a new ranking file
 // TODO: authentication
 func Upload(w http.ResponseWriter, r *http.Request) {
-	// TODO: parse file, return errors so that user can correct them
+	// TODO: return errors so that user can correct them
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		log.Printf("Error receiving the file: %v", err)

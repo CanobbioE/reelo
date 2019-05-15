@@ -5,18 +5,31 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/CanobbioE/reelo/backend/utils/parse"
 	mysql "github.com/go-sql-driver/mysql"
 )
 
-const (
+var (
 	dbDriver = "mysql"
 	user     = "reeloUser"
 	password = "password"
 	host     = "localhost:3306"
 	dbName   = "reelo"
 )
+
+func init() {
+	if os.Getenv("ENV") == "prod" {
+		dbDriver = os.Getenv("DB_DRIVER")
+		user = os.Getenv("DB_USER")
+		password = os.Getenv("DB_PASSWORD")
+		host = os.Getenv("DB_HOST")
+		dbName = os.Getenv("DB_NAME")
+	}
+	log.Println("DB initialized")
+	log.Println(dbDriver, user, host, dbName)
+}
 
 // DB is a wrapper for the sql.DB
 type DB struct {
@@ -31,6 +44,9 @@ func (database *DB) Close() {
 // NewDB returns the databse used for this program.
 // REMEMBER TO CLOSE IT!
 func NewDB() *DB {
+
+	log.Println("NEW DB")
+	log.Println(dbDriver, user, host, dbName)
 	dbConfig := mysql.NewConfig()
 	dbConfig.User = user
 	dbConfig.Passwd = password
