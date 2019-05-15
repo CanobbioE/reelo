@@ -21,6 +21,8 @@ services:
     image: canobbioe/reelo-be
     ports:
       - 8080:8080
+    expose:
+      - 8080
     depends_on:
       - reelo-db
     environment:
@@ -29,15 +31,15 @@ services:
       - DB_PASSWORD=password
       - DB_NAME=reelo
       - DB_HOST=reelo-db
-    command: ./reelo
+      - ENV=prod
+    command:
+      ./reelo
 
   reelo-fe:
     image: canobbioe/reelo-fe
     container_name: reelo-fe
     ports:
       - 80:80
-    depends_on:
-      - reelo-be
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
 
