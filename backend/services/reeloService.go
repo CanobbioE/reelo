@@ -13,7 +13,7 @@ func CalculateAllReelo() {
 	elo.InitCostants()
 	ctx := context.Background()
 	db := rdb.NewDB()
-	players := db.GetAllPlayers(ctx)
+	players := db.AllPlayers(ctx)
 	for _, player := range players {
 		player.Reelo = int(elo.Reelo(ctx, player.Name, player.Surname))
 		db.UpdateReelo(ctx, player)

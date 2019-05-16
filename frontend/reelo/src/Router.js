@@ -9,7 +9,7 @@ import ClippedDrawer from './components/Drawer/Drawer';
 import {properties} from './config/Properties';
 import Globals from './config/Globals';
 import reducers from './reducers';
-import Home from './containers/Home';
+import About from './containers/About';
 import Ranks from './containers/Ranks';
 import Admin from './containers/Admin';
 import Upload from './containers/Upload';
@@ -33,8 +33,8 @@ class Router extends Component {
 					<BrowserRouter>
 						<ClippedDrawer>
 							<div>
-								<Route exact path={Globals.routes.home} component={Home} />
-								<Route exact path={Globals.routes.ranks} component={Ranks} />
+								<Route exact path={Globals.routes.home} component={Ranks} />
+								<Route exact path={Globals.routes.about} component={About} />
 								<Route exact path={Globals.routes.upload} component={Upload} />
 								<Route exact path={Globals.routes.admin} component={Admin} />
 								<Route exact path={Globals.routes.varchange} component={EditAlgorithm} />

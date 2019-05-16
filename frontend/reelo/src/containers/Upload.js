@@ -1,9 +1,15 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {compose} from 'redux';
-import {Grid, Typography} from '@material-ui/core';
+import {
+	Grid,
+	Typography,
+	DialogContentText,
+	DialogContent,
+} from '@material-ui/core';
 import {UploadForm} from '../components/UploadForm';
 import RequireAuth from './RequireAuth';
+import DialogAlert from '../components/DialogAlert';
 import {
 	updateUploadFile,
 	updateUploadYear,
@@ -11,9 +17,11 @@ import {
 	updateUploadFormat,
 	updateUploadIsParis,
 	uploadFile,
+	resetUploadForm,
 } from '../actions';
 
 function Upload(props) {
+	const [alertOpen, setAlertOpen] = useState(props.uploadForm.error !== '');
 	const info = (
 		<Grid item xs={10}>
 			<Typography variant="body2">
@@ -27,6 +35,32 @@ function Upload(props) {
 			<br />
 		</Grid>
 	);
+
+	const error = props.uploadForm.error.split('\n').map((item, i) => {
+		return (
+			<span key={i}>
+				{item}
+				<br />
+			</span>
+		);
+	});
+
+	const dialogContent = (
+		<DialogContent>
+			<DialogContentText id="alert-dialog-description">
+				Durante la lettura del file si sono verificati degli errori, ecco il
+				messaggio generato:
+			</DialogContentText>
+			<DialogContentText color="error" id="alert-dialog-description">
+				{error}
+			</DialogContentText>
+			<DialogContentText id="alert-dialog-description">
+				Se possibile cerca di sistemare il documento.
+			</DialogContentText>
+		</DialogContent>
+	);
+
+	if (props.uploadForm.error !== '' && !alertOpen) setAlertOpen(true);
 
 	return (
 		<Grid container justify="center">
@@ -44,6 +78,14 @@ function Upload(props) {
 					categoryValue={props.uploadForm.category}
 					onIsParisInput={props.updateUploadIsParis}
 					isParisValue={props.uploadForm.isParis}
+				/>
+				<DialogAlert
+					open={alertOpen}
+					onClose={() => {
+						props.resetUploadForm();
+						setAlertOpen(false);
+					}}
+					content={dialogContent}
 				/>
 			</Grid>
 		</Grid>
@@ -65,6 +107,7 @@ const composedComponent = compose(
 			uploadFile,
 			updateUploadFormat,
 			updateUploadIsParis,
+			resetUploadForm,
 		},
 	),
 );

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import BarApp from '../MyAppBar';
+import MyAppBar from '../MyAppBar';
 import DrawerList from './DrawerList';
 import {connect} from 'react-redux';
 
@@ -32,7 +32,7 @@ function ClippedDrawer(props) {
 	const {classes} = props;
 	return (
 		<div className={classes.root}>
-			<BarApp />
+			<MyAppBar />
 			<Drawer
 				className={classes.drawer}
 				variant="permanent"

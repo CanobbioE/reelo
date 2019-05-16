@@ -40,7 +40,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	err = services.ParseFileWithInfo(file, uploadInfo)
 	if err != nil {
 		log.Printf("Error while parsing file: %v", err)
-		http.Error(w, fmt.Sprintf("TODO: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
 	log.Printf("\n\nFile parsed succesfully\n")

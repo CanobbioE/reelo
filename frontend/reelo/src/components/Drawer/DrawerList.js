@@ -8,13 +8,10 @@ import Globals from '../../config/Globals';
 function DrawerList(props) {
 	return (
 		<List>
-			<ListItem button component={Link} to={Globals.routes.home} key={'home'}>
-				<ListItemText primary={'Informazioni'} />
-			</ListItem>
-
-			<ListItem button component={Link} to={Globals.routes.ranks} key={'ranks'}>
+			<ListItem button component={Link} to={Globals.routes.home} key={'ranks'}>
 				<ListItemText primary={'Classifiche'} />
 			</ListItem>
+
 			{props.isAuthenticated && (
 				<ListItem
 					button
@@ -34,6 +31,10 @@ function DrawerList(props) {
 					<ListItemText primary={'Modifica algoritmo'} />
 				</ListItem>
 			)}
+
+			<ListItem button component={Link} to={Globals.routes.about} key={'home'}>
+				<ListItemText primary={'Informazioni'} />
+			</ListItem>
 		</List>
 	);
 }

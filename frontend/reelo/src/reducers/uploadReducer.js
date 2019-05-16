@@ -7,6 +7,7 @@ import {
 	RANK_UPLOAD_FAIL,
 	FORMAT_UPLOAD_CHANGED,
 	PARIS_UPLOAD_CHANGED,
+	RANK_UPLOAD_ERROR_RESET,
 } from '../utils/Types';
 
 const INITIAL_STATE = {
@@ -38,6 +39,8 @@ export default (state = INITIAL_STATE, action) => {
 			return {...state, error: '', format: action.payload};
 		case PARIS_UPLOAD_CHANGED:
 			return {...state, error: '', isParis: action.payload};
+		case RANK_UPLOAD_ERROR_RESET:
+			return {...state, error: ''};
 		default:
 			return state;
 	}

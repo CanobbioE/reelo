@@ -8,6 +8,9 @@ import {
 	Button,
 	Typography,
 	Checkbox,
+	List,
+	ListItem,
+	ListItemText,
 } from '@material-ui/core';
 
 const categories = ['c1', 'c2', 'ce', 'cm', 'l1', 'l2', 'gp', 'hc'];
@@ -47,6 +50,42 @@ export const UploadForm = props => {
 		)),
 	);
 
+	const listPrimary = [
+		'Nome',
+		'Cognome',
+		'Città',
+		'Punti',
+		'Tempo',
+		'Esercizi',
+	];
+	const listSecondary = [
+		'La colonna contenente il nome del concorrente (n)',
+		'La colonna contenente il cognome del concorrente (c)',
+		'La colonna in cui è specificata la sede in cui si sono tenuti i giochi (s)',
+		'La colonna contenente il punteggio totale ottenuto dal concorrente (p)',
+		'La colonna che specifica quanto tempo il concorrente ha impiegato a completare la prova',
+		'La colonna che specifica il numero di esercizi risolti',
+	];
+	const fieldsList = listPrimary.map((text, i) => (
+		<ListItem key={i}>
+			<ListItemText
+				primary={
+					<React.Fragment>
+						<Typography component="span" color="textPrimary" variant="body2">
+							<strong>{text}</strong>
+						</Typography>
+					</React.Fragment>
+				}
+				secondary={
+					<React.Fragment>
+						<Typography component="span" color="textPrimary" variant="body2">
+							{listSecondary[i]}
+						</Typography>
+					</React.Fragment>
+				}
+			/>
+		</ListItem>
+	));
 	return (
 		<form onSubmit={handleSubmit}>
 			<Grid item container spacing={24}>
@@ -62,8 +101,15 @@ export const UploadForm = props => {
 
 				<Grid item xs={12}>
 					<Typography variant="body2">
-						Inserisci il tipo di dati nelle colonne in modo ordinato e separato
-						da spazi: e.g. nome cognome città esercizi punteggio tempo
+						Inserisci il tipo di dati contenuto nelle colonne in modo ordinato e
+						separato da spazi, i possibili valori sono:
+					</Typography>
+					<List>{fieldsList}</List>
+					<Typography variant="body2">
+						I valori tra le parentesi sono abbreviazioni che possono essere
+						inserite invece dell'intera parola. Specifica solo le colonne che
+						compaiono, ad esempio se ci fosse solo il nome scrivi solo il valore
+						"nome" (senza virgolette)
 					</Typography>
 					<TextField
 						required
@@ -119,7 +165,7 @@ export const UploadForm = props => {
 				</Grid>
 
 				<Grid item xs={12}>
-					<Button type="submit" variant="outlined">
+					<Button type="submit" variant="contained" color="primary">
 						Carica
 					</Button>
 				</Grid>
