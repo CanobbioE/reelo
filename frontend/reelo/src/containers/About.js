@@ -1,7 +1,7 @@
 import {Grid, Typography} from '@material-ui/core';
 import React from 'react';
 
-export default function Home(props) {
+export default function About(props) {
 	return (
 		<Grid container justify="center">
 			<Grid item xs={10}>

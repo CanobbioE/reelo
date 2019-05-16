@@ -8,12 +8,13 @@ export default class Globals {
 	static API = {
 		login: '/admin',
 		upload: '/upload',
+		ranks: '/ranks',
 	};
 
 	// All the routes in this app
 	static routes = {
 		home: '/',
-		ranks: '/classifiche',
+		about: '/informazioni',
 		upload: '/carica',
 		admin: '/amministrazione',
 		varchange: '/modifica-algoritmo',

@@ -1,6 +1,8 @@
 import React from 'react';
+import {Link} from 'react-router-dom';
 import {AppBar, withStyles, Toolbar, Typography} from '@material-ui/core';
 import {properties} from '../../config/Properties';
+import Globals from '../../config/Globals';
 
 const styles = theme => ({
 	appBar: {
@@ -9,19 +11,25 @@ const styles = theme => ({
 	},
 	grow: {
 		flexGrow: 1,
+		textDecoration: 'none',
 	},
 });
 
-function BarApp(props) {
+function MyAppBar(props) {
 	const {classes} = props;
 	return (
 		<AppBar position="fixed" className={classes.appBar}>
 			<Toolbar>
-				<Typography variant="h4" color="inherit" className={classes.grow}>
+				<Typography
+					component={Link}
+					to={Globals.routes.home}
+					variant="h4"
+					color="inherit"
+					className={classes.grow}>
 					{properties.appname}
 				</Typography>
 			</Toolbar>
 		</AppBar>
 	);
 }
-export default withStyles(styles)(BarApp);
+export default withStyles(styles)(MyAppBar);
