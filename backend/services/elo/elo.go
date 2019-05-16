@@ -44,14 +44,12 @@ func InitCostants() {
 }
 
 // Reelo returns the points for a given user calculated with a custom algorithm.
-func Reelo(name, surname string) (reelo float64) {
-	InitCostants()
+func Reelo(ctx context.Context, name, surname string) (reelo float64) {
 	db := rdb.NewDB()
 	defer db.Close()
 
 	lastKnownCategoryForPlayer := db.GetLastKnownCategoryForPlayer(name, surname)
 	lastKnownYear := db.GetLastKnownYear()
-	ctx := context.Background()
 	partecipationYears := db.GetPlayerPartecipationYears(ctx, name, surname)
 
 	//### Steps from 1 to 7

@@ -21,7 +21,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	status, jwt, err := services.Login(cred)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, fmt.Sprintf("%v", err), status)
+		return
 	}
 	w.Write([]byte(jwt))
 	log.Printf("User %s logged in!", cred.Username)
