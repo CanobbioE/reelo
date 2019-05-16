@@ -1,6 +1,8 @@
 version: "3"
 
 services:
+
+
   reelo-db:
     image: mysql:5.7
     container_name: reelo-db
@@ -17,23 +19,26 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
-  # reelo-be:
-  #   image: canobbioe/reelo-be
-  #   ports:
-  #     - 8080:8080
-  #   expose:
-  #     - 8080
-  #   depends_on:
-  #     - reelo-db
-  #   environment:
-  #     - DB_DRIVER=mysql
-  #     - DB_USER=reeloUser
-  #     - DB_PASSWORD=password
-  #     - DB_NAME=reelo
-  #     - DB_HOST=reelo-db
-  #     - ENV=prod
-  #   command:
-  #     ./reelo
+  reelo-be:
+   image: canobbioe/reelo-be
+   container_name: reelo-be
+   ports:
+     - 8080:8080
+   expose:
+     - 8080
+   depends_on:
+     - reelo-db
+   environment:
+     - DB_DRIVER=mysql
+     - DB_USER=reeloUser
+     - DB_PASSWORD=password
+     - DB_NAME=reelo
+     - DB_HOST=reelo-db
+     - ENV=prod
+     - LOG_FILE_PATH=app.log
+   command:
+     ./reelo
+
 
   reelo-fe:
     image: canobbioe/reelo-fe
