@@ -12,29 +12,31 @@ export default function LoginForm(props) {
 
 	return (
 		<form onSubmit={props.onSubmit}>
-			<Grid item xs={12}>
-				<TextField
-					required
-					type="email"
-					label="Posta elettronica"
-					value={props.emailValue}
-					onChange={updateEmail}
-				/>
-			</Grid>
-			<Grid item xs={12}>
-				<TextField
-					required
-					type="password"
-					label="Parola chiave"
-					value={props.passwordValue}
-					onChange={updatePassword}
-				/>
-			</Grid>
+			<Grid container direction="column" alignItems="center" spacing={24}>
+				<Grid item xs={12}>
+					<TextField
+						required
+						type="email"
+						label="Posta elettronica"
+						value={props.emailValue}
+						onChange={updateEmail}
+					/>
+				</Grid>
+				<Grid item xs={12}>
+					<TextField
+						required
+						type="password"
+						label="Parola chiave"
+						value={props.passwordValue}
+						onChange={updatePassword}
+					/>
+				</Grid>
 
-			<Grid item xs={12}>
-				<Button type="submit" variant="outlined">
-					Accedi
-				</Button>
+				<Grid item xs={12}>
+					<Button type="submit" variant="contained" color="primary">
+						Accedi
+					</Button>
+				</Grid>
 			</Grid>
 		</form>
 	);

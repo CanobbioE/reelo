@@ -12,3 +12,4 @@ export const RANK_UPLOAD_SUCCESS = 'rank_upload_success';
 export const RANK_UPLOAD_LOADING = 'rank_upload_loading';
 export const RANK_UPLOAD_FAIL = 'rank_upload_fail';
 export const PARIS_UPLOAD_CHANGED = 'paris_upload_changed';
+export const RANK_UPLOAD_ERROR_RESET = 'rank_upload_error_reset';
