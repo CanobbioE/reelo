@@ -10,7 +10,7 @@ import {
 	Checkbox,
 } from '@material-ui/core';
 
-const categories = ['c1', 'c2', 'l1', 'l2', 'gp', 'hc'];
+const categories = ['c1', 'c2', 'ce', 'cm', 'l1', 'l2', 'gp', 'hc'];
 
 export const UploadForm = props => {
 	const handleSubmit = event => {
