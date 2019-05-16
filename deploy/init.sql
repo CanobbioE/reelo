@@ -45,6 +45,28 @@ CREATE TABLE Utenti (
 	PRIMARY KEY (nomeutente)
 );
 
+CREATE TABLE Costanti (
+	id int AUTO_INCREMENT,
+	anno_inizio int,
+	k_esercizi float,
+	finale float,
+	fattore_moltiplicativo float,
+	exploit float,
+	no_partecipazione float,
+	PRIMARY KEY (id)
+);
+
+-- INIT VALUES
+
+INSERT INTO Costanti (
+	anno_inizio,
+	k_esercizi,
+	finale,
+	fattore_moltiplicativo,
+	exploit,
+	no_partecipazione
+) VALUES (2002, 20.0, 1.5, 10000.0, 0.9, 0.9);
+
 INSERT INTO Utenti (nomeutente, parolachiave)
 VALUES ('admin@canna.it', '0f07b601d88c88ec79eeac16bd05cbbd014b99ae45df1fcb0f80a221418e81c0');
 

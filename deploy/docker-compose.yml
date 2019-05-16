@@ -17,27 +17,29 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
-  reelo-be:
-    image: canobbioe/reelo-be
-    ports:
-      - 8080:8080
-    depends_on:
-      - reelo-db
-    environment:
-      - DB_DRIVER=mysql
-      - DB_USER=reeloUser
-      - DB_PASSWORD=password
-      - DB_NAME=reelo
-      - DB_HOST=reelo-db
-    command: ./reelo
+  # reelo-be:
+  #   image: canobbioe/reelo-be
+  #   ports:
+  #     - 8080:8080
+  #   expose:
+  #     - 8080
+  #   depends_on:
+  #     - reelo-db
+  #   environment:
+  #     - DB_DRIVER=mysql
+  #     - DB_USER=reeloUser
+  #     - DB_PASSWORD=password
+  #     - DB_NAME=reelo
+  #     - DB_HOST=reelo-db
+  #     - ENV=prod
+  #   command:
+  #     ./reelo
 
   reelo-fe:
     image: canobbioe/reelo-fe
     container_name: reelo-fe
     ports:
       - 80:80
-    depends_on:
-      - reelo-be
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
 

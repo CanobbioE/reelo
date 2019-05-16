@@ -1,13 +1,27 @@
 package main
 
+/* TODOs to ask to scientific committee
+ * Double check category order
+ * How to handle paris (do I exclude results from paris on every query?
+ */
 import (
 	"log"
 	"net/http"
 
 	"github.com/CanobbioE/reelo/backend/controllers"
+	"github.com/CanobbioE/reelo/backend/utils/parse"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
+
+func init() {
+	log.Println("Initializing app...")
+	// TODO: Check db integrity
+	// TODO: Call parse.All() if we have stuff in Ranks folder
+	// TODO: Fetch costants from db
+	parse.GetCities()
+	log.Println("Initialized")
+}
 
 func main() {
 	router := mux.NewRouter()

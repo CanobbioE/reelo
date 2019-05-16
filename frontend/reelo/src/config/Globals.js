@@ -1,5 +1,8 @@
 export default class Globals {
-	static baseURL = 'http://localhost:8080';
+	static port = '8080';
+	static baseURL = `${window.location.protocol}//${window.location.hostname}:${
+		Globals.port
+	}`;
 
 	// All the APIs endpoints
 	static API = {

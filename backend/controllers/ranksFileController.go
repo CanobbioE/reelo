@@ -1,9 +1,8 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
-	"io"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -19,8 +18,7 @@ func GetRanks(w http.ResponseWriter, r *http.Request) {
 // Upload creates a new ranking file
 // TODO: authentication
 func Upload(w http.ResponseWriter, r *http.Request) {
-	var buf bytes.Buffer
-	// TODO: parse file, return errors so that user can correct them
+	// TODO: return errors so that user can correct them
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		log.Printf("Error receiving the file: %v", err)
@@ -28,7 +26,6 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	io.Copy(&buf, file)
 
 	var uploadInfo api.UploadInfo
 	err = json.Unmarshal([]byte(r.FormValue("data")), &uploadInfo)
@@ -38,16 +35,23 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO here we should take the contents of the file,
-	// parse it and then save it to db.
-	// We also want to take the error returned by the parser
+	// We want to take the error returned by the parser
 	// and have it displayed in the FE
-	err = services.ParseFileWithInfo(buf, uploadInfo)
+	err = services.ParseFileWithInfo(file, uploadInfo)
 	if err != nil {
 		log.Printf("Error while parsing file: %v", err)
-		http.Error(w, "TODO error", http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("TODO: %v", err), http.StatusInternalServerError)
 		return
 	}
+	log.Printf("\n\nFile parsed succesfully\n")
 
+	err = services.SaveRankingFile(file, uploadInfo.Year, uploadInfo.Category, uploadInfo.IsParis)
+	if err != nil {
+		log.Printf("Error saving the file: %v", err)
+		http.Error(w, "can't save file", http.StatusInternalServerError)
+	}
+	// TODO services.SaveRankingFormat()
+	services.CalculateAllReelo()
+	log.Println("Recalculated REELO for all players")
 	return
 }

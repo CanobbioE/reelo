@@ -10,7 +10,7 @@ import {
 	Checkbox,
 } from '@material-ui/core';
 
-const categories = ['c1', 'c2', 'l1', 'l2', 'gp'];
+const categories = ['c1', 'c2', 'ce', 'cm', 'l1', 'l2', 'gp', 'hc'];
 
 export const UploadForm = props => {
 	const handleSubmit = event => {
@@ -63,7 +63,7 @@ export const UploadForm = props => {
 				<Grid item xs={12}>
 					<Typography variant="body2">
 						Inserisci il tipo di dati nelle colonne in modo ordinato e separato
-						da spazi: e.g. nome cognome sede punteggio tempo
+						da spazi: e.g. nome cognome città esercizi punteggio tempo
 					</Typography>
 					<TextField
 						required
