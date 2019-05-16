@@ -18,7 +18,7 @@ func Login(c api.Credentials) (int, string, error) {
 	var jwt string
 
 	db := rdb.NewDB()
-	expPassword, err := db.GetPassword(context.Background(), c.Username)
+	expPassword, err := db.Password(context.Background(), c.Username)
 	defer db.Close()
 
 	if err != nil {

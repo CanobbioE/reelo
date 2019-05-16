@@ -29,7 +29,7 @@ func InitCostants() {
 	db := rdb.NewDB()
 	defer db.Close()
 
-	c, err := db.GetReeloCostants()
+	c, err := db.ReeloCostants()
 	if err != nil {
 		log.Printf("Error initializing costants: %v", err)
 		log.Println("Falling back to the hardcoded configuration")
@@ -48,15 +48,21 @@ func Reelo(ctx context.Context, name, surname string) (reelo float64) {
 	db := rdb.NewDB()
 	defer db.Close()
 
-	lastKnownCategoryForPlayer := db.GetLastKnownCategoryForPlayer(name, surname)
-	lastKnownYear := db.GetLastKnownYear()
-	partecipationYears := db.GetPlayerPartecipationYears(ctx, name, surname)
+	lastKnownCategoryForPlayer := db.LastKnownCategoryForPlayer(name, surname)
+	lastKnownYear := db.LastKnownYear()
+	partecipationYears := db.PlayerPartecipationYears(ctx, name, surname)
 
 	//### Steps from 1 to 7
 	for _, year := range partecipationYears {
-		oneYearScore(ctx,
-			name, surname, lastKnownCategoryForPlayer,
-			year, lastKnownYear, &reelo)
+		// There could be more than one category for a year,
+		// this could happen for namesakes or when we have international results
+		categories := db.Categories(ctx, name, surname, year)
+		for _, c := range categories {
+			isParis := db.IsResultFromParis(ctx, name, surname, year, c)
+			oneYearScore(ctx,
+				name, surname, lastKnownCategoryForPlayer, c,
+				year, lastKnownYear, &reelo, isParis)
+		}
 	}
 
 	//### 8. Average:
@@ -80,21 +86,19 @@ func Reelo(ctx context.Context, name, surname string) (reelo float64) {
 }
 
 func oneYearScore(ctx context.Context,
-	name, surname, lastKnownCategoryForPlayer string,
-	year, lastKnownYear int, reelo *float64) {
+	name, surname, lastKnownCategoryForPlayer, category string,
+	year, lastKnownYear int, reelo *float64, isParis bool) {
 	db := rdb.NewDB()
 	defer db.Close()
 
 	// Variables names are chosen accordingly to the formula
 	// provided by the scientific committee
-	category := db.GetCategory(name, surname, year)
-
 	t := StartOfCategory(year, category)
 	n := EndOfCategory(year, category)
 	eMax := float64(t - n + 1)
 	dMax := float64(MaxScoreForCategory(year, category))
-	d := db.GetScore(name, surname, year)
-	e := float64(db.GetExercises(name, surname, year))
+	d := db.Score(name, surname, year, isParis)
+	e := float64(db.Exercises(name, surname, year, isParis))
 
 	//### 1. Base score:
 	// Is the sum of the difficulty D and the number of completed exercises
@@ -102,7 +106,7 @@ func oneYearScore(ctx context.Context,
 
 	//### 2. International results:
 	// If the result is from paris let's multiply for pFinal
-	if db.IsResultFromParis(name, surname, year, category) {
+	if isParis {
 		baseScore = baseScore * pFinal
 	}
 
@@ -110,8 +114,8 @@ func oneYearScore(ctx context.Context,
 	categoriesHomogenization(&baseScore, t, n, d, e, eMax, dMax)
 
 	//### 4. Score normailzation:
-	// Scores ar normalized to the average of averages of this year's categories
-	baseScore = baseScore / db.GetAvgScoresOfCategories(year)
+	// Scores are normalized to the average of averages of this year's categories
+	baseScore = baseScore / db.AvgScoresOfCategories(year)
 
 	//### 5. Multiplicative factor:
 	// just to have a big nice number let's multiply for a costant
@@ -150,9 +154,9 @@ func categoryPromotion(baseScore *float64,
 	db := rdb.NewDB()
 	defer db.Close()
 	if categoryFromString(lastKnownCategoryForPlayer) > categoryFromString(category) {
-		oldAvg := db.GetAvgScore(year, category)
-		newAvg := db.GetAvgScore(year, lastKnownCategoryForPlayer)
-		newMax := db.GetMaxScore(year, lastKnownCategoryForPlayer)
+		oldAvg := db.AvgScore(year, category)
+		newAvg := db.AvgScore(year, lastKnownCategoryForPlayer)
+		newMax := db.MaxScore(year, lastKnownCategoryForPlayer)
 		thisYearScore := *baseScore
 
 		convertedScore := thisYearScore * newAvg / oldAvg
