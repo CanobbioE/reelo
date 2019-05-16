@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 )
 
@@ -45,4 +46,12 @@ func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
 	return id
 }
 
-// TODO: make a function for all the queries
+func adaptToParis(query string, isParis bool) string {
+	if isParis {
+		return fmt.Sprintf("%s\nAND P.sede = \"paris\"\n", query)
+	}
+	return fmt.Sprintf("%s\nAND P.sede <> \"paris\"\n", query)
+}
+
+// TODO: make a function for all the single result queries
+// TODO: make a function for all the multiple results queries
