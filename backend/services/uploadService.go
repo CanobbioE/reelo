@@ -43,10 +43,15 @@ func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
 
 // SaveRankingFile saves the specified reader in a file named "year_category.txt"
 func SaveRankingFile(src io.Reader, year, category string, isParis bool) error {
-	prefix := parse.RankPath
+	prefix := fmt.Sprintf("%s/%s", parse.RankPath, year)
 	if isParis {
-		prefix = fmt.Sprintf("%s/paris", parse.RankPath)
+		prefix = fmt.Sprintf("%s/paris", prefix)
 	}
+	err := os.MkdirAll(prefix, 0777)
+	if err != nil && os.IsNotExist(err) {
+		return err
+	}
+
 	dstPath := fmt.Sprintf("%s/%s_%s.txt", prefix, year, strings.ToUpper(category))
 	dst, err := os.Create(dstPath)
 	if err != nil {

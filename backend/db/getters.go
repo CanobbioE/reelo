@@ -118,7 +118,7 @@ func (database *DB) Exercises(name, surname string, year int, isParis bool) (es 
 // this could happen for namesakes or when we have international results
 func (database *DB) Categories(ctx context.Context, name, surname string, year int) (categories []string) {
 	q := findCategoriesByPlayerAndYear
-	rows, err := database.db.QueryContext(ctx, q, name, surname)
+	rows, err := database.db.QueryContext(ctx, q, name, surname, year)
 	if err != nil {
 		log.Printf("Error getting categories: %v", err)
 		return categories

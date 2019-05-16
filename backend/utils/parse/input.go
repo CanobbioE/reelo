@@ -29,7 +29,7 @@ func readRankingFile(year int, category string, format Format) ([]LineInfo, erro
 	return result, nil
 }
 
-func parseLine(format Format, input string) LineInfo {
+func parseLine(format Format, input string) (LineInfo, []string) {
 	input = strings.ToLower(input)
 	splitted := strings.Split(input, " ")
 	var result LineInfo
@@ -38,14 +38,15 @@ func parseLine(format Format, input string) LineInfo {
 	var deltaName int
 	var deltaCity int
 	var deltaSurname int
+	var errs []string
 
 	if input == "" {
-		return result
+		return result, errs
 	}
 
 	if len(splitted) < len(format) {
 		fmt.Println(input)
-		return result
+		return result, errs
 	}
 
 	// going in numerical order
@@ -131,13 +132,14 @@ func parseLine(format Format, input string) LineInfo {
 					log.Println("Unsupported format", fName)
 				}
 				if err != nil {
-					log.Printf("Could not convert data. The input is: %v", err)
-					fmt.Println(input)
+					e := fmt.Sprintf("Could not convert data: %v\nThe input is: %v\n", err, input)
+					log.Printf(e)
+					errs = append(errs, e)
 				}
 			}
 		}
 	}
-	return result
+	return result, errs
 }
 
 func extractValue(fName string, index, delta int, splitted []string, result LineInfo) string {

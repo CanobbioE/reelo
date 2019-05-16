@@ -2,6 +2,7 @@ package parse
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -34,8 +35,9 @@ func All() DataAll {
 // File parses the specified file expecting it to be in the given format
 func File(fileReader io.Reader, format Format, year int, category string) ([]LineInfo, error) {
 	var results []LineInfo
+	warning := false
+	mergedErrs := fmt.Sprintf("Multiple parsing errors:")
 	expectedSize = len(format)
-	// TODO: validate the format
 
 	r, err := RunRewriters(Rews, fileReader)
 	if err != nil {
@@ -45,7 +47,12 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 	// Parsing each line to save it into the right struct
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		singleLine := parseLine(format, scanner.Text())
+		singleLine, errs := parseLine(format, scanner.Text())
+		if len(errs) > 0 {
+			// Stacking up errors so the user can fix them all in one go
+			mergedErrs = prettyPrintErrors(mergedErrs, errs)
+			warning = true
+		}
 		singleLine.Category = category
 		singleLine.Year = year
 
@@ -54,8 +61,10 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 	if err := scanner.Err(); err != nil {
 		return results, err
 	}
+	if warning {
+		return results, fmt.Errorf("%v", mergedErrs)
+	}
 
-	// TODO: save the format in the JSON
 	return results, nil
 }
 
@@ -79,4 +88,11 @@ func findYears() []int {
 	}
 
 	return years
+}
+
+func prettyPrintErrors(dst string, errs []string) string {
+	for _, e := range errs {
+		dst = fmt.Sprintf("%v\n%v", dst, e)
+	}
+	return dst
 }

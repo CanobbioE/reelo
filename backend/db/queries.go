@@ -42,7 +42,7 @@ WHERE U.nome = ? AND U.Cognome = ? AND G.anno = ?`
 SELECT G.categoria FROM Giochi G
 JOIN Partecipazione P ON P.giochi = G.id
 JOIN Giocatore U ON U.id = P.giocatore
-WHERE G.anno = ? AND U.nome = ? AND U.cognome = ?`
+WHERE U.nome = ? AND U.cognome = ? AND G.anno = ? `
 
 	findAvgScoresByYear = `
 SELECT AVG(R.punteggio) FROM Risultato R
