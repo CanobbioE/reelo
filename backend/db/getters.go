@@ -134,7 +134,7 @@ WHERE U.nome = ? AND U.Cognome = ? AND G.anno = ?
 // has partecipated in the specified year
 func (database *DB) GetCategory(name, surname string, year int) (category string) {
 	q := `
-SELECT G.categoria FROM Giochi
+SELECT G.categoria FROM Giochi G
 JOIN Partecipazione P ON P.giochi = G.id
 JOIN Giocatore U ON U.id = P.giocatore
 WHERE G.anno = ? AND U.nome = ? AND U.cognome = ?
@@ -155,7 +155,7 @@ func (database *DB) GetAvgScoresOfCategories(year int) (avg float64) {
 SELECT AVG(R.punteggio) FROM Risultato R
 JOIN Partecipazione P ON P.risultato = R.id
 JOIN Giochi G ON G.id = P.giochi
-WHERE year = ?
+WHERE G.anno = ?
 `
 	err := database.db.QueryRow(q, year).Scan(&avg)
 	if err != nil {
@@ -271,7 +271,7 @@ func (database *DB) IsResultFromParis(name, surname string, year int, category s
 SELECT P.sede FROM Partecipazione P
 JOIN Giocatore U ON U.id = P.giocatore
 JOIN Giochi G ON G.id = P.giochi
-WHERE U.nome = ? U.cognome = ?
+WHERE U.nome = ? AND U.cognome = ?
 AND G.anno = ? AND G.categoria = ?
 `
 	var city string
