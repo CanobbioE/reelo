@@ -1,8 +1,8 @@
 package main
 
 /* TODOs to ask to scientific committee
- * Double check category order
- * How to handle paris (do I exclude results from paris on every query?
+* Double check category order
+* How to handle paris (do I exclude results from paris on every query?
  */
 import (
 	"io"
@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"github.com/CanobbioE/reelo/backend/controllers"
+	"github.com/CanobbioE/reelo/backend/middlewares"
 	"github.com/CanobbioE/reelo/backend/utils/parse"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -42,19 +43,13 @@ func main() {
 
 	router.HandleFunc("/ranks", controllers.GetRanks).Methods("GET")
 	router.HandleFunc("/admin", controllers.Login).Methods("POST")
-	router.HandleFunc("/upload", controllers.Upload).Methods("POST")
+	router.HandleFunc("/upload", middlewares.Auth(
+		http.HandlerFunc(controllers.Upload))).Methods("POST")
+	router.HandleFunc("/force-reelo", middlewares.Auth(
+		http.HandlerFunc(controllers.ForceReelo))).Methods("PUT")
 
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(
 		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "PATCH", "OPTIONS"}),
 		handlers.AllowedOrigins([]string{"*"}))(router)))
-}
-
-// TODO: implement middleware
-func requireAuth(w http.ResponseWriter, r *http.Request) {
-	token := r.Header.Get("Authorization")
-	if token == "" {
-		log.Println("missing token")
-		http.Error(w, "missing token", http.StatusUnauthorized)
-	}
 }

@@ -26,6 +26,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(jwt))
+	// TODO: this does almost nothing on SPA :(
+	http.SetCookie(w, &http.Cookie{
+		Name:  "token",
+		Value: jwt,
+	})
+
 	log.Printf("User %s logged in!", cred.Username)
 	return
 }

@@ -79,5 +79,18 @@ SELECT P.sede FROM Partecipazione P
 JOIN Giocatore U ON U.id = P.giocatore
 JOIN Giochi G ON G.id = P.giochi
 WHERE U.nome = ? AND U.cognome = ?
-AND G.anno = ? AND G.categoria = ?  `
+AND G.anno = ? AND G.categoria = ?`
+
+	findAllPlayersRanks = `
+SELECT U.nome, U.cognome, G.categoria, U.reelo FROM Giocatore U
+JOIN Partecipazione P ON P.giocatore = U.id
+JOIN Giochi G ON G.id = P.giochi
+WHERE (G.anno, U.id) IN (
+	SELECT MAX(G.anno), U.id FROM Giochi G
+	JOIN Partecipazione P ON P.giochi = G.id
+	JOIN Giocatore U ON U.id = P.giocatore
+	GROUP BY U.id
+)`
 )
+
+// last played years:

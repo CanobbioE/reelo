@@ -36,6 +36,7 @@ services:
      - DB_HOST=reelo-db
      - ENV=prod
      - LOG_FILE_PATH=app.log
+     - JWT_KEY=my_secret_key
    command:
      ./reelo
 

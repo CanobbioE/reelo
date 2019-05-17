@@ -1,0 +1,22 @@
+.scrollbar {
+	overflow-y: scroll;
+	max-height: 70vh !important;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+	border-radius: 10px;
+	background-color: #f5f5f5;
+}
+
+.scrollbar::-webkit-scrollbar {
+	width: 8px;
+	background-color: #f5f5f5;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: #555;
+}
+.ranks-table-row {
+	background-color: #f5f5f5;
+}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/CanobbioE/reelo/backend/api"
 	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/utils"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -48,22 +49,14 @@ func toHexHash(s string) string {
 }
 
 func generateJWT(username string) (string, error) {
-	// Create the JWT key used to create the signature
-	var jwtKey = []byte("TODO")
-
-	// Create a struct that will be encoded to a JWT.
-	// We add jwt.StandardClaims as an embedded type, to provide fields like expiry time
-	type claims struct {
-		Username string `json:"username"`
-		jwt.StandardClaims
-	}
+	jwtKey := utils.JWTKey()
 
 	// Declare the expiration time of the token
 	// here, we have kept it as 60 minutes
 	expirationTime := time.Now().Add(60 * time.Minute)
 
 	// Create the JWT claims, which includes the username and expiry time
-	c := &claims{
+	c := &utils.Claims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
