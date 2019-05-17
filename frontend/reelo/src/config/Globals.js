@@ -9,6 +9,7 @@ export default class Globals {
 		login: '/admin',
 		upload: '/upload',
 		ranks: '/ranks',
+		force: '/force-reelo',
 	};
 
 	// All the routes in this app

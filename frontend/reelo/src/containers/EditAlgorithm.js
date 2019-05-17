@@ -3,7 +3,7 @@ import {Grid} from '@material-ui/core';
 export default function EditAlgorithm(props) {
 	return (
 		<Grid container justify="center">
-			<p> EditAlgorithm works! </p>
+			<p> Questa pagina non è ancora stata implementata </p>
 		</Grid>
 	);
 }
