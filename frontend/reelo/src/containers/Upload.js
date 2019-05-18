@@ -78,6 +78,7 @@ function Upload(props) {
 					categoryValue={props.uploadForm.category}
 					onIsParisInput={props.updateUploadIsParis}
 					isParisValue={props.uploadForm.isParis}
+					loading={props.uploadForm.loading}
 				/>
 				<DialogAlert
 					open={alertOpen}

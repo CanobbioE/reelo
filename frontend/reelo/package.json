@@ -10,6 +10,7 @@
 		"react-redux": "^6.0.1",
 		"react-router-dom": "^5.0.0",
 		"react-scripts": "2.1.8",
+		"react-throttle": "^0.3.0",
 		"redux": "^4.0.1",
 		"redux-thunk": "^2.3.0"
 	},
@@ -22,7 +23,12 @@
 	"eslintConfig": {
 		"extends": "react-app"
 	},
-	"browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"],
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not ie <= 11",
+		"not op_mini all"
+	],
 	"devDependencies": {
 		"eslint-plugin-react": "^7.13.0"
 	}

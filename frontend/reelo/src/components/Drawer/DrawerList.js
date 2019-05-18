@@ -18,7 +18,7 @@ function DrawerList(props) {
 					component={Link}
 					to={Globals.routes.upload}
 					key={'upload'}>
-					<ListItemText primary={'Caricamento'} />
+					<ListItemText primary={'Carica'} />
 				</ListItem>
 			)}
 
@@ -33,7 +33,7 @@ function DrawerList(props) {
 			)}
 
 			<ListItem button component={Link} to={Globals.routes.about} key={'home'}>
-				<ListItemText primary={'Informazioni'} />
+				<ListItemText primary={'Info'} />
 			</ListItem>
 		</List>
 	);

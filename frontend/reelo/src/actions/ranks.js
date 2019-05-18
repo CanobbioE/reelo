@@ -23,7 +23,7 @@ export const fetchRanks = () => async dispatch => {
 	} catch (e) {
 		dispatch({
 			type: RANKS_FETCH_ERROR,
-			payload: e.response.data,
+			payload: e && e.response && e.response.data,
 		});
 	}
 };
@@ -33,7 +33,7 @@ export const forceReelo = () => async dispatch => {
 		type: RANKS_FETCH_LOADING,
 	});
 	try {
-		await axios.put(`${Globals.baseURL}${Globals.API.force}`, {
+		await axios.put(`${Globals.baseURL}${Globals.API.force}`, null, {
 			headers: {
 				Authorization: localStorage.getItem('token'),
 			},

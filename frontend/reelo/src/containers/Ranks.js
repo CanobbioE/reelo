@@ -24,7 +24,10 @@ function Ranks(props) {
 	const error = (
 		<Grid item xs={12}>
 			<Typography align="center" variant="body2" color="error">
-				Oops, si &egrave; verificato un errore: {props.ranks.error}
+				Oops, si &egrave; verificato un errore:{' '}
+				{rows
+					? props.ranks.error
+					: 'Non sono presenti valori nella base di dati'}
 			</Typography>
 		</Grid>
 	);
@@ -34,7 +37,7 @@ function Ranks(props) {
 				<Grid item xs={12}>
 					<Typography variant="h4">Classifiche</Typography>
 				</Grid>
-				{props.ranks.error === '' ? content : error}
+				{props.ranks.error === '' && rows ? content : error}
 				<Grid item xs={12}>
 					{!props.auth.authenticated ? null : (
 						<Button
