@@ -1,7 +1,8 @@
 import {AUTH_USER, AUTH_ERROR} from '../utils/Types';
 
 const INITIAL_STATE = {
-	authenticated: localStorage.getItem('token') !== '',
+	authenticated:
+		localStorage.getItem('token') !== '' && localStorage.getItem('token'),
 	errorMessage: [],
 };
 

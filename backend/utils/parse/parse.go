@@ -11,7 +11,7 @@ import (
 )
 
 // All parses all files in the ranks folder
-func All() DataAll {
+func All() (DataAll, error) {
 	var results = make(DataAll)
 	formats := readFormats()
 	years := findYears()
@@ -19,17 +19,21 @@ func All() DataAll {
 
 	for _, year := range years {
 		inputFormat := retrieveFormat(year, formats)
-		format := NewFormat(inputFormat)
+		format, err := NewFormat(inputFormat)
+		if err != nil {
+			return nil, err
+		}
 		for _, category := range categories {
 			var err error
 			results[year], err = readRankingFile(year, category, format)
 			if err != nil {
-				log.Panic(err)
+				log.Printf("Error parsing all files: %v", err)
+				return nil, err
 			}
 		}
 	}
 
-	return results
+	return results, nil
 }
 
 // File parses the specified file expecting it to be in the given format

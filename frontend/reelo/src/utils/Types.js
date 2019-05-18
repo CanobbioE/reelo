@@ -17,3 +17,15 @@ export const RANK_UPLOAD_ERROR_RESET = 'rank_upload_error_reset';
 export const RANKS_FETCH_LOADING = 'ranks_fetch_loading';
 export const RANKS_FETCH_SUCCESS = 'ranks_fetch_success';
 export const RANKS_FETCH_ERROR = 'ranks_fetch_error';
+
+export const ALG_YEAR_CHANGED = 'alg_year_changed';
+export const ALG_EX_CHANGED = 'alg_ex_changed';
+export const ALG_FINAL_CHANGED = 'alg_final_changed';
+export const ALG_MULT_CHANGED = 'alg_mult_changed';
+export const ALG_EXP_CHANGED = 'alg_exp_changed';
+export const ALG_SUCCESS = 'alg_success';
+export const ALG_POST_LOADING = 'alg_post_loading';
+export const ALG_POST_FAIL = 'alg_post_fail';
+export const ALG_NP_CHANGED = 'alg_np_changed';
+export const ALG_FETCH_SUCCESS = 'alg_fetch_success';
+export const ALG_POST_SUCCESS = 'alg_post_success';

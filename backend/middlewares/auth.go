@@ -13,7 +13,7 @@ import (
 func Auth(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
-		if token == "" {
+		if token == "" || token == "null" {
 			log.Println("Missing token")
 			http.Error(w, "missing token", http.StatusUnauthorized)
 			return
@@ -25,7 +25,6 @@ func Auth(next http.Handler) http.HandlerFunc {
 				return utils.JWTKey(), nil
 			})
 		if !tkn.Valid {
-
 			log.Println("Invalid token")
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return

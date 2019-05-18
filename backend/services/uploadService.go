@@ -27,7 +27,10 @@ func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
 		return err
 	}
 	category := strings.ToUpper(info.Category)
-	format := parse.NewFormat(strings.Split(info.Format, " "))
+	format, err := parse.NewFormat(strings.Split(info.Format, " "))
+	if err != nil {
+		return err
+	}
 	isParis := info.IsParis
 
 	// TODO: this is the warning we want to return to the front end

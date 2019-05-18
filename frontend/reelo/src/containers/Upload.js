@@ -24,11 +24,11 @@ function Upload(props) {
 	const [alertOpen, setAlertOpen] = useState(props.uploadForm.error !== '');
 	const info = (
 		<Grid item xs={10}>
-			<Typography variant="body2">
+			<Typography variant="subtitle1">
 				Utilizza questa pagina per inserire un file classifica con estensione
 				".txt".
 			</Typography>
-			<Typography variant="body2">
+			<Typography variant="subtitle2">
 				Utilizza l'apposita sezione per specificare la disposizione dei dati
 				all'interno del file. (e.g. "nome cognome sede punteggio tempo").
 			</Typography>
@@ -65,7 +65,7 @@ function Upload(props) {
 	return (
 		<Grid container justify="center">
 			{info}
-			<Grid item xs={10}>
+			<Grid container item xs={10}>
 				<UploadForm
 					onSubmit={props.uploadFile}
 					onFileInput={props.updateUploadFile}
@@ -78,6 +78,7 @@ function Upload(props) {
 					categoryValue={props.uploadForm.category}
 					onIsParisInput={props.updateUploadIsParis}
 					isParisValue={props.uploadForm.isParis}
+					loading={props.uploadForm.loading}
 				/>
 				<DialogAlert
 					open={alertOpen}

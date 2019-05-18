@@ -1,6 +1,12 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import {AppBar, withStyles, Toolbar, Typography} from '@material-ui/core';
+import {
+	AppBar,
+	withStyles,
+	Toolbar,
+	Typography,
+	Button,
+} from '@material-ui/core';
 import {properties} from '../../config/Properties';
 import Globals from '../../config/Globals';
 
@@ -28,6 +34,14 @@ function MyAppBar(props) {
 					className={classes.grow}>
 					{properties.appname}
 				</Typography>
+				{props.showLogout && (
+					<Button
+						component={Link}
+						to={Globals.routes.home}
+						onClick={props.logout}>
+						Logout
+					</Button>
+				)}
 			</Toolbar>
 		</AppBar>
 	);

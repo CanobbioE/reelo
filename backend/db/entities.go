@@ -26,10 +26,10 @@ type Player struct {
 
 // Costants represents all the costants used to calculate the reelo score
 type Costants struct {
-	StartingYear           int
-	ExercisesCostant       float64
-	PFinal                 float64
-	MultiplicativeFactor   float64
-	AntiExploit            float64
-	NoPartecipationPenalty float64
+	StartingYear           int     `json:"year"`
+	ExercisesCostant       float64 `json:"ex"`
+	PFinal                 float64 `json:"final"`
+	MultiplicativeFactor   float64 `json:"mult"`
+	AntiExploit            float64 `json:"exp"`
+	NoPartecipationPenalty float64 `json:"np"`
 }

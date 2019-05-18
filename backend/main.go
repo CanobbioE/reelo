@@ -47,6 +47,8 @@ func main() {
 		http.HandlerFunc(controllers.Upload))).Methods("POST")
 	router.HandleFunc("/force-reelo", middlewares.Auth(
 		http.HandlerFunc(controllers.ForceReelo))).Methods("PUT")
+	router.HandleFunc("/algorithm", middlewares.Auth(
+		http.HandlerFunc(controllers.HandleAlgorithm))).Methods("PATCH", "GET")
 
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(
 		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),

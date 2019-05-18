@@ -1,4 +1,4 @@
-# reelo
+# Reelo
 
 Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's term that means "real number".
 
@@ -6,18 +6,19 @@ Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's
 
 ### Back end
 
-- middleware for authentication
-- prompt for error while parsing
-- define APIs entities
-- allow ELO algorithm to be edited
-- endpoint for ranks
+- Handle double surnames !!
+- API limiter (?)
+- Refactor db
+- Better error handling
+- Better auth handling
+- Pagination (?)
 
 ### Front end
 
-- Edit algorithm form
-- Display errors (especially while parsing files)
+- i18n (?)
+- Caching
 - Better cookies handling
-- Rankings page
+- A bit of refactoring wouldn't hurt
 
 ## Application flow
 
@@ -32,6 +33,6 @@ There's two types of user: Admin and Standard.
 ## Credits
 
 - Ideation: Cesco Reale
-- Implementation: Fabio Angelini
+- Implementation: Fabio Angelini, Anna Bernardi, Edoardo Canobbio
 - Scientific Committee: Fabio Angelini, Andrea Nari, Marco Pellegrini, Cesco Reale
 - Collaborators: David Barbato, Maurizio De Leo, Francesco Morandin, Alberto Saracco

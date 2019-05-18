@@ -30,6 +30,7 @@ export default (state = INITIAL_STATE, action) => {
 
 const ranksFetched = data => {
 	const rows = [];
+	if (!data || !data.length) return null;
 	data.forEach((rank, index) => {
 		rows.push({
 			id: index,
@@ -39,5 +40,7 @@ const ranksFetched = data => {
 			reelo: rank.reelo,
 		});
 	});
-	return rows;
+
+	const sorted = rows.sort((a, b) => b.reelo - a.reelo);
+	return sorted;
 };

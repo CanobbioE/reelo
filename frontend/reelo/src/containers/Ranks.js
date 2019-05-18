@@ -15,16 +15,23 @@ function Ranks(props) {
 	const labels = ['Nome', 'Cognome', 'Categoria', 'Reelo'];
 
 	const content = (
-		<Grid item xs={12}>
-			<LoadingIcon show={props.ranks.loading} />
-			{!props.ranks.loading && <RanksTable rows={rows} labels={labels} />}
+		<Grid container item xs={12} justify="space-around">
+			<Grid item xs={1}>
+				<LoadingIcon show={props.ranks.loading} />
+			</Grid>
+			<Grid item xs={12}>
+				{!props.ranks.loading && <RanksTable rows={rows} labels={labels} />}
+			</Grid>
 		</Grid>
 	);
 
 	const error = (
 		<Grid item xs={12}>
 			<Typography align="center" variant="body2" color="error">
-				Oops, si &egrave; verificato un errore: {props.ranks.error}
+				Oops, si &egrave; verificato un errore:{' '}
+				{rows
+					? props.ranks.error
+					: 'Non sono presenti valori nella base di dati'}
 			</Typography>
 		</Grid>
 	);
@@ -34,7 +41,7 @@ function Ranks(props) {
 				<Grid item xs={12}>
 					<Typography variant="h4">Classifiche</Typography>
 				</Grid>
-				{props.ranks.error === '' ? content : error}
+				{props.ranks.error === '' && rows ? content : error}
 				<Grid item xs={12}>
 					{!props.auth.authenticated ? null : (
 						<Button

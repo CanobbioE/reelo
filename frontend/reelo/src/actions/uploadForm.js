@@ -54,6 +54,7 @@ export const updateUploadFormat = format => {
 };
 
 const fieldConverter = field => {
+	field.trim();
 	switch (field) {
 		case 'n':
 			return 'nome';

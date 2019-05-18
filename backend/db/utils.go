@@ -8,7 +8,7 @@ import (
 
 // ContainsPlayer verifies if a player is already in the database
 func (database *DB) ContainsPlayer(ctx context.Context, name, surname string) bool {
-	q := `SELECT id FROM giocatore WHERE nome = ? AND cognome = ?`
+	q := `SELECT id FROM Giocatore WHERE nome = ? AND cognome = ?`
 	rows, err := database.db.QueryContext(ctx, q, name, surname)
 	if err != nil {
 		log.Fatal(err)

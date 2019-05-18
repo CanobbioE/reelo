@@ -12,6 +12,7 @@ import {
 	ListItem,
 	ListItemText,
 } from '@material-ui/core';
+import LoadingIcon from './LoadingIcon';
 
 const categories = ['c1', 'c2', 'ce', 'cm', 'l1', 'l2', 'gp', 'hc'];
 
@@ -164,10 +165,15 @@ export const UploadForm = props => {
 					</Grid>
 				</Grid>
 
-				<Grid item xs={12}>
-					<Button type="submit" variant="contained" color="primary">
-						Carica
-					</Button>
+				<Grid item container xs={12} justify="flex-start" alignItems="flex-end">
+					<Grid item xs={2}>
+						<Button type="submit" variant="contained" color="primary">
+							Carica
+						</Button>
+					</Grid>
+					<Grid item xs={1}>
+						<LoadingIcon show={props.loading} />
+					</Grid>
 				</Grid>
 			</Grid>
 		</form>
