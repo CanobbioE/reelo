@@ -15,9 +15,13 @@ function Ranks(props) {
 	const labels = ['Nome', 'Cognome', 'Categoria', 'Reelo'];
 
 	const content = (
-		<Grid item xs={12}>
-			<LoadingIcon show={props.ranks.loading} />
-			{!props.ranks.loading && <RanksTable rows={rows} labels={labels} />}
+		<Grid container item xs={12} justify="space-around">
+			<Grid item xs={1}>
+				<LoadingIcon show={props.ranks.loading} />
+			</Grid>
+			<Grid item xs={12}>
+				{!props.ranks.loading && <RanksTable rows={rows} labels={labels} />}
+			</Grid>
 		</Grid>
 	);
 

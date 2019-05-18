@@ -5,7 +5,6 @@ import Drawer from '@material-ui/core/Drawer';
 import MyAppBar from '../MyAppBar';
 import DrawerList from './DrawerList';
 import {connect} from 'react-redux';
-import Globals from '../../config/Globals';
 import {signout} from '../../actions';
 
 const drawerWidth = '15%';
@@ -34,13 +33,7 @@ function ClippedDrawer(props) {
 	const {classes} = props;
 	return (
 		<div className={classes.root}>
-			<MyAppBar
-				showLogout={props.auth.authenticated}
-				logout={() => {
-					props.signout();
-					props.history.push(Globals.routes.home);
-				}}
-			/>
+			<MyAppBar showLogout={props.auth.authenticated} logout={props.signout} />
 			<Drawer
 				className={classes.drawer}
 				variant="permanent"

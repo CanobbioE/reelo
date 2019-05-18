@@ -5,7 +5,7 @@ export default props => {
 	let ret = props.show ? (
 		<Grid item>
 			<br />
-			<CircularProgress />
+			<CircularProgress disableShrink />
 			<br />
 		</Grid>
 	) : (

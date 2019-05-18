@@ -34,7 +34,14 @@ function MyAppBar(props) {
 					className={classes.grow}>
 					{properties.appname}
 				</Typography>
-				{props.showLogout && <Button onClick={props.logout}>Logout</Button>}
+				{props.showLogout && (
+					<Button
+						component={Link}
+						to={Globals.routes.home}
+						onClick={props.logout}>
+						Logout
+					</Button>
+				)}
 			</Toolbar>
 		</AppBar>
 	);

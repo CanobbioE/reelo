@@ -10,6 +10,7 @@ export default class Globals {
 		upload: '/upload',
 		ranks: '/ranks',
 		force: '/force-reelo',
+		algorithm: '/algorithm',
 	};
 
 	// All the routes in this app
