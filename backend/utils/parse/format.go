@@ -2,6 +2,7 @@ package parse
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -35,20 +36,21 @@ type allFormats struct {
 type Format map[string]int
 
 // NewFormat returns a new format based on the specified slice of strings
-func NewFormat(input []string) Format {
+func NewFormat(input []string) (Format, error) {
 	format := make(map[string]int)
 
 	for index, value := range input {
 		value = strings.ToLower(value)
 		if _, ok := possibleFormats[value]; !ok {
-			log.Fatalf("format value %s not recognized.", value)
+			err := fmt.Errorf("format value %s not recognized", value)
+			return nil, err
 		}
 		if value == "città(provincia)" {
 			value = "città"
 		}
 		format[value] = index
 	}
-	return format
+	return format, nil
 }
 
 // readFormats reads a json file containing the input's format

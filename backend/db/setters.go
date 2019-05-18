@@ -50,7 +50,11 @@ func (database DB) InserRankingFile(ctx context.Context,
 		if isParis {
 			city = "paris"
 		}
-		playerID := database.Add(ctx, "giocatore", line.Name, line.Surname)
+		var playerID int
+		if !database.ContainsPlayer(ctx, line.Name, line.Surname) {
+			playerID = database.Add(ctx, "giocatore", line.Name, line.Surname)
+		}
+		playerID = database.PlayerID(ctx, line.Name, line.Surname)
 		resultsID := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points)
 		database.Add(ctx, "partecipazione", playerID, gamesID, resultsID, city)
 	}
@@ -58,7 +62,7 @@ func (database DB) InserRankingFile(ctx context.Context,
 
 // UpdateReelo sets a new reelo for the specified player
 func (database *DB) UpdateReelo(ctx context.Context, p Player) error {
-	q := `UPDATE Giocatori SET reelo = ? WHERE nome = ? AND cognome = ?`
+	q := `UPDATE Giocatore SET reelo = ? WHERE nome = ? AND cognome = ?`
 	_, err := database.db.ExecContext(ctx, q, p.Reelo, p.Name, p.Surname)
 	if err != nil {
 		return err

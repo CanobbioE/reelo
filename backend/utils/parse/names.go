@@ -309,3 +309,21 @@ var doubleWordNames = []string{
 	"younis jarir",
 	"bon gloria",
 }
+
+var doubleWordSurnames = []string{
+	"monzio compagoni",
+	"moon ji",
+	"veni veni",
+	"verdelli saccani",
+	"peiretti paradisi",
+	"monzio compagnoli",
+	"cian seren",
+	"podestà lucciardi",
+	"cotti piccinelli",
+	"gallenger gutierrez",
+	"spina ciro",
+	"trovato saluzzo",
+	"antinori petrini",
+	"spurio pompili",
+	"peraldo gianolino",
+}

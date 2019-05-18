@@ -71,6 +71,17 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 							result.Surname = strings.Title(value)
 						}
 					}
+					// TODO: not sure about this
+					for _, c := range doubleWordSurnames {
+						if strings.Contains(input, " "+c+" ") ||
+							strings.Contains(input, c+" ") {
+							log.Printf("Line with multi word surname found. Surname is %s.", c)
+
+							deltaSurname = len(strings.Split(c, " ")) - 1
+							value := extractValue(fName, index, deltaSurname, splitted, result)
+							result.Name = strings.Title(value)
+						}
+					}
 
 				case "nome":
 					result.Name = strings.Title(splitted[index])
@@ -87,7 +98,9 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 							}
 						}
 
-						if strings.Contains(input, " "+c+" ") && !excFlag {
+						if (strings.Contains(input, " "+c+" ") ||
+							strings.Contains(input, c+" ")) &&
+							!excFlag {
 							log.Printf("Line with multi word name found. Name is %s.", c)
 							//log.Printf("Line is %v", splitted)
 

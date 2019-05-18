@@ -24,7 +24,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	var uploadInfo api.UploadInfo
 	err = json.Unmarshal([]byte(r.FormValue("data")), &uploadInfo)
 	if err != nil {
-		log.Printf("Error while unmarshalling data: %v", err)
+		log.Printf("Error while unmarshalling upload data: %v", err)
 		http.Error(w, "can't unmarshal data", http.StatusBadRequest)
 		return
 	}

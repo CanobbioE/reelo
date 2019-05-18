@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"log"
 
 	rdb "github.com/CanobbioE/reelo/backend/db"
 	"github.com/CanobbioE/reelo/backend/services/elo"
@@ -16,6 +17,9 @@ func CalculateAllReelo() {
 	players := db.AllPlayers(ctx)
 	for _, player := range players {
 		player.Reelo = int(elo.Reelo(ctx, player.Name, player.Surname))
-		db.UpdateReelo(ctx, player)
+		err := db.UpdateReelo(ctx, player)
+		if err != nil {
+			log.Printf("Error updating reelo: %v", err)
+		}
 	}
 }
