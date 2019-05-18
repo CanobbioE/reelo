@@ -23,6 +23,8 @@ var (
 	noPartecipationPenalty = 0.9
 )
 
+const debug = true
+
 // InitCostants retrieves all the costants in the database, if anything goes wrong
 // it will fallback to the hardcoded values
 func InitCostants() {
@@ -81,7 +83,9 @@ func Reelo(ctx context.Context, name, surname string) (reelo float64) {
 	// If the player didn't partecipate in the most recent year, his REELO decays
 	if !contains(partecipationYears, lastKnownYear) {
 		reelo = reelo * noPartecipationPenalty
+
 	}
+
 	return reelo
 }
 

@@ -64,8 +64,25 @@ func (database DB) InserRankingFile(ctx context.Context,
 func (database *DB) UpdateReelo(ctx context.Context, p Player) error {
 	q := `UPDATE Giocatore SET reelo = ? WHERE nome = ? AND cognome = ?`
 	_, err := database.db.ExecContext(ctx, q, p.Reelo, p.Name, p.Surname)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
+}
+
+// UpdateCostants updates the costants used by the reelo algorithm
+func (database *DB) UpdateCostants(ctx context.Context, c Costants) error {
+	q := `
+UPDATE Costanti SET
+anno_inizio = ?,
+k_esercizi = ?,
+finale = ?,
+fattore_moltiplicativo = ?,
+exploit = ?,
+no_partecipazione = ?`
+	_, err := database.db.ExecContext(ctx, q,
+		c.StartingYear,
+		c.ExercisesCostant,
+		c.PFinal,
+		c.MultiplicativeFactor,
+		c.AntiExploit,
+		c.NoPartecipationPenalty)
+	return err
 }

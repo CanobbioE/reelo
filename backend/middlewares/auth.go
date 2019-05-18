@@ -14,7 +14,7 @@ func Auth(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
 		if token == "" || token == "null" {
-			log.Println("Missing tokend")
+			log.Println("Missing token")
 			http.Error(w, "missing token", http.StatusUnauthorized)
 			return
 		}
