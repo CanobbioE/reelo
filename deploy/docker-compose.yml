@@ -8,10 +8,10 @@ services:
     container_name: reelo-db
     restart: always
     environment:
-      MYSQL_DATABASE: reelo
-      MYSQL_USER: reeloUser
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PWD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PWD}
     ports:
       - 3306:3306
     expose:
@@ -30,13 +30,13 @@ services:
      - reelo-db
    environment:
      - DB_DRIVER=mysql
-     - DB_USER=reeloUser
-     - DB_PASSWORD=password
-     - DB_NAME=reelo
+     - DB_USER=${DB_USER}
+     - DB_PASSWORD=${DB_PWD}
+     - DB_NAME=${DB_NAME}
      - DB_HOST=reelo-db
      - ENV=prod
      - LOG_FILE_PATH=app.log
-     - JWT_KEY=my_secret_key
+     - JWT_KEY=${JWT_KEY}
    command:
      ./reelo
 
