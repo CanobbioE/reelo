@@ -73,7 +73,7 @@ const fieldConverter = field => {
 		case 'es':
 			return 'esercizi';
 		default:
-			return '';
+			return field;
 	}
 };
 
@@ -91,7 +91,7 @@ export const uploadFile = (
 		const jwt = localStorage.getItem('token');
 		const mappedFormat = format
 			.split(' ')
-			.map(field => fieldConverter(field))
+			.map(field => fieldConverter(field.toLowerCase()))
 			.reduce((f1, f2) => f1 + ' ' + f2);
 		const data = JSON.stringify({
 			category: category,
