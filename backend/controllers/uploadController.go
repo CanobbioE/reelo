@@ -47,5 +47,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	// TODO services.SaveRankingFormat()
 	services.CalculateAllReelo()
 	log.Println("Recalculated REELO for all players")
+
+	services.Backup()
 	return
 }

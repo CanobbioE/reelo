@@ -52,7 +52,7 @@ WHERE G.anno = ?`
 
 	findAvgScoresByYearAndCategory = `
 SELECT AVG(R.punteggio) FROM Risultato R
-JOIN Partecipazione P ON P.risultato = R.id,
+JOIN Partecipazione P ON P.risultato = R.id
 JOIN Giochi G ON G.id = P.giochi
 WHERE G.anno = ? AND G.categoria = ?`
 

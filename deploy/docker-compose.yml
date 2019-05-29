@@ -2,9 +2,6 @@ version: "3"
 
 services:
 
-
-
-
   reelo-db:
     image: mysql:5.7
     container_name: reelo-db
@@ -31,6 +28,8 @@ services:
    depends_on:
      - reelo-db
    environment:
+     - GD_TKN=token.json
+     - GD_CRED=credentials.json
      - DB_DRIVER=mysql
      - DB_USER=${DB_USER}
      - DB_PASSWORD=${DB_PWD}

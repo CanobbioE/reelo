@@ -11,6 +11,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 RUN mkdir ranks
+RUN mkdir bkp
 RUN mkdir -p utils/parse
 COPY ./utils/parse/locations ./utils/parse/locations
 COPY --from=builder /go/bin/reelo .

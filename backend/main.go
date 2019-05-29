@@ -12,18 +12,18 @@ import (
 
 	"github.com/CanobbioE/reelo/backend/controllers"
 	"github.com/CanobbioE/reelo/backend/middlewares"
+	"github.com/CanobbioE/reelo/backend/services"
 	"github.com/CanobbioE/reelo/backend/utils/parse"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/jasonlvhit/gocron"
 )
 
 func init() {
-	log.Println("Initializing app...")
 	// TODO: Check db integrity
 	// TODO: Call parse.All() if we have stuff in Ranks folder
-	// TODO: Fetch costants from db
 	parse.GetCities()
-	log.Println("Initialized")
+	log.Println("App initialized")
 }
 
 func main() {
@@ -38,6 +38,10 @@ func main() {
 		wrt := io.MultiWriter(os.Stdout, f)
 		log.SetOutput(wrt)
 	}
+
+	// Backup scheduling
+	gocron.Every(1).Days().At("03:00").Do(services.Backup)
+	gocron.Start()
 
 	router := mux.NewRouter()
 
