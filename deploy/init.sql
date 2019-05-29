@@ -68,5 +68,5 @@ INSERT INTO Costanti (
 ) VALUES (2002, 20.0, 1.5, 10000.0, 0.9, 0.9);
 
 INSERT INTO Utenti (nomeutente, parolachiave)
-VALUES ('admin@canna.it', '0f07b601d88c88ec79eeac16bd05cbbd014b99ae45df1fcb0f80a221418e81c0');
+VALUES ('admin@reelo.it', 'b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2');
 

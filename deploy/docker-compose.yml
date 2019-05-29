@@ -2,7 +2,6 @@ version: "3"
 
 services:
 
-
   reelo-db:
     image: mysql:5.7
     container_name: reelo-db
@@ -29,17 +28,19 @@ services:
    depends_on:
      - reelo-db
    environment:
+     - GD_TKN=token.json
+     - GD_CRED=credentials.json
      - DB_DRIVER=mysql
      - DB_USER=${DB_USER}
      - DB_PASSWORD=${DB_PWD}
      - DB_NAME=${DB_NAME}
      - DB_HOST=reelo-db
+     - DB_BKP_PATH=./bkp
      - ENV=prod
      - LOG_FILE_PATH=app.log
      - JWT_KEY=${JWT_KEY}
    command:
      ./reelo
-
 
   reelo-fe:
     image: canobbioe/reelo-fe
@@ -48,4 +49,13 @@ services:
       - 80:80
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8181:8080
+    links:
+      - reelo-db
 

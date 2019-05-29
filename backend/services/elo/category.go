@@ -4,17 +4,17 @@ type category int
 
 // Enum to compare categories
 const (
-	C1 category = iota
-	C2
-	CE
+	CE category = iota
 	CM
+	C1
+	C2
 	L1
-	L2
 	GP
+	L2
 	HC
 )
 
-var toString = []string{"C1", "C2", "CE", "CM", "L1", "L2", "GP", "HC"}
+var toString = []string{"CE", "CM", "C1", "C2", "L1", "GP", "L2", "HC"}
 
 func (c category) String() string {
 	return toString[c]

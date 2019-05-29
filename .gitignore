@@ -13,7 +13,8 @@
 
 # Ignoring ranks
 *.zip
-# ranks
+# backups
+bkp/*
 # node modules
 node_modules/
 node_modules/*
@@ -24,4 +25,5 @@ node_modules/*
 
 # Environment config
 .env
+credentials.json
 
