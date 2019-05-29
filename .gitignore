@@ -24,4 +24,5 @@ node_modules/*
 
 # Environment config
 .env
+credentials.json
 
