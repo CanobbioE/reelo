@@ -64,8 +64,8 @@ export const UploadForm = props => {
 		'La colonna contenente il cognome del concorrente (c)',
 		'La colonna in cui è specificata la sede in cui si sono tenuti i giochi (s)',
 		'La colonna contenente il punteggio totale ottenuto dal concorrente (p)',
-		'La colonna che specifica quanto tempo il concorrente ha impiegato a completare la prova',
-		'La colonna che specifica il numero di esercizi risolti',
+		'La colonna che specifica quanto tempo il concorrente ha impiegato a completare la prova (t)',
+		'La colonna che specifica il numero di esercizi risolti (e, es)',
 	];
 	const fieldsList = listPrimary.map((text, i) => (
 		<ListItem key={i}>
@@ -92,6 +92,7 @@ export const UploadForm = props => {
 			<Grid item container spacing={24}>
 				<Grid item xs={12}>
 					<Input
+						style={{height: 'auto'}}
 						label="Documento"
 						type="file"
 						onChange={handleFileSelection(props.onFileInput)}

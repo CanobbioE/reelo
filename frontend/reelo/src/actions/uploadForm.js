@@ -106,7 +106,7 @@ export const uploadFile = (
 		await axios.post(`${Globals.baseURL}${Globals.API.upload}`, formData, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
-				Authorization: localStorage.getItem('token'),
+				Authorization: `Bearer ${localStorage.getItem('token')}`,
 			},
 		});
 
