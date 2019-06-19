@@ -17,7 +17,7 @@ var doubleNameCities []string
 func GetCities() {
 	file, err := os.Open("./utils/parse/locations")
 	if err != nil {
-		log.Fatal("Couldn't open file.", err)
+		log.Fatal("Couldn't open cities file.", err)
 	}
 	defer file.Close()
 

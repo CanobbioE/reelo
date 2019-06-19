@@ -11,7 +11,8 @@ func (database *DB) ContainsPlayer(ctx context.Context, name, surname string) bo
 	q := `SELECT id FROM Giocatore WHERE nome = ? AND cognome = ?`
 	rows, err := database.db.QueryContext(ctx, q, name, surname)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error cchecking player's existence: %v\n", err)
+		return false
 	}
 	defer rows.Close()
 
