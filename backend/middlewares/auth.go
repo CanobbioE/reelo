@@ -3,6 +3,7 @@ package middlewares
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/CanobbioE/reelo/backend/utils"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -13,6 +14,7 @@ import (
 func Auth(next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
+		token = strings.ReplaceAll(token, "Bearer ", "")
 		if token == "" || token == "null" {
 			log.Println("Missing token")
 			http.Error(w, "missing token", http.StatusUnauthorized)
