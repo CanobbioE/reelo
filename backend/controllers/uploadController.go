@@ -6,13 +6,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CanobbioE/reelo/backend/api"
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/services"
 )
 
 // Upload creates a new ranking file
 func Upload(w http.ResponseWriter, r *http.Request) {
-	// TODO: return errors so that user can correct them
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		log.Printf("Error receiving the file: %v", err)
@@ -21,7 +20,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	var uploadInfo api.UploadInfo
+	var uploadInfo dto.UploadInfo
 	err = json.Unmarshal([]byte(r.FormValue("data")), &uploadInfo)
 	if err != nil {
 		log.Printf("Error while unmarshalling upload data: %v", err)
@@ -45,7 +44,11 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "can't save file", http.StatusInternalServerError)
 	}
 	// TODO services.SaveRankingFormat()
-	services.CalculateAllReelo()
+	err = services.CalculateAllReelo()
+	if err != nil {
+		log.Printf("Error recalculating reelo file: %v", err)
+		http.Error(w, "can't recalculate reelo", http.StatusInternalServerError)
+	}
 	log.Println("Recalculated REELO for all players")
 
 	services.Backup()

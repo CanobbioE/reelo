@@ -46,24 +46,43 @@ func InitCostants() {
 }
 
 // Reelo returns the points for a given user calculated with a custom algorithm.
-func Reelo(ctx context.Context, name, surname string) (reelo float64) {
+func Reelo(ctx context.Context, name, surname string) (float64, error) {
+	var reelo float64
 	db := rdb.NewDB()
 	defer db.Close()
 
-	lastKnownCategoryForPlayer := db.LastKnownCategoryForPlayer(name, surname)
-	lastKnownYear := db.LastKnownYear()
-	partecipationYears := db.PlayerPartecipationYears(ctx, name, surname)
+	lastKnownCategoryForPlayer, err := db.LastKnownCategoryForPlayer(name, surname)
+	if err != nil {
+		return reelo, err
+	}
+	lastKnownYear, err := db.LastKnownYear()
+	if err != nil {
+		return reelo, err
+	}
+	partecipationYears, err := db.PlayerPartecipationYears(ctx, name, surname)
+	if err != nil {
+		return reelo, err
+	}
 
 	//### Steps from 1 to 7
 	for _, year := range partecipationYears {
 		// There could be more than one category for a year,
 		// this could happen for namesakes or when we have international results
-		categories := db.Categories(ctx, name, surname, year)
+		categories, err := db.Categories(ctx, name, surname, year)
+		if err != nil {
+			return reelo, err
+		}
 		for _, c := range categories {
-			isParis := db.IsResultFromParis(ctx, name, surname, year, c)
-			oneYearScore(ctx,
+			isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
+			if err != nil {
+				return reelo, err
+			}
+			err = oneYearScore(ctx,
 				name, surname, lastKnownCategoryForPlayer, c,
 				year, lastKnownYear, &reelo, isParis)
+			if err != nil {
+				return reelo, err
+			}
 		}
 	}
 
@@ -86,12 +105,12 @@ func Reelo(ctx context.Context, name, surname string) (reelo float64) {
 
 	}
 
-	return reelo
+	return reelo, nil
 }
 
 func oneYearScore(ctx context.Context,
 	name, surname, lastKnownCategoryForPlayer, category string,
-	year, lastKnownYear int, reelo *float64, isParis bool) {
+	year, lastKnownYear int, reelo *float64, isParis bool) error {
 	db := rdb.NewDB()
 	defer db.Close()
 
@@ -101,8 +120,18 @@ func oneYearScore(ctx context.Context,
 	n := EndOfCategory(year, category)
 	eMax := float64(t - n + 1)
 	dMax := float64(MaxScoreForCategory(year, category))
-	d := db.Score(name, surname, year, isParis)
-	e := float64(db.Exercises(name, surname, year, isParis))
+	d, err := db.Score(name, surname, year, isParis)
+	if err != nil {
+		return err
+	}
+	exercises, err := db.Exercises(name, surname, year, isParis)
+	if err != nil {
+		return err
+	}
+	e := float64(exercises)
+	if err != nil {
+		return err
+	}
 
 	//### 1. Base score:
 	// Is the sum of the difficulty D and the number of completed exercises
@@ -119,7 +148,11 @@ func oneYearScore(ctx context.Context,
 
 	//### 4. Score normailzation:
 	// Scores are normalized to the average of averages of this year's categories
-	baseScore = baseScore / db.AvgScoresOfCategories(year)
+	avgCatScore, err := db.AvgScoresOfCategories(year)
+	if err != nil {
+		return err
+	}
+	baseScore = baseScore / avgCatScore
 
 	//### 5. Multiplicative factor:
 	// just to have a big nice number let's multiply for a costant
@@ -134,6 +167,7 @@ func oneYearScore(ctx context.Context,
 	baseScore = baseScore * agingFactor
 
 	*reelo = *reelo + baseScore
+	return nil
 }
 
 //### 3. Categories homogenization:
@@ -154,13 +188,22 @@ func categoriesHomogenization(baseScore *float64, t, n int, d, e, eMax, dMax flo
 // to the most recent category
 func categoryPromotion(baseScore *float64,
 	lastKnownCategoryForPlayer, category string,
-	year int) {
+	year int) error {
 	db := rdb.NewDB()
 	defer db.Close()
 	if categoryFromString(lastKnownCategoryForPlayer) > categoryFromString(category) {
-		oldAvg := db.AvgScore(year, category)
-		newAvg := db.AvgScore(year, lastKnownCategoryForPlayer)
-		newMax := db.MaxScore(year, lastKnownCategoryForPlayer)
+		oldAvg, err := db.AvgScore(year, category)
+		if err != nil {
+			return err
+		}
+		newAvg, err := db.AvgScore(year, lastKnownCategoryForPlayer)
+		if err != nil {
+			return err
+		}
+		newMax, err := db.MaxScore(year, lastKnownCategoryForPlayer)
+		if err != nil {
+			return err
+		}
 		thisYearScore := *baseScore
 
 		convertedScore := thisYearScore * newAvg / oldAvg
@@ -170,6 +213,7 @@ func categoryPromotion(baseScore *float64,
 		}
 		*baseScore = convertedScore
 	}
+	return nil
 }
 
 func contains(array []int, item int) bool {

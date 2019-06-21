@@ -5,14 +5,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CanobbioE/reelo/backend/api"
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/services"
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
 // Login writes jwt in the HTTP response
 func Login(w http.ResponseWriter, r *http.Request) {
-	var cred api.Credentials
+	var cred dto.Credentials
 	err := utils.ReadBody(r.Body, &cred)
 	if err != nil {
 		log.Println(err)

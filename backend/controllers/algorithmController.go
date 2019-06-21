@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CanobbioE/reelo/backend/api"
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/services"
 )
 
@@ -24,7 +24,7 @@ func HandleAlgorithm(w http.ResponseWriter, r *http.Request) {
 
 // UpdateAlgorithm updates some varaibles used for the reelo algorithm
 func UpdateAlgorithm(w http.ResponseWriter, r *http.Request) {
-	var c api.Costants
+	var c dto.Costants
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("Error while  reading costants body: %v", err)

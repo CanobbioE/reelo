@@ -1,4 +1,4 @@
-package api
+package dto
 
 // Credentials represent a user login credentials
 type Credentials struct {

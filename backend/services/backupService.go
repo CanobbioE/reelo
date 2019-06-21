@@ -15,6 +15,7 @@ func Backup() {
 	err := UploadFile(file)
 	if err != nil {
 		log.Printf("Error while uploading file to google drive: %v\n", err)
+		return
 	}
 	log.Println("Backup successfully done!")
 }

@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/CanobbioE/reelo/backend/api"
 	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/utils/parse"
 )
 
@@ -18,7 +18,7 @@ import (
 // and tries to parse each line into an entity to be saved in the database
 // appending the data defined in the upload info
 // TODO: implement this
-func ParseFileWithInfo(fileReader io.Reader, info api.UploadInfo) error {
+func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 	db := rdb.NewDB()
 	defer db.Close()
 	var results []parse.LineInfo

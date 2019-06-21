@@ -10,7 +10,7 @@ import (
 // Add is used to insert a new row in the specified db and table.
 // The id of the newly added row is returned for further reference.
 // Possible tables are: 'giocatore', 'risultato', 'partecipazione', 'giochi'
-func (database *DB) Add(ctx context.Context, table string, params ...interface{}) int {
+func (database *DB) Add(ctx context.Context, table string, params ...interface{}) (int, error) {
 	var q1, q2 string
 
 	switch table {
@@ -38,13 +38,20 @@ func (database *DB) Add(ctx context.Context, table string, params ...interface{}
 		q2 = fmt.Sprintf("SELECT id FROM Giochi"+
 			" WHERE anno = %d AND categoria = %s", params...)
 	}
-	return int(database.performAndReturn(ctx, q1, q2))
+	id, err := database.performAndReturn(ctx, q1, q2)
+	if err != nil {
+		return -1, err
+	}
+	return int(id), nil
 }
 
 // InserRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
 func (database DB) InserRankingFile(ctx context.Context,
-	file []parse.LineInfo, year int, category string, isParis bool) {
-	gamesID := database.Add(ctx, "giochi", year, category)
+	file []parse.LineInfo, year int, category string, isParis bool) error {
+	gamesID, err := database.Add(ctx, "giochi", year, category)
+	if err != nil {
+		return err
+	}
 	for _, line := range file {
 		city := line.City
 		if isParis {
@@ -52,12 +59,25 @@ func (database DB) InserRankingFile(ctx context.Context,
 		}
 		var playerID int
 		if !database.ContainsPlayer(ctx, line.Name, line.Surname) {
-			playerID = database.Add(ctx, "giocatore", line.Name, line.Surname)
+			playerID, err = database.Add(ctx, "giocatore", line.Name, line.Surname)
+			if err != nil {
+				return err
+			}
 		}
-		playerID = database.PlayerID(ctx, line.Name, line.Surname)
-		resultsID := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points)
-		database.Add(ctx, "partecipazione", playerID, gamesID, resultsID, city)
+		playerID, err = database.PlayerID(ctx, line.Name, line.Surname)
+		if err != nil {
+			return err
+		}
+		resultsID, err := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points)
+		if err != nil {
+			return err
+		}
+		_, err = database.Add(ctx, "partecipazione", playerID, gamesID, resultsID, city)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // UpdateReelo sets a new reelo for the specified player
