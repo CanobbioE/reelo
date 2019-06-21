@@ -17,7 +17,7 @@ var (
 	password = "password"
 	host     = "localhost:3306"
 	dbName   = "reelo"
-	bkpDir   = "./bkp"
+	bkpDir   = "bkp"
 )
 
 func init() {
