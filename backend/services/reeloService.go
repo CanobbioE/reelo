@@ -10,16 +10,25 @@ import (
 
 // CalculateAllReelo recalculates the Reelo score
 // for every single player in the database
-func CalculateAllReelo() {
+func CalculateAllReelo() error {
 	elo.InitCostants()
 	ctx := context.Background()
 	db := rdb.NewDB()
-	players := db.AllPlayers(ctx)
+	players, err := db.AllPlayers(ctx)
+	if err != nil {
+		return err
+	}
 	for _, player := range players {
-		player.Reelo = int(elo.Reelo(ctx, player.Name, player.Surname))
-		err := db.UpdateReelo(ctx, player)
+		elo, err := elo.Reelo(ctx, player.Name, player.Surname)
+		if err != nil {
+			return err
+		}
+		player.Reelo = int(elo)
+		err = db.UpdateReelo(ctx, player)
 		if err != nil {
 			log.Printf("Error updating reelo: %v", err)
+			return err
 		}
 	}
+	return nil
 }

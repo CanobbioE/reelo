@@ -25,12 +25,11 @@ func (database *DB) ContainsPlayer(ctx context.Context, name, surname string) bo
 // performAndReturn performs two queries (q1 and q2).
 // The first one inserts a row in the DB and the second one gets the ID of the
 // inserted row. The id is then returned.
-func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
+func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) (int64, error) {
 	// TODO: everything here is terrible btw
 	result, err := database.db.ExecContext(ctx, q1)
 	if err != nil {
-		log.Printf("Error performing query:\n%s\n%v\n", q1, err)
-		return -1
+		return -1, fmt.Errorf("error performing query:\n%s\n%v", q1, err)
 	}
 	// Try to get the id with the built in function
 	id, err := result.LastInsertId()
@@ -39,12 +38,11 @@ func (database *DB) performAndReturn(ctx context.Context, q1, q2 string) int64 {
 			// Try to get the id with a query
 			err := database.db.QueryRowContext(ctx, q2).Scan(&id)
 			if err != nil {
-				log.Printf("Error retrieving ID with:\n%s\n%v\n", q2, err)
-				return -1
+				return -1, fmt.Errorf("error retrieving ID with:\n%s\n%v", q2, err)
 			}
 		}
 	}
-	return id
+	return id, nil
 }
 
 func adaptToParis(query string, isParis bool) string {

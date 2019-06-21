@@ -2,29 +2,30 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/CanobbioE/reelo/backend/dto"
 )
 
 // PlayerID retrieves a player id from the database given its name and surname
-func (database *DB) PlayerID(ctx context.Context, name, surname string) (id int) {
+func (database *DB) PlayerID(ctx context.Context, name, surname string) (int, error) {
+	var id int
 	q := findPlayerIDByNameAndSurname
 	err := database.db.QueryRow(q, name, surname).Scan(&id)
 	if err != nil {
-		log.Printf("Error getting player id: %v", err)
-		return id
+		return id, fmt.Errorf("Error getting player id: %v", err)
 	}
-	return id
+	return id, nil
 }
 
 // Results retrives all the results a player had in all the years he partecipated
-func (database *DB) Results(ctx context.Context, name, surname string) (results []Result) {
+func (database *DB) Results(ctx context.Context, name, surname string) ([]Result, error) {
+	var results []Result
 	q := findResultsByNameAndSurname
 	rows, err := database.db.QueryContext(ctx, q, name, surname)
 	if err != nil {
-		log.Printf("Error getting results: %v", err)
-		return results
+		return results, fmt.Errorf("Error getting results: %v", err)
 	}
 	defer rows.Close()
 
@@ -32,21 +33,20 @@ func (database *DB) Results(ctx context.Context, name, surname string) (results 
 		r := Result{}
 		err := rows.Scan(&r.Time, &r.Exercises, &r.Score, &r.Year, &r.Category)
 		if err != nil {
-			log.Printf("Error getting results: %v", err)
-			return results
+			return results, fmt.Errorf("Error getting results: %v", err)
 		}
 		results = append(results, r)
 	}
-	return results
+	return results, nil
 }
 
 // AllPlayers retrieves all players from the database
-func (database *DB) AllPlayers(ctx context.Context) (players []Player) {
+func (database *DB) AllPlayers(ctx context.Context) ([]Player, error) {
+	var players []Player
 	q := findAllPlayers
 	rows, err := database.db.QueryContext(ctx, q)
 	if err != nil {
-		log.Printf("Error getting players: %v", err)
-		return players
+		return players, fmt.Errorf("Error getting players: %v", err)
 	}
 	defer rows.Close()
 
@@ -54,22 +54,24 @@ func (database *DB) AllPlayers(ctx context.Context) (players []Player) {
 		p := Player{}
 		err := rows.Scan(&p.Name, &p.Surname)
 		if err != nil {
-			log.Printf("Error getting players: %v", err)
-			return players
+			return players, fmt.Errorf("Error getting players: %v", err)
 		}
 		players = append(players, p)
 	}
-	return players
+	return players, nil
 }
 
 // PlayerPartecipationYears retrieves a list of all the years a player has played
-func (database *DB) PlayerPartecipationYears(ctx context.Context, name, surname string) (years []int) {
-	pID := database.PlayerID(ctx, name, surname)
+func (database *DB) PlayerPartecipationYears(ctx context.Context, name, surname string) ([]int, error) {
+	var years []int
+	pID, err := database.PlayerID(ctx, name, surname)
+	if err != nil {
+		return years, err
+	}
 	q := findPartecipationYearsByPlayer
 	rows, err := database.db.QueryContext(ctx, q, pID)
 	if err != nil {
-		log.Printf("Error getting partcipation years: %v", err)
-		return years
+		return years, fmt.Errorf("Error getting partcipation years: %v", err)
 	}
 	defer rows.Close()
 
@@ -77,53 +79,52 @@ func (database *DB) PlayerPartecipationYears(ctx context.Context, name, surname 
 		var y int
 		err := rows.Scan(&y)
 		if err != nil {
-			log.Printf("Error getting partcipation years: %v", err)
-			return years
+			return years, fmt.Errorf("Error getting partcipation years: %v", err)
 		}
 		years = append(years, y)
 	}
-	return years
+	return years, nil
 }
 
 // Score retrieve the score of a given player for a given year
-func (database *DB) Score(name, surname string, year int, isParis bool) (score float64) {
+func (database *DB) Score(name, surname string, year int, isParis bool) (float64, error) {
+	var score float64
 	q := findScoresByPlayerAndYear
 
 	q = adaptToParis(q, isParis)
 
 	err := database.db.QueryRow(q, name, surname, year).Scan(&score)
 	if err != nil {
-		log.Printf("Error getting scores: %v", (err))
-		return score
+		return score, fmt.Errorf("Error getting scores: %v", (err))
 	}
-	return score
+	return score, nil
 }
 
 // Exercises retrieve the number of exercises the specified player
 // has completed in a given year
-func (database *DB) Exercises(name, surname string, year int, isParis bool) (es int) {
+func (database *DB) Exercises(name, surname string, year int, isParis bool) (int, error) {
+	var es int
 	q := findExercisesByPlayerAndYear
 
 	adaptToParis(q, isParis)
 
 	err := database.db.QueryRow(q, name, surname, year).Scan(&es)
 	if err != nil {
-		log.Printf("Error getting exercises: %v", (err))
-		return es
+		return es, fmt.Errorf("Error getting exercises: %v", (err))
 	}
-	return es
+	return es, nil
 }
 
 // Categories returns the categories in which the given player
 // has partecipated in the specified year.
 // There could be more than one category for a year,
 // this could happen for namesakes or when we have international results
-func (database *DB) Categories(ctx context.Context, name, surname string, year int) (categories []string) {
+func (database *DB) Categories(ctx context.Context, name, surname string, year int) ([]string, error) {
+	var categories []string
 	q := findCategoriesByPlayerAndYear
 	rows, err := database.db.QueryContext(ctx, q, name, surname, year)
 	if err != nil {
-		log.Printf("Error getting categories: %v", err)
-		return categories
+		return categories, fmt.Errorf("Error getting categories: %v", err)
 	}
 	defer rows.Close()
 
@@ -131,49 +132,48 @@ func (database *DB) Categories(ctx context.Context, name, surname string, year i
 		var c string
 		err := rows.Scan(&c)
 		if err != nil {
-			log.Printf("Error getting categories: %v", err)
-			return categories
+			return categories, fmt.Errorf("Error getting categories: %v", err)
 		}
 		categories = append(categories, c)
 	}
-	return categories
+	return categories, nil
 
 }
 
 // AvgScoresOfCategories calculates the average scores for
 // all the categories in the given year
-func (database *DB) AvgScoresOfCategories(year int) (avg float64) {
+func (database *DB) AvgScoresOfCategories(year int) (float64, error) {
+	var avg float64
 	q := findAvgScoresByYear
 	err := database.db.QueryRow(q, year).Scan(&avg)
 	if err != nil {
-		log.Printf("Error getting average score of categories: %v", err)
-		return avg
+		return avg, fmt.Errorf("Error getting average score of categories: %v", err)
 	}
-	return avg
+	return avg, nil
 }
 
 // AvgScore returns the score's average for the given year and category
-func (database *DB) AvgScore(year int, category string) (avg float64) {
+func (database *DB) AvgScore(year int, category string) (float64, error) {
+	var avg float64
 	q := findAvgScoresByYearAndCategory
 	err := database.db.QueryRow(q, year, category).Scan(&avg)
 	if err != nil {
-		log.Printf("Error getting average score: %v", err)
-		return avg
+		return avg, fmt.Errorf("Error getting average score: %v", err)
 	}
 
-	return avg
+	return avg, nil
 }
 
 // MaxScore calculates the maximum score obtained by any player
 // in the given year and category
-func (database *DB) MaxScore(year int, category string) (max float64) {
+func (database *DB) MaxScore(year int, category string) (float64, error) {
+	var max float64
 	q := findMaxScoreByYearAndCategory
 	err := database.db.QueryRow(q, year, category).Scan(&max)
 	if err != nil {
-		log.Printf("Error getting max score: %v", err)
-		return max
+		return max, fmt.Errorf("Error getting max score: %v", err)
 	}
-	return max
+	return max, nil
 }
 
 // Password retrieve the hashed password of a user
@@ -205,38 +205,37 @@ func (database *DB) ReeloCostants() (Costants, error) {
 }
 
 // LastKnownYear returns the last year we know anything about
-func (database *DB) LastKnownYear() (year int) {
+func (database *DB) LastKnownYear() (int, error) {
+	var year int
 	q := findMaxYear
 	err := database.db.QueryRow(q).Scan(&year)
 	if err != nil {
-		log.Printf("Error getting last known year: %v", err)
-		return year
+		return year, fmt.Errorf("Error getting last known year: %v", err)
 	}
-	return year
+	return year, nil
 }
 
 // LastKnownCategoryForPlayer returns the last category into which
 // we know the specified player has partecipated
-func (database *DB) LastKnownCategoryForPlayer(name, surname string) (category string) {
+func (database *DB) LastKnownCategoryForPlayer(name, surname string) (string, error) {
+	var category string
 	q := findCategoryByPlayerAndYear
 	err := database.db.QueryRow(q, name, surname, name, surname).Scan(&category)
 	if err != nil {
-		log.Printf("Error getting last known category: %v", err)
-		return category
+		return category, fmt.Errorf("Error getting last known category: %v", err)
 	}
-	return category
+	return category, nil
 }
 
 // IsResultFromParis checks if the result associated w/ the given data
 // comes from an international game
 func (database *DB) IsResultFromParis(ctx context.Context, name, surname string,
-	year int, category string) bool {
+	year int, category string) (bool, error) {
 
 	q := findCityByPlayerAndYearAndCategory
 	rows, err := database.db.QueryContext(ctx, q, name, surname, year, category)
 	if err != nil {
-		log.Printf("Error getting results from paris: %v", err)
-		return false
+		return false, fmt.Errorf("Error getting results from paris: %v", err)
 	}
 	defer rows.Close()
 
@@ -244,14 +243,13 @@ func (database *DB) IsResultFromParis(ctx context.Context, name, surname string,
 		var c string
 		err := rows.Scan(&c)
 		if err != nil {
-			log.Printf("Error getting results from paris: %v", err)
-			return false
+			return false, fmt.Errorf("Error getting results from paris: %v", err)
 		}
 		if c == "paris" {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 // AllRanks returns a list of all the player and ranks inside the database.

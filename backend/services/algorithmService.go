@@ -13,7 +13,6 @@ func UpdateAlgorithm(ctx context.Context, c dto.Costants) error {
 	defer db.Close()
 
 	return db.UpdateCostants(ctx, rdb.Costants(c))
-
 }
 
 // GetCostants fetch the current values for the variables used

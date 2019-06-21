@@ -12,7 +12,6 @@ import (
 
 // Upload creates a new ranking file
 func Upload(w http.ResponseWriter, r *http.Request) {
-	// TODO: return errors so that user can correct them
 	file, _, err := r.FormFile("file")
 	if err != nil {
 		log.Printf("Error receiving the file: %v", err)
@@ -45,7 +44,11 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "can't save file", http.StatusInternalServerError)
 	}
 	// TODO services.SaveRankingFormat()
-	services.CalculateAllReelo()
+	err = services.CalculateAllReelo()
+	if err != nil {
+		log.Printf("Error recalculating reelo file: %v", err)
+		http.Error(w, "can't recalculate reelo", http.StatusInternalServerError)
+	}
 	log.Println("Recalculated REELO for all players")
 
 	services.Backup()
