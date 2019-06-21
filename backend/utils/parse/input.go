@@ -75,13 +75,15 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 					for _, c := range doubleWordSurnames {
 						if strings.Contains(input, " "+c+" ") ||
 							strings.Contains(input, c+" ") {
-							log.Printf("Line with multi word surname found. Surname is %s.", c)
+							// log.Printf("Line with multi word surname found. Surname is %s.", c)
 
 							deltaSurname = len(strings.Split(c, " ")) - 1
 							value := extractValue(fName, index, deltaSurname, splitted, result)
-							result.Name = strings.Title(value)
+							result.Surname = strings.Title(value)
 						}
 					}
+					result.Surname = strings.ReplaceAll(result.Surname, "_", " ")
+					result.Surname = strings.ReplaceAll(result.Surname, "-", " ")
 
 				case "nome":
 					result.Name = strings.Title(splitted[index])
@@ -101,7 +103,7 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 						if (strings.Contains(input, " "+c+" ") ||
 							strings.Contains(input, c+" ")) &&
 							!excFlag {
-							log.Printf("Line with multi word name found. Name is %s.", c)
+							// log.Printf("Line with multi word name found. Name is %s.", c)
 							//log.Printf("Line is %v", splitted)
 
 							deltaName = len(strings.Split(c, " ")) - 1
@@ -146,7 +148,7 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 				}
 				if err != nil {
 					e := fmt.Sprintf("Could not convert data: %v\nThe input is: %v\n", err, input)
-					log.Printf(e)
+					// log.Printf(e)
 					errs = append(errs, e)
 				}
 			}
