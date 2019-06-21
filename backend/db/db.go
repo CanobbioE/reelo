@@ -27,7 +27,7 @@ func init() {
 		password = os.Getenv("DB_PASSWORD")
 		host = os.Getenv("DB_HOST")
 		dbName = os.Getenv("DB_NAME")
-		bkpDir = os.Getenv("BD_BKP_PATH")
+		bkpDir = os.Getenv("DB_BKP_PATH")
 	}
 	log.Println("DB initialized")
 	log.Println(dbDriver, user, host, dbName)
