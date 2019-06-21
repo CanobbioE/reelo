@@ -1,4 +1,4 @@
-package api
+package dto
 
 // UploadInfo represents the information associated w/
 // an uploaded ranking file.

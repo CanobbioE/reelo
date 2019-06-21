@@ -7,15 +7,15 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/CanobbioE/reelo/backend/api"
 	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/utils"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Login implements the login logic.
 // It returns an http status and an eventual error.
-func Login(c api.Credentials) (int, string, error) {
+func Login(c dto.Credentials) (int, string, error) {
 	var jwt string
 
 	db := rdb.NewDB()

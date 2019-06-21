@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CanobbioE/reelo/backend/api"
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/services"
 )
 
@@ -21,7 +21,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	var uploadInfo api.UploadInfo
+	var uploadInfo dto.UploadInfo
 	err = json.Unmarshal([]byte(r.FormValue("data")), &uploadInfo)
 	if err != nil {
 		log.Printf("Error while unmarshalling upload data: %v", err)

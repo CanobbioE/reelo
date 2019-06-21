@@ -3,12 +3,12 @@ package services
 import (
 	"context"
 
-	"github.com/CanobbioE/reelo/backend/api"
 	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/dto"
 )
 
 // UpdateAlgorithm updates some varaibles used for the reelo algorithm
-func UpdateAlgorithm(ctx context.Context, c api.Costants) error {
+func UpdateAlgorithm(ctx context.Context, c dto.Costants) error {
 	db := rdb.NewDB()
 	defer db.Close()
 
@@ -18,14 +18,14 @@ func UpdateAlgorithm(ctx context.Context, c api.Costants) error {
 
 // GetCostants fetch the current values for the variables used
 // in the reelo algorithm
-func GetCostants() (api.Costants, error) {
+func GetCostants() (dto.Costants, error) {
 	db := rdb.NewDB()
 	defer db.Close()
 	c, err := db.ReeloCostants()
 	if err != nil {
-		return api.Costants(c), err
+		return dto.Costants(c), err
 	}
 
-	return api.Costants(c), nil
+	return dto.Costants(c), nil
 
 }

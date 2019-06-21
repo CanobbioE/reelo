@@ -1,4 +1,4 @@
-package api
+package dto
 
 // Costants represent all the possible variables used when calculating the reelo
 type Costants struct {

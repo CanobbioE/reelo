@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/CanobbioE/reelo/backend/api"
+	"github.com/CanobbioE/reelo/backend/dto"
 )
 
 // PlayerID retrieves a player id from the database given its name and surname
@@ -257,7 +257,7 @@ func (database *DB) IsResultFromParis(ctx context.Context, name, surname string,
 // AllRanks returns a list of all the player and ranks inside the database.
 // A rank is composed by a player's name, surname, reelo and last category
 // into which he has played
-func (database *DB) AllRanks(ctx context.Context) (ranks []api.Rank, err error) {
+func (database *DB) AllRanks(ctx context.Context) (ranks []dto.Rank, err error) {
 	q := findAllPlayersRanks
 	rows, err := database.db.QueryContext(ctx, q)
 	if err != nil {
@@ -267,7 +267,7 @@ func (database *DB) AllRanks(ctx context.Context) (ranks []api.Rank, err error) 
 	defer rows.Close()
 
 	for rows.Next() {
-		var r api.Rank
+		var r dto.Rank
 		err := rows.Scan(&r.Name, &r.Surname, &r.Category, &r.Reelo)
 		if err != nil {
 			log.Printf("Error getting all ranks: %v", err)

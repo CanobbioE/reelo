@@ -1,4 +1,4 @@
-package api
+package dto
 
 // Rank represent one entry of a ranking
 type Rank struct {
