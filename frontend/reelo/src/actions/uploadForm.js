@@ -72,6 +72,8 @@ const fieldConverter = field => {
 		case 'e':
 		case 'es':
 			return 'esercizi';
+		case ' ':
+			return '';
 		default:
 			return field;
 	}
@@ -90,6 +92,7 @@ export const uploadFile = (
 	try {
 		const jwt = localStorage.getItem('token');
 		const mappedFormat = format
+			.replace(',', ' ')
 			.split(' ')
 			.map(field => fieldConverter(field.toLowerCase()))
 			.reduce((f1, f2) => f1 + ' ' + f2);
@@ -113,6 +116,8 @@ export const uploadFile = (
 		dispatch({
 			type: RANK_UPLOAD_SUCCESS,
 		});
+		// TODO: This is horrible, this is madness
+		alert('Caricamento avvenuto con successo');
 	} catch (e) {
 		console.log(e);
 		dispatch({
