@@ -17,10 +17,10 @@ import (
 // ParseFileWithInfo reads the content of a buffer and verifies its correctness
 // and tries to parse each line into an entity to be saved in the database
 // appending the data defined in the upload info
-// TODO: implement this
 func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 	db := rdb.NewDB()
 	defer db.Close()
+
 	var results []parse.LineInfo
 	year, err := strconv.Atoi(info.Year)
 	if err != nil {

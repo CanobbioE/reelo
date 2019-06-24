@@ -60,9 +60,15 @@ CREATE TABLE Costanti (
 -- INIT VALUES
 SET collation_connection = 'utf8_general_ci';
 
-ALTER DATABASE your_database_name CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER DATABASE reelo CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-ALTER TABLE your_table_name CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE  Giochi CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE Giocatore CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE Risultato CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE Utenti CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE Costanti CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE Partecipazione CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+
 
 INSERT INTO Costanti (
 	anno_inizio,
