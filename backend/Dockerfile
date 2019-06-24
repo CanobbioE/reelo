@@ -14,6 +14,7 @@ RUN mkdir ranks
 RUN mkdir bkp
 RUN mkdir -p utils/parse
 COPY ./utils/parse/locations ./utils/parse/locations
+COPY ./credentials.json .
 COPY --from=builder /go/bin/reelo .
 
 # CMD = ["reelo"]

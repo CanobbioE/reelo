@@ -50,10 +50,10 @@ func getTokenFromWeb(config *oauth2.Config) (*oauth2.Token, error) {
 	fmt.Printf("Go to the following link in your browser then type the "+
 		"authorization code: \n%v\n", authURL)
 
-	var authCode string
-	if _, err := fmt.Scan(&authCode); err != nil {
-		return nil, fmt.Errorf("unable to read authorization code: %v", err)
-	}
+	var authCode = "4/cgGl5AFhtnVpQ5A_AdAg7-mzBSf1nSsuSWYbmcHAXgd76LN0jT4XR1M"
+	// if _, err := fmt.Scan(&authCode); err != nil {
+	// return nil, fmt.Errorf("unable to read authorization code: %v", err)
+	// }
 
 	tok, err := config.Exchange(context.Background(), authCode)
 	if err != nil {

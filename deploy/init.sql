@@ -17,7 +17,8 @@ CREATE TABLE Giochi (
 	id int AUTO_INCREMENT,
 	anno int,
 	categoria varchar(4),
-	PRIMARY KEY (id, anno, categoria)
+	PRIMARY KEY (id)
+	CONSTRAINTduplicate_giochi UNIQUE (anno, categoria)
 );
 
 CREATE TABLE Risultato (
