@@ -303,7 +303,6 @@ var doubleWordNames = []string{
 	"tatyana g.",
 	"ten lon",
 	"valentina rebecca",
-	"valerio luca",
 	"wen jinc",
 	"wen qian",
 	"younis jarir",

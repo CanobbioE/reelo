@@ -19,6 +19,13 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Recovered in Upload: %v\n", r)
+			http.Error(w, fmt.Sprintf("file corrupted: %v", r), http.StatusBadRequest)
+			return
+		}
+	}()
 
 	var uploadInfo dto.UploadInfo
 	err = json.Unmarshal([]byte(r.FormValue("data")), &uploadInfo)

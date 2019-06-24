@@ -11,6 +11,7 @@ import (
 // CalculateAllReelo recalculates the Reelo score
 // for every single player in the database
 func CalculateAllReelo() error {
+	log.Println("Recalculating reelo")
 	elo.InitCostants()
 	ctx := context.Background()
 	db := rdb.NewDB()

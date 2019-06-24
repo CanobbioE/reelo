@@ -30,6 +30,11 @@ func readRankingFile(year int, category string, format Format) ([]LineInfo, erro
 }
 
 func parseLine(format Format, input string) (LineInfo, []string) {
+	defer func() {
+		if r := recover(); r != nil {
+			panic(fmt.Sprintf("input is: %v and error is: %v\n", input, r))
+		}
+	}()
 	input = strings.ToLower(input)
 	splitted := strings.Split(input, " ")
 	var result LineInfo
