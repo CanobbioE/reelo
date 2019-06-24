@@ -17,8 +17,8 @@ CREATE TABLE Giochi (
 	id int AUTO_INCREMENT,
 	anno int,
 	categoria varchar(4),
-	PRIMARY KEY (id)
-	CONSTRAINTduplicate_giochi UNIQUE (anno, categoria)
+	PRIMARY KEY (id),
+	CONSTRAINT duplicate_giochi UNIQUE (anno, categoria)
 );
 
 CREATE TABLE Risultato (
@@ -58,6 +58,11 @@ CREATE TABLE Costanti (
 );
 
 -- INIT VALUES
+SET collation_connection = 'utf8_general_ci';
+
+ALTER DATABASE your_database_name CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE your_table_name CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 INSERT INTO Costanti (
 	anno_inizio,
