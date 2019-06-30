@@ -48,6 +48,7 @@ func InitCostants() {
 // Reelo returns the points for a given user calculated with a custom algorithm.
 func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	var reelo float64
+	var weights []float64
 	db := rdb.NewDB()
 	defer db.Close()
 
@@ -77,19 +78,24 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 			if err != nil {
 				return reelo, err
 			}
-			err = oneYearScore(ctx,
+			weight, err := oneYearScore(ctx,
 				name, surname, lastKnownCategoryForPlayer, c,
 				year, lastKnownYear, &reelo, isParis)
 			if err != nil {
 				return reelo, err
 			}
+			weights = append(weights, weight)
 		}
 	}
 
 	//### 8. Average:
 	// Since reelo is already the sum of weighted scores we just divide
-	// by the number of years we know the player has played
-	reelo = reelo / float64(len(partecipationYears))
+	// by the sum of the weights
+	var sumOfWeights float64
+	for _, w := range weights {
+		sumOfWeights += w
+	}
+	reelo = reelo / sumOfWeights
 
 	//### 9. Anti-Exploit:
 	// To avoid the exploitation of a single partecipation: if the player has only
@@ -110,27 +116,39 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 
 func oneYearScore(ctx context.Context,
 	name, surname, lastKnownCategoryForPlayer, category string,
-	year, lastKnownYear int, reelo *float64, isParis bool) error {
+	year, lastKnownYear int, reelo *float64, isParis bool) (float64, error) {
 	db := rdb.NewDB()
 	defer db.Close()
 
 	// Variables names are chosen accordingly to the formula
 	// provided by the scientific committee
-	t := StartOfCategory(year, category)
-	n := EndOfCategory(year, category)
+	t, err := db.StartOfCategory(context.Background(), year, category)
+	if err != nil {
+		return 0, err
+	}
+
+	n, err := db.EndOfCategory(context.Background(), year, category)
+	if err != nil {
+		return 0, err
+	}
+
 	eMax := float64(t - n + 1)
-	dMax := float64(MaxScoreForCategory(year, category))
+	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
+	if err != nil {
+		return 0, err
+	}
+	dMax := float64(maxScoreForCat)
 	d, err := db.Score(name, surname, year, isParis)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	exercises, err := db.Exercises(name, surname, year, isParis)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	e := float64(exercises)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	//### 1. Base score:
@@ -150,7 +168,7 @@ func oneYearScore(ctx context.Context,
 	// Scores are normalized to the average of averages of this year's categories
 	avgCatScore, err := db.AvgScoresOfCategories(year)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	baseScore = baseScore / avgCatScore
 
@@ -167,7 +185,7 @@ func oneYearScore(ctx context.Context,
 	baseScore = baseScore * agingFactor
 
 	*reelo = *reelo + baseScore
-	return nil
+	return agingFactor, nil
 }
 
 //### 3. Categories homogenization:
@@ -175,7 +193,7 @@ func oneYearScore(ctx context.Context,
 // her/his probabilty of solving it.
 func categoriesHomogenization(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 	for i := 1; i <= t-1; i++ {
-		errorFactor := float64(1-d+e*exercisesCostant) / (exercisesCostant*eMax + dMax)
+		errorFactor := float64(1 - (d+e*exercisesCostant)/(exercisesCostant*eMax+dMax))
 		difficultyFactor := float64(i) / float64(n+1)
 		nonResolutionProbability := 1 - errorFactor*difficultyFactor
 		*baseScore += (exercisesCostant + float64(i)) * nonResolutionProbability

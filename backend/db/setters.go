@@ -21,8 +21,8 @@ func (database *DB) Add(ctx context.Context, table string, params ...interface{}
 			" WHERE nome = \"%s\" AND cognome = \"%s\"", params...)
 
 	case "risultato":
-		q1 = fmt.Sprintf("INSERT INTO Risultato (tempo, esercizi, punteggio)"+
-			" VALUES (%d, %d, %d)", params...)
+		q1 = fmt.Sprintf("INSERT INTO Risultato (tempo, esercizi, punteggio, posizione)"+
+			" VALUES (%d, %d, %d, %d)", params...)
 
 		q2 = fmt.Sprintf("SELECT MAX(id) FROM Risultato "+
 			"WHERE tempo = %d AND esercizi = %d AND punteggio = %d", params...)
@@ -32,8 +32,8 @@ func (database *DB) Add(ctx context.Context, table string, params ...interface{}
 			"VALUES (%d, %d, %d, \"%s\")", params...)
 
 	case "giochi":
-		q1 = fmt.Sprintf("INSERT INTO Giochi (anno, categoria)"+
-			" VALUES (%d, \"%s\")", params...)
+		q1 = fmt.Sprintf("INSERT INTO Giochi (anno, categoria, inizio, fine)"+
+			" VALUES (%d, \"%s\", %d, %d)", params...)
 
 		q2 = fmt.Sprintf("SELECT id FROM Giochi"+
 			" WHERE anno = %d AND categoria = %s", params...)
@@ -46,9 +46,14 @@ func (database *DB) Add(ctx context.Context, table string, params ...interface{}
 }
 
 // InserRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
-func (database DB) InserRankingFile(ctx context.Context,
-	file []parse.LineInfo, year int, category string, isParis bool) error {
-	gamesID, err := database.Add(ctx, "giochi", year, category)
+func (database DB) InserRankingFile(
+	ctx context.Context,
+	file []parse.LineInfo,
+	gameInfo GameInfo,
+	isParis bool) error {
+
+	gamesID, err := database.Add(ctx, "giochi",
+		gameInfo.Year, gameInfo.Category, gameInfo.Start, gameInfo.End)
 	if err != nil {
 		return err
 	}
@@ -68,7 +73,7 @@ func (database DB) InserRankingFile(ctx context.Context,
 		if err != nil {
 			return err
 		}
-		resultsID, err := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points)
+		resultsID, err := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points, line.Position)
 		if err != nil {
 			return err
 		}

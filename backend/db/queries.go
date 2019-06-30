@@ -91,6 +91,20 @@ WHERE (G.anno, U.id) IN (
 	JOIN Giocatore U ON U.id = P.giocatore
 	GROUP BY U.id
 )`
+
+	findStartByYearAndCategory = `
+SELECT inizio
+FROM Giochi
+WHERE anno = ?
+AND categoria = ?
+`
+
+	findEndByYearAndCategory = `
+SELECT fine
+FROM Giochi
+WHERE anno = ?
+AND categoria = ?
+`
 )
 
 // last played years:

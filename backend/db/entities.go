@@ -33,3 +33,11 @@ type Costants struct {
 	AntiExploit            float64 `json:"exp"`
 	NoPartecipationPenalty float64 `json:"np"`
 }
+
+// GameInfo contains the data about a certain game
+type GameInfo struct {
+	Year     int
+	Category string
+	Start    int
+	End      int
+}
