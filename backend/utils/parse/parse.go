@@ -50,8 +50,9 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 
 	// Parsing each line to save it into the right struct
 	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
+	for i := 0; scanner.Scan(); i++ {
 		singleLine, errs := parseLine(format, scanner.Text())
+		singleLine.Position = i
 		if len(errs) > 0 {
 			// Stacking up errors so the user can fix them all in one go
 			mergedErrs = prettyPrintErrors(mergedErrs, errs)

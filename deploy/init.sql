@@ -17,8 +17,11 @@ CREATE TABLE Giochi (
 	id int AUTO_INCREMENT,
 	anno int,
 	categoria varchar(4),
+	inizio int,
+	fine int,
 	PRIMARY KEY (id),
-	CONSTRAINT duplicate_giochi UNIQUE (anno, categoria)
+	CONSTRAINT duplicate_giochi UNIQUE (anno, categoria),
+	CONSTRAINT endAfterStart UNIQUE (inizio <= fine)
 );
 
 CREATE TABLE Risultato (
@@ -26,6 +29,7 @@ CREATE TABLE Risultato (
 	tempo int,
 	esercizi int,
 	punteggio int,
+	posizione int,
 	PRIMARY KEY (id)
 );
 
