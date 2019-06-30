@@ -40,7 +40,26 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 		return warning
 	}
 
-	db.InserRankingFile(context.Background(), results, year, category, isParis)
+	start, err := db.StartOfCategory(context.Background(), year, category)
+	if err != nil {
+		log.Printf("error finding first exercise for category %v: %v\n", category, err)
+		return err
+	}
+
+	end, err := db.EndOfCategory(context.Background(), year, category)
+	if err != nil {
+		log.Printf("error finding last exercise for category %v: %v\n", category, err)
+		return err
+	}
+
+	gameInfo := rdb.GameInfo{
+		year,
+		category,
+		start,
+		end,
+	}
+
+	db.InserRankingFile(context.Background(), results, gameInfo, isParis)
 	return nil
 }
 

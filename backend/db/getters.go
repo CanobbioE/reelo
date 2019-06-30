@@ -274,5 +274,61 @@ func (database *DB) AllRanks(ctx context.Context) (ranks []dto.Rank, err error) 
 		ranks = append(ranks, r)
 	}
 	return ranks, nil
+}
 
+// StartOfCategory returns the number of the first exercise for the specified year and category
+func (database *DB) StartOfCategory(ctx context.Context, year int, category string) (int, error) {
+	var start int
+	q := findStartByYearAndCategory
+	rows, err := database.db.QueryContext(ctx, q, year, category)
+	if err != nil {
+		return start, fmt.Errorf("Error getting the first exercise: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&start)
+		if err != nil {
+			return start, fmt.Errorf("Error getting the first exercise: %v", err)
+		}
+	}
+	return start, nil
+}
+
+// EndOfCategory returns the number of the last exercise for the specified year and category
+func (database *DB) EndOfCategory(ctx context.Context, year int, category string) (int, error) {
+	var end int
+	q := findEndByYearAndCategory
+	rows, err := database.db.QueryContext(ctx, q, year, category)
+	if err != nil {
+		return end, fmt.Errorf("Error getting the first exercise: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&end)
+		if err != nil {
+			return end, fmt.Errorf("Error getting the first exercise: %v", err)
+		}
+	}
+	return end, nil
+}
+
+// MaxScoreForCategory returns the maximum score obtainable in a category for the year
+func (database *DB) MaxScoreForCategory(ctx context.Context, year int, category string) (int, error) {
+	var maxScore int
+	start, err := database.StartOfCategory(ctx, year, category)
+	if err != nil {
+		return maxScore, fmt.Errorf("Error getting the starting exercise: %v", err)
+	}
+
+	end, err := database.EndOfCategory(ctx, year, category)
+	if err != nil {
+		return maxScore, fmt.Errorf("Error getting the ending exercise: %v", err)
+	}
+
+	for i := start; i <= end; i++ {
+		maxScore += i
+	}
+	return maxScore, nil
 }

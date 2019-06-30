@@ -8,4 +8,6 @@ type UploadInfo struct {
 	IsParis  bool   `json:isParis`
 	Format   string `json:format`
 	Token    string `json:token`
+	Start    int    `json:start`
+	End      int    `json:end`
 }
