@@ -23,9 +23,7 @@ var (
 	noPartecipationPenalty = 0.9
 )
 
-const debug = true
-
-// InitCostants retrieves all the costants in the database, if anything goes wrong
+// InitCostants retrieves the costants in the database, if anything goes wrong
 // it will fallback to the hardcoded values
 func InitCostants() {
 	db := rdb.NewDB()
@@ -45,7 +43,7 @@ func InitCostants() {
 	noPartecipationPenalty = c.NoPartecipationPenalty
 }
 
-// Reelo returns the points for a given user calculated with a custom algorithm.
+// Reelo calculates a player's ELO using a custom algorithm
 func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	var reelo float64
 	var weights []float64
@@ -68,7 +66,7 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	//### Steps from 1 to 7
 	for _, year := range partecipationYears {
 		// There could be more than one category for a year,
-		// this could happen for namesakes or when we have international results
+		// this could happen in case of namesakes or international results
 		categories, err := db.Categories(ctx, name, surname, year)
 		if err != nil {
 			return reelo, err
@@ -98,14 +96,14 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	reelo = reelo / sumOfWeights
 
 	//### 9. Anti-Exploit:
-	// To avoid the exploitation of a single partecipation: if the player has only
-	// one result and it's in the most recent year, then her/his REELO decays
+	// To avoid single year partecipation's exploit: if the player has only
+	// one result and it's in the most recent year, then her/his REELO is worth less
 	if len(partecipationYears) == 1 && lastKnownYear == partecipationYears[0] {
 		reelo = reelo * antiExploit
 	}
 
 	//### 10. No-partecipation penalty:
-	// If the player didn't partecipate in the most recent year, his REELO decays
+	// If the player didn't partecipate in the most recent year, his REELO is worth less
 	if !contains(partecipationYears, lastKnownYear) {
 		reelo = reelo * noPartecipationPenalty
 
@@ -120,7 +118,7 @@ func oneYearScore(ctx context.Context,
 	db := rdb.NewDB()
 	defer db.Close()
 
-	// Variables names are chosen accordingly to the formula
+	// Variables names are chosen consistently with the formula
 	// provided by the scientific committee
 	t, err := db.StartOfCategory(context.Background(), year, category)
 	if err != nil {
@@ -153,7 +151,7 @@ func oneYearScore(ctx context.Context,
 
 	//### 1. Base score:
 	// Is the sum of the difficulty D and the number of completed exercises
-	baseScore := d + e*exercisesCostant
+	baseScore := exercisesCostant*e + d
 
 	//### 2. International results:
 	// If the result is from paris let's multiply for pFinal
@@ -181,7 +179,7 @@ func oneYearScore(ctx context.Context,
 
 	//### 7. Aging:
 	// Most recent scores should weight more than past years ones
-	agingFactor := 1 - 5/72*math.Log2(float64(lastKnownYear-year+1))
+	agingFactor := 1 - float64(5)/72*math.Log2(float64(lastKnownYear-year+1))
 	baseScore = baseScore * agingFactor
 
 	*reelo = *reelo + baseScore
@@ -191,18 +189,28 @@ func oneYearScore(ctx context.Context,
 //### 3. Categories homogenization:
 // For each exercises a player is not supposed to solve we calculate
 // her/his probabilty of solving it.
+// To the base score we should add:
+// (K + i) * {1 - [i/N+1] * [1 - (K*e+d)/(KeMax+dMax)]}
+//
+// Where:
+//
+// exercisesCostant = K
+// errorFactor = 1 - [(K*e+d) / (K*eMax+dMax)]
+// difficultyFactor = i/(n+1)
+// nonResolutionProbability = 1 - difficultyFactor*errorFactor
 func categoriesHomogenization(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 	for i := 1; i <= t-1; i++ {
-		errorFactor := float64(1 - (d+e*exercisesCostant)/(exercisesCostant*eMax+dMax))
+		errorFactor := float64(1 - (exercisesCostant*e+d)/(exercisesCostant*eMax+dMax))
 		difficultyFactor := float64(i) / float64(n+1)
-		nonResolutionProbability := 1 - errorFactor*difficultyFactor
+		nonResolutionProbability := 1 - difficultyFactor*errorFactor
 		*baseScore += (exercisesCostant + float64(i)) * nonResolutionProbability
 	}
 }
 
 //### 6. Category promotion:
-// If this year the player's category is inferior to the category she/he
-// has played most recently, then we convert this year score
+// If in the year we are using to calculate the ELO,
+// the player's category is inferior to the category she/he
+// has played most recently, then we convert this year's score
 // to the most recent category
 func categoryPromotion(baseScore *float64,
 	lastKnownCategoryForPlayer, category string,
