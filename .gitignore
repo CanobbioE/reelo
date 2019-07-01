@@ -15,6 +15,7 @@
 *.zip
 # backups
 bkp/*
+bkp
 # node modules
 node_modules/
 node_modules/*

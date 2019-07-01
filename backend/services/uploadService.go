@@ -26,6 +26,14 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 	if err != nil {
 		return err
 	}
+	start, err := strconv.Atoi(info.Start)
+	if err != nil {
+		return err
+	}
+	end, err := strconv.Atoi(info.End)
+	if err != nil {
+		return err
+	}
 	category := strings.ToUpper(info.Category)
 	format, err := parse.NewFormat(strings.Split(info.Format, " "))
 	if err != nil {
@@ -38,18 +46,6 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 	if warning != nil {
 		log.Printf("parse.File() returned warning: %v\n", warning)
 		return warning
-	}
-
-	start, err := db.StartOfCategory(context.Background(), year, category)
-	if err != nil {
-		log.Printf("error finding first exercise for category %v: %v\n", category, err)
-		return err
-	}
-
-	end, err := db.EndOfCategory(context.Background(), year, category)
-	if err != nil {
-		log.Printf("error finding last exercise for category %v: %v\n", category, err)
-		return err
 	}
 
 	gameInfo := rdb.GameInfo{

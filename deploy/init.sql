@@ -20,8 +20,7 @@ CREATE TABLE Giochi (
 	inizio int,
 	fine int,
 	PRIMARY KEY (id),
-	CONSTRAINT duplicate_giochi UNIQUE (anno, categoria),
-	CONSTRAINT endAfterStart UNIQUE (inizio <= fine)
+	CONSTRAINT duplicate_giochi UNIQUE (anno, categoria)
 );
 
 CREATE TABLE Risultato (
@@ -84,5 +83,5 @@ INSERT INTO Costanti (
 ) VALUES (2002, 20.0, 1.5, 10000.0, 0.9, 0.9);
 
 INSERT INTO Utenti (nomeutente, parolachiave)
-VALUES ('admin@reelo.it', 'b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2');
+VALUES ('admin@reelo.it', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
 
