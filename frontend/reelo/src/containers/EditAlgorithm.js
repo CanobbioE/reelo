@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {compose} from 'redux';
-import {Grid, Typography, Slide, Button, Avatar} from '@material-ui/core';
+import {Grid, Typography, Slide, Avatar} from '@material-ui/core';
 import RequireAuth from './RequireAuth';
 import {EditAlgForm} from '../components/EditAlgForm';
 import Globals from '../config/Globals';
-import doneImg from '../assets/images/done-checkmark.png';
+// import doneImg from '../assets/images/done-checkmark.png';
 import {
 	updateAlgYear,
 	updateAlgEx,

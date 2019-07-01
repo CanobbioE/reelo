@@ -13,6 +13,8 @@ export const RANK_UPLOAD_LOADING = 'rank_upload_loading';
 export const RANK_UPLOAD_FAIL = 'rank_upload_fail';
 export const PARIS_UPLOAD_CHANGED = 'paris_upload_changed';
 export const RANK_UPLOAD_ERROR_RESET = 'rank_upload_error_reset';
+export const START_UPLOAD_CHANGED = 'start_upload_changed ';
+export const END_UPLOAD_CHANGED = 'end_upload_changed ';
 
 export const RANKS_FETCH_LOADING = 'ranks_fetch_loading';
 export const RANKS_FETCH_SUCCESS = 'ranks_fetch_success';

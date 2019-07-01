@@ -15,6 +15,8 @@ import {
 	updateUploadYear,
 	updateUploadCategory,
 	updateUploadFormat,
+	updateUploadStart,
+	updateUploadEnd,
 	updateUploadIsParis,
 	uploadFile,
 	resetUploadForm,
@@ -78,7 +80,14 @@ function Upload(props) {
 					categoryValue={props.uploadForm.category}
 					onIsParisInput={props.updateUploadIsParis}
 					isParisValue={props.uploadForm.isParis}
+					onStartInput={props.updateUploadStart}
+					startValue={props.uploadForm.start}
+					onEndInput={props.updateUploadEnd}
+					endValue={props.uploadForm.end}
 					loading={props.uploadForm.loading}
+					startSugg={props.uploadForm.startSugg}
+					endSugg={props.uploadForm.endSugg}
+					formatSugg={props.uploadForm.formatSugg}
 				/>
 				<DialogAlert
 					open={alertOpen}
@@ -109,6 +118,8 @@ const composedComponent = compose(
 			updateUploadFormat,
 			updateUploadIsParis,
 			resetUploadForm,
+			updateUploadStart,
+			updateUploadEnd,
 		},
 	),
 );
