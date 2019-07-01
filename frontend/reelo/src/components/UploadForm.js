@@ -25,6 +25,8 @@ export const UploadForm = props => {
 			props.yearValue,
 			props.isParisValue,
 			props.formatValue,
+			props.startValue,
+			props.endValue,
 		);
 	};
 
@@ -51,14 +53,7 @@ export const UploadForm = props => {
 		)),
 	);
 
-	const listPrimary = [
-		'Nome',
-		'Cognome',
-		'Città',
-		'Punti',
-		'Tempo',
-		'Esercizi',
-	];
+	const listPrimary = ['Nome', 'Cognome', 'Sede', 'Punti', 'Tempo', 'Esercizi'];
 	const listSecondary = [
 		'La colonna contenente il nome del concorrente (n)',
 		'La colonna contenente il cognome del concorrente (c)',
@@ -103,26 +98,6 @@ export const UploadForm = props => {
 
 				<Grid item xs={12}>
 					<Typography variant="body2">
-						Inserisci il tipo di dati contenuto nelle colonne in modo ordinato e
-						separato da spazi, i possibili valori sono:
-					</Typography>
-					<List>{fieldsList}</List>
-					<Typography variant="body2">
-						I valori tra le parentesi sono abbreviazioni che possono essere
-						inserite invece dell'intera parola. Specifica solo le colonne che
-						compaiono, ad esempio se ci fosse solo il nome scrivi solo il valore
-						"nome" (senza virgolette)
-					</Typography>
-					<TextField
-						required
-						value={props.formatValue}
-						label="Formato dati"
-						onChange={handleChanges(props.onFormatInput)}
-					/>
-				</Grid>
-
-				<Grid item xs={12}>
-					<Typography variant="body2">
 						Inserisci l'anno a cui i risultati fanno riferimento
 					</Typography>
 					<TextField
@@ -147,6 +122,64 @@ export const UploadForm = props => {
 						}}>
 						{selectItems}
 					</Select>
+				</Grid>
+
+				<Grid item xs={12}>
+					<Typography variant="body2">
+						Inserisci il tipo di dati contenuto nelle colonne in modo ordinato e
+						separato da spazi, i possibili valori sono:
+					</Typography>
+					<List>{fieldsList}</List>
+					<Typography variant="body2">
+						I valori tra le parentesi sono abbreviazioni che possono essere
+						inserite invece dell'intera parola. Specifica solo le colonne che
+						compaiono, ad esempio se ci fosse solo il nome scrivi solo il valore
+						"nome" (senza virgolette)
+					</Typography>
+					<br />
+					{props.formatSugg !== '' && (
+						<Typography variant="body2">
+							<b>
+								Valore suggerito per il {props.yearValue}: {props.formatSugg}
+							</b>
+						</Typography>
+					)}
+					<TextField
+						required
+						value={props.formatValue}
+						label="Formato dati"
+						onChange={handleChanges(props.onFormatInput)}
+					/>
+				</Grid>
+
+				<Grid item xs={12}>
+					<Typography variant="body2">
+						Specifica da quale eserizio inizia la categoria scelta.
+						{props.startSugg !== '' && props.startSugg && (
+							<b>Valore suggerito: {props.startSugg}</b>
+						)}
+					</Typography>
+					<TextField
+						required
+						value={props.startValue}
+						label="Esercizio iniziale"
+						onChange={handleChanges(props.onStartInput)}
+					/>
+				</Grid>
+
+				<Grid item xs={12}>
+					<Typography variant="body2">
+						Seleziona a quale eserizio finisce la categoria scelta.
+						{props.endSugg !== '' && props.endSugg && (
+							<b>Valore suggerito: {props.endSugg}</b>
+						)}
+					</Typography>
+					<TextField
+						required
+						value={props.endValue}
+						label="Esercizio finale"
+						onChange={handleChanges(props.onEndInput)}
+					/>
 				</Grid>
 
 				<Grid item container xs={12} alignItems="baseline">

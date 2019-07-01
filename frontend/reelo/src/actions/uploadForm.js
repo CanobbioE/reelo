@@ -9,6 +9,8 @@ import {
 	FORMAT_UPLOAD_CHANGED,
 	PARIS_UPLOAD_CHANGED,
 	RANK_UPLOAD_ERROR_RESET,
+	START_UPLOAD_CHANGED,
+	END_UPLOAD_CHANGED,
 } from '../utils/Types';
 import Globals from '../config/Globals';
 
@@ -53,6 +55,20 @@ export const updateUploadFormat = format => {
 	};
 };
 
+export const updateUploadStart = start => {
+	return {
+		type: START_UPLOAD_CHANGED,
+		payload: start,
+	};
+};
+
+export const updateUploadEnd = end => {
+	return {
+		type: END_UPLOAD_CHANGED,
+		payload: end,
+	};
+};
+
 const fieldConverter = field => {
 	field.trim();
 	switch (field) {
@@ -85,6 +101,8 @@ export const uploadFile = (
 	year,
 	isParis,
 	format,
+	start,
+	end,
 ) => async dispatch => {
 	dispatch({
 		type: RANK_UPLOAD_LOADING,
@@ -102,6 +120,8 @@ export const uploadFile = (
 			isParis: isParis,
 			token: jwt,
 			format: mappedFormat,
+			start: start,
+			end: end,
 		});
 		const formData = new FormData();
 		formData.append('file', file);
