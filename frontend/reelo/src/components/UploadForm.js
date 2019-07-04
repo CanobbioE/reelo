@@ -140,7 +140,8 @@ export const UploadForm = props => {
 					{props.formatSugg !== '' && (
 						<Typography variant="body2">
 							<b>
-								Valore suggerito per il {props.yearValue}: {props.formatSugg}
+								Valore suggerito per il {props.yearValue} NAZIONALI:{' '}
+								{props.formatSugg}
 							</b>
 						</Typography>
 					)}
@@ -156,7 +157,10 @@ export const UploadForm = props => {
 					<Typography variant="body2">
 						Specifica da quale eserizio inizia la categoria scelta.
 						{props.startSugg !== '' && props.startSugg && (
-							<b>Valore suggerito: {props.startSugg}</b>
+							<b>
+								Valore suggerito per la categoria {props.categoryValue}{' '}
+								NAZIONALE: {props.startSugg}
+							</b>
 						)}
 					</Typography>
 					<TextField
@@ -171,7 +175,10 @@ export const UploadForm = props => {
 					<Typography variant="body2">
 						Seleziona a quale eserizio finisce la categoria scelta.
 						{props.endSugg !== '' && props.endSugg && (
-							<b>Valore suggerito: {props.endSugg}</b>
+							<b>
+								Valore suggerito per la categoria {props.categoryValue}{' '}
+								NAZIONALE: {props.endSugg}
+							</b>
 						)}
 					</Typography>
 					<TextField
