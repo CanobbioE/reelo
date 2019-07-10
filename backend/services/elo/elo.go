@@ -67,15 +67,18 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	for _, year := range partecipationYears {
 		// There could be more than one category for a year,
 		// this could happen in case of namesakes or international results
+
 		categories, err := db.Categories(ctx, name, surname, year)
 		if err != nil {
 			return reelo, err
 		}
+
 		for _, c := range categories {
 			isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
 			if err != nil {
 				return reelo, err
 			}
+
 			weight, err := oneYearScore(ctx,
 				name, surname, lastKnownCategoryForPlayer, c,
 				year, lastKnownYear, &reelo, isParis)
@@ -93,6 +96,7 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	for _, w := range weights {
 		sumOfWeights += w
 	}
+
 	reelo = reelo / sumOfWeights
 
 	//### 9. Anti-Exploit:
@@ -106,7 +110,6 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	// If the player didn't partecipate in the most recent year, his REELO is worth less
 	if !contains(partecipationYears, lastKnownYear) {
 		reelo = reelo * noPartecipationPenalty
-
 	}
 
 	return reelo, nil
@@ -130,24 +133,23 @@ func oneYearScore(ctx context.Context,
 		return 0, err
 	}
 
-	eMax := float64(t - n + 1)
+	eMax := float64(n - t + 1)
 	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
 	if err != nil {
 		return 0, err
 	}
+
 	dMax := float64(maxScoreForCat)
 	d, err := db.Score(name, surname, year, isParis)
 	if err != nil {
 		return 0, err
 	}
+
 	exercises, err := db.Exercises(name, surname, year, isParis)
 	if err != nil {
 		return 0, err
 	}
 	e := float64(exercises)
-	if err != nil {
-		return 0, err
-	}
 
 	//### 1. Base score:
 	// Is the sum of the difficulty D and the number of completed exercises
@@ -168,6 +170,7 @@ func oneYearScore(ctx context.Context,
 	if err != nil {
 		return 0, err
 	}
+
 	baseScore = baseScore / avgCatScore
 
 	//### 5. Multiplicative factor:
