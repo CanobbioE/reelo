@@ -62,20 +62,28 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	if err != nil {
 		return reelo, err
 	}
+	log.Printf("----- INIZIO per %v %v\n", name, surname)
+	log.Printf("[%v %v]ultimaCat: %v\tultimoAnno :%v\tanniPartecipato :%v\n", name, surname, lastKnownCategoryForPlayer, lastKnownYear, partecipationYears)
 
 	//### Steps from 1 to 7
 	for _, year := range partecipationYears {
 		// There could be more than one category for a year,
 		// this could happen in case of namesakes or international results
+
+		log.Printf("[%v %v] Anno: %v\n", name, surname, year)
 		categories, err := db.Categories(ctx, name, surname, year)
 		if err != nil {
 			return reelo, err
 		}
+		log.Printf("[%v %v] Categorie: %v\n", name, surname, categories)
+
 		for _, c := range categories {
 			isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
 			if err != nil {
 				return reelo, err
 			}
+			log.Printf("[%v %v] Parigi?: %v\n", name, surname, isParis)
+
 			weight, err := oneYearScore(ctx,
 				name, surname, lastKnownCategoryForPlayer, c,
 				year, lastKnownYear, &reelo, isParis)
@@ -83,6 +91,7 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 				return reelo, err
 			}
 			weights = append(weights, weight)
+			log.Printf("[%v %v] Pesi: %v\n", name, surname, weights)
 		}
 	}
 
@@ -93,6 +102,8 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	for _, w := range weights {
 		sumOfWeights += w
 	}
+
+	log.Printf("[%v %v] sommaPesi: %v\treelo: %v\treelo/sumPesi: %v\n", name, surname, sumOfWeights, reelo, reelo/sumOfWeights)
 	reelo = reelo / sumOfWeights
 
 	//### 9. Anti-Exploit:
@@ -100,15 +111,17 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	// one result and it's in the most recent year, then her/his REELO is worth less
 	if len(partecipationYears) == 1 && lastKnownYear == partecipationYears[0] {
 		reelo = reelo * antiExploit
+		log.Printf("[%v %v] Dopo antiExploit: %v\n", name, surname, reelo)
 	}
 
 	//### 10. No-partecipation penalty:
 	// If the player didn't partecipate in the most recent year, his REELO is worth less
 	if !contains(partecipationYears, lastKnownYear) {
 		reelo = reelo * noPartecipationPenalty
-
+		log.Printf("[%v %v] Dopo noPartecipa:%v\n", name, surname, reelo)
 	}
 
+	log.Printf("[%v %v] Finale: %v\n", name, surname, reelo)
 	return reelo, nil
 }
 
@@ -124,43 +137,53 @@ func oneYearScore(ctx context.Context,
 	if err != nil {
 		return 0, err
 	}
+	log.Printf("[%v %v OYS %v %v] StartOfCategory: %v\n", name, surname, year, category, t)
 
 	n, err := db.EndOfCategory(context.Background(), year, category)
 	if err != nil {
 		return 0, err
 	}
 
-	eMax := float64(t - n + 1)
+	log.Printf("[%v %v OYS %v %v] EndOfCategory: %v\n", name, surname, year, category, n)
+
+	eMax := float64(n - t + 1)
+	log.Printf("[%v %v OYS %v %v] eMax: %v\n", name, surname, year, category, eMax)
 	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
 	if err != nil {
 		return 0, err
 	}
+	log.Printf("[%v %v OYS %v %v] MaxScoreForCategory: %v\n", name, surname, year, category, maxScoreForCat)
+
 	dMax := float64(maxScoreForCat)
 	d, err := db.Score(name, surname, year, isParis)
 	if err != nil {
 		return 0, err
 	}
+	log.Printf("[%v %v OYS %v %v] score: %v\n", name, surname, year, category, eMax)
+
 	exercises, err := db.Exercises(name, surname, year, isParis)
 	if err != nil {
 		return 0, err
 	}
 	e := float64(exercises)
-	if err != nil {
-		return 0, err
-	}
+	log.Printf("[%v %v OYS %v %v] e-exercises: %v-%v\n", name, surname, year, category, e, exercises)
 
 	//### 1. Base score:
 	// Is the sum of the difficulty D and the number of completed exercises
 	baseScore := exercisesCostant*e + d
 
+	log.Printf("[%v %v OYS %v %v] baseScore: %v\n", name, surname, year, category, baseScore)
+
 	//### 2. International results:
 	// If the result is from paris let's multiply for pFinal
 	if isParis {
 		baseScore = baseScore * pFinal
+		log.Printf("[%v %v OYS %v %v] baseScore dopo parigi: %v\n", name, surname, year, category, baseScore)
 	}
 
 	//### 3. Category homogenization:
 	categoriesHomogenization(&baseScore, t, n, d, e, eMax, dMax)
+	log.Printf("[%v %v OYS %v %v] baseScore dopo catHomo: %v\n", name, surname, year, category, baseScore)
 
 	//### 4. Score normailzation:
 	// Scores are normalized to the average of averages of this year's categories
@@ -168,19 +191,26 @@ func oneYearScore(ctx context.Context,
 	if err != nil {
 		return 0, err
 	}
+
+	log.Printf("[%v %v OYS %v %v] avgCatScore: %v\n", name, surname, year, category, avgCatScore)
 	baseScore = baseScore / avgCatScore
+	log.Printf("[%v %v OYS %v %v] baseScore dopo avg: %v\n", name, surname, year, category, baseScore)
 
 	//### 5. Multiplicative factor:
 	// just to have a big nice number let's multiply for a costant
 	baseScore = baseScore * multiplicativeFactor
+	log.Printf("[%v %v OYS %v %v] baseScore dopo mult: %v\n", name, surname, year, category, baseScore)
 
 	//### 6. Category promotion:
 	categoryPromotion(&baseScore, lastKnownCategoryForPlayer, category, year)
+	log.Printf("[%v %v OYS %v %v] baseScore dopo promotion: %v\n", name, surname, year, category, baseScore)
 
 	//### 7. Aging:
 	// Most recent scores should weight more than past years ones
 	agingFactor := 1 - float64(5)/72*math.Log2(float64(lastKnownYear-year+1))
+	log.Printf("[%v %v OYS %v %v] aging: %v\n", name, surname, year, category, agingFactor)
 	baseScore = baseScore * agingFactor
+	log.Printf("[%v %v OYS %v %v] baseScore dopo aging: %v\n", name, surname, year, category, baseScore)
 
 	*reelo = *reelo + baseScore
 	return agingFactor, nil
