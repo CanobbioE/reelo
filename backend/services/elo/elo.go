@@ -46,23 +46,19 @@ func PseudoReelo(ctx context.Context, name, surname string, year int) error {
 	db := rdb.NewDB()
 	defer db.Close()
 
-	log.Printf("----- INIZIO pseudo-Reelo per %v %v\n", name, surname)
 	//### Steps from 1 to 5
 	// There could be more than one category for a year,
 	// this could happen in case of namesakes or international results
-	log.Printf("[%v %v] Considero l'Anno: %v\n", name, surname, year)
 	categories, err := db.Categories(ctx, name, surname, year)
 	if err != nil {
 		return err
 	}
 
 	for _, c := range categories {
-		log.Printf("[%v %v] Categoria: %v\n", name, surname, c)
 		isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
 		if err != nil {
 			return err
 		}
-		log.Printf("[%v %v] È parigi?: %v\n", name, surname, isParis)
 	}
 
 	for _, c := range categories {
@@ -87,7 +83,6 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	db := rdb.NewDB()
 	defer db.Close()
 
-	log.Printf("----- INIZIO Reelo per %v %v\n", name, surname)
 	// Get some usefull values from db:
 	//
 	// A list of years in which the player has partecipated
@@ -121,7 +116,6 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 		if err != nil {
 			return reelo, err
 		}
-
 		// the category for the current year, used to check for category promotion
 		category, err := db.Category(ctx, name, surname, year)
 		if err != nil {
@@ -132,20 +126,14 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 		if err != nil {
 			return reelo, err
 		}
-		log.Printf("[%v %v OYS %v %v] Passo6: Promozione punteggio convertito %v\n", name, surname, year, category, pseudoReelo)
-
 		stepSeven(&pseudoReelo, &sumOfWeights, lastKnownYear, year)
-
 		reelo += pseudoReelo
 	}
 
-	log.Printf("[%v %v] Passo8: sommaReeloj/sommaPesi: %v / %v = %v\n", name, surname, reelo, sumOfWeights, reelo/sumOfWeights)
 	stepEight(&reelo, sumOfWeights)
-
 	stepNine(&reelo, years, lastKnownYear)
 	stepTen(&reelo, years, lastKnownYear)
 
-	log.Printf("[%v %v] Punteggio finale: %v\n", name, surname, reelo)
 	return reelo, nil
 }
 
@@ -163,59 +151,39 @@ func oneYearScore(ctx context.Context, name, surname, category string,
 	if err != nil {
 		return baseScore, err
 	}
-	log.Printf("[%v %v OYS %v %v] primo esercizio della cat: %v\n", name, surname, year, category, t)
-
 	// the last exercise a player is supposed to solve for the given category
 	n, err := db.EndOfCategory(context.Background(), year, category)
 	if err != nil {
 		return baseScore, err
 	}
-
-	log.Printf("[%v %v OYS %v %v] ultimo esercizio della cat: %v\n", name, surname, year, category, n)
-
 	// the maximum number of solvable exercises for the given category
 	eMax := float64(n - t + 1)
-	log.Printf("[%v %v OYS %v %v] eMax: %v\n", name, surname, year, category, eMax)
-
 	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
 	if err != nil {
 		return baseScore, err
 	}
 	// the maximum score obtainable in the given category
 	dMax := float64(maxScoreForCat)
-	log.Printf("[%v %v OYS %v %v] dMax: %v\n", name, surname, year, category, dMax)
-
 	// the player's score for this year-category
 	d, err := db.Score(name, surname, year, isParis)
 	if err != nil {
 		return baseScore, err
 	}
-
 	// the number of exercises solved by the player for this year-category
 	exercises, err := db.Exercises(name, surname, year, isParis)
 	if err != nil {
 		return baseScore, err
 	}
 	e := float64(exercises)
-	log.Printf("[%v %v OYS %v %v] numero di esercizi svolti dal giocatore: %v\n", name, surname, year, category, e)
 
 	stepOne(&baseScore, e, d)
-	log.Printf("[%v %v OYS %v %v] Passo1: punteggioBase = k*e+d = %v*%v+%v = %v\n", name, surname, year, category, exercisesCostant, e, d, baseScore)
-
 	stepTwo(&baseScore, isParis)
-	log.Printf("[%v %v OYS %v %v] Passo2: dopo parigi %v\n", name, surname, year, category, baseScore)
-
 	stepThree(&baseScore, t, n, d, e, eMax, dMax)
-	log.Printf("[%v %v OYS %v %v] Passo3: Omogeneizzazione finita, punteggio base: %v\n", name, surname, year, category, baseScore)
-
 	err = stepFour(&baseScore, year)
 	if err != nil {
 		return baseScore, err
 	}
-	log.Printf("[%v %v OYS %v %v] Passo4: punteggio base dopo normalizzazione: %v\n", name, surname, year, category, baseScore)
-
 	stepFive(&baseScore)
-	log.Printf("[%v %v OYS %v %v] Passo5: dopo fattore moltiplicativo: %v\n", name, surname, year, category, baseScore)
 
 	return baseScore, nil
 }
@@ -246,7 +214,6 @@ func maxPseudoReelo(year int, category string) (float64, error) {
 	dMax := float64(maxScoreForCat)
 	d := dMax
 
-	log.Printf("Passo6: Promozione, calcolo il massimo Reelo ottenibile nel %v categoria %v\n", year, category)
 	stepOne(&pseudoReelo, e, d)
 	stepTwo(&pseudoReelo, true)
 	stepThree(&pseudoReelo, t, n, d, e, eMax, dMax)

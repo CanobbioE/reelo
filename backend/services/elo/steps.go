@@ -1,7 +1,6 @@
 package elo
 
 import (
-	"log"
 	"math"
 
 	rdb "github.com/CanobbioE/reelo/backend/db"
@@ -36,11 +35,8 @@ func stepTwo(baseScore *float64, isParis bool) {
 func stepThree(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 	for i := 1; i <= t-1; i++ {
 		errorFactor := float64(1 - (exercisesCostant*e+d)/(exercisesCostant*eMax+dMax))
-		log.Printf("Passo3: Omogeneizzazione fattore errore: %v\n", errorFactor)
 		difficultyFactor := float64(i) / float64(n+1)
-		log.Printf("Passo3: Omogeneizzazione fattore difficoltà: %v\n", difficultyFactor)
 		nonResolutionProbability := 1 - difficultyFactor*errorFactor
-		log.Printf("Passo3: Omogeneizzazione prob di non risoluzione: %v\n", nonResolutionProbability)
 		*baseScore += (exercisesCostant + float64(i)) * nonResolutionProbability
 	}
 }
@@ -54,8 +50,6 @@ func stepFour(baseScore *float64, year int) error {
 	if err != nil {
 		return err
 	}
-	log.Printf("Passo4: media delle medie delle categorie: %v\n", avgCatScore)
-	log.Printf("Passo4: punteggioBase / mediaDelleMedie = %v / %v = %v", *baseScore, avgCatScore, *baseScore/avgCatScore)
 	*baseScore = *baseScore / avgCatScore
 	return nil
 }
@@ -76,14 +70,11 @@ func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 	db := rdb.NewDB()
 	defer db.Close()
 
-	log.Printf("Passo6: Promozione ultima categoria conosciuta: %v\n", lastKnownCategoryForPlayer)
-	log.Printf("Passo6: Promozione categoria attuale: %v\n", category)
 	if categoryFromString(lastKnownCategoryForPlayer) > categoryFromString(category) {
 		oldAvg, err := db.AvgPseudoReelo(year, category)
 		if err != nil {
 			return err
 		}
-		log.Printf("Passo6: Promozione vecchia media: %v\n", oldAvg)
 
 		newAvg, err := db.AvgPseudoReelo(year, lastKnownCategoryForPlayer)
 		if err != nil {
@@ -94,7 +85,6 @@ func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 		if newAvg < 0 {
 			return nil
 		}
-		log.Printf("Passo6: Promozione nuova media: %v\n", newAvg)
 
 		newMax, err := maxPseudoReelo(year, lastKnownCategoryForPlayer)
 		if err != nil {
@@ -105,19 +95,16 @@ func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 		if newMax < 0 {
 			return nil
 		}
-		log.Printf("Passo6: Promozione nuovo massimo: %v\n", newMax)
 
 		thisYearScore := *baseScore
 
 		convertedScore := thisYearScore * newAvg / oldAvg
 		// Do not exceed the maximum obtainable score
 		if convertedScore > newMax {
-			log.Printf("Passo6: Promozione superato massimo!: %v > %v\n", convertedScore, newMax)
 			convertedScore = newMax
 		}
 		//  Do not drop below the originalScore
 		if convertedScore < thisYearScore {
-			log.Printf("Passo6: Promozione superato il minimo!: %v < %v\n", convertedScore, thisYearScore)
 			convertedScore = thisYearScore
 		}
 		*baseScore = convertedScore
@@ -129,10 +116,8 @@ func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 // Most recent scores should weight more than the ones from past years
 func stepSeven(baseScore, sumOfWeights *float64, lastKnownYear, year int) {
 	agingFactor := 1 - float64(5)/72*math.Log2(float64(lastKnownYear-year+1))
-	log.Printf("Passo7: Fattore invecchiamento 1 - 5/72*log2(A-Ai+1) = 1 - 5/72 * log2(%v-%v+1): %v\n", lastKnownYear, year, agingFactor)
 	*baseScore *= agingFactor
 	*sumOfWeights += agingFactor
-	log.Printf("Passo7: punteggioBasse dopo invecchiamento: %v\n", *baseScore)
 }
 
 //### 8. Average:
@@ -147,7 +132,6 @@ func stepEight(baseScore *float64, sumOfWeights float64) {
 // one result and it's in the most recent year, then her/his REELO is worth less
 func stepNine(baseScore *float64, years []int, lastKnownYear int) {
 	if len(years) == 1 && lastKnownYear == years[0] {
-		log.Printf("Passo9: antiExploit: %v, reelo = reelo * antiExploit = %v \n", antiExploit, *baseScore*antiExploit)
 		*baseScore *= antiExploit
 	}
 }
@@ -156,7 +140,6 @@ func stepNine(baseScore *float64, years []int, lastKnownYear int) {
 // If the player didn't partecipate in the most recent year, his REELO is worth less
 func stepTen(baseScore *float64, years []int, lastKnownYear int) {
 	if !contains(years, lastKnownYear) {
-		log.Printf("Passo10: penalità non partecipazione: %v * %v = %v\n", *baseScore, noPartecipationPenalty, *baseScore*noPartecipationPenalty)
 		*baseScore *= noPartecipationPenalty
 	}
 }
