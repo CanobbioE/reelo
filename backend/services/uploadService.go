@@ -41,7 +41,7 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 	}
 	isParis := info.IsParis
 
-	// TODO: this is the warning we want to return to the front end
+	// this is the warning we want to return to the front end
 	results, warning := parse.File(fileReader, format, year, category)
 	if warning != nil {
 		log.Printf("parse.File() returned warning: %v\n", warning)
@@ -60,6 +60,7 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 }
 
 // SaveRankingFile saves the specified reader in a file named "year_category.txt"
+// TODO: this is unusued due to limited space on server
 func SaveRankingFile(src io.Reader, year, category string, isParis bool) error {
 	prefix := fmt.Sprintf("%s/%s", parse.RankPath, year)
 	if isParis {
