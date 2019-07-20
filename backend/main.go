@@ -50,7 +50,7 @@ func main() {
 	router.HandleFunc("/upload", middlewares.Auth(
 		http.HandlerFunc(controllers.Upload))).Methods("POST")
 	router.HandleFunc("/force-reelo", middlewares.Auth(
-		http.HandlerFunc(controllers.ForceReelo))).Methods("PUT")
+		http.HandlerFunc(controllers.ForcePseudoReelo))).Methods("PUT")
 	router.HandleFunc("/algorithm", middlewares.Auth(
 		http.HandlerFunc(controllers.HandleAlgorithm))).Methods("PATCH", "GET")
 

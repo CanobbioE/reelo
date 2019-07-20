@@ -45,13 +45,7 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("\n\nFile parsed succesfully\n")
 
-	// TODO save to cloud
-	// err = services.SaveRankingFile(file, uploadInfo.Year, uploadInfo.Category, uploadInfo.IsParis)
-	// if err != nil {
-	// log.Printf("Error saving the file: %v", err)
-	// http.Error(w, "can't save file", http.StatusInternalServerError)
-	// }
-	err = services.CalculateAllReelo()
+	err = services.CalculateAllReelo(true)
 	if err != nil {
 		log.Printf("Error recalculating reelo file: %v", err)
 		http.Error(w, "can't recalculate reelo", http.StatusInternalServerError)

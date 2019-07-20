@@ -8,6 +8,8 @@ import (
 	"github.com/CanobbioE/reelo/backend/dto"
 )
 
+// TODO: refactor me into just two functions: queryMultiple and querySingle
+
 // PlayerID retrieves a player id from the database given its name and surname
 func (database *DB) PlayerID(ctx context.Context, name, surname string) (int, error) {
 	var id int
@@ -140,25 +142,25 @@ func (database *DB) Categories(ctx context.Context, name, surname string, year i
 
 }
 
-// AvgScoresOfCategories calculates the average scores for
+// AvgScoresOfCategories calculates the average scores (k*e + d) for
 // all the categories in the given year
-func (database *DB) AvgScoresOfCategories(year int) (float64, error) {
+func (database *DB) AvgScoresOfCategories(year int, k float64) (float64, error) {
 	var avg float64
 	q := findAvgScoresByYear
-	err := database.db.QueryRow(q, year).Scan(&avg)
+	err := database.db.QueryRow(q, k, year).Scan(&avg)
 	if err != nil {
 		return avg, fmt.Errorf("Error getting average score of categories: %v", err)
 	}
 	return avg, nil
 }
 
-// AvgScore returns the score's average for the given year and category
-func (database *DB) AvgScore(year int, category string) (float64, error) {
+// AvgPseudoReelo returns the pseudo-Reelo's average for the given year and category
+func (database *DB) AvgPseudoReelo(year int, category string) (float64, error) {
 	var avg float64
-	q := findAvgScoresByYearAndCategory
+	q := findAvgPseudoReeloByYearAndCategory
 	err := database.db.QueryRow(q, year, category).Scan(&avg)
 	if err != nil {
-		return avg, fmt.Errorf("Error getting average score: %v", err)
+		return avg, fmt.Errorf("Error getting average pseudo-Reelo: %v", err)
 	}
 
 	return avg, nil
@@ -219,7 +221,7 @@ func (database *DB) LastKnownYear() (int, error) {
 // we know the specified player has partecipated
 func (database *DB) LastKnownCategoryForPlayer(name, surname string) (string, error) {
 	var category string
-	q := findCategoryByPlayerAndYear
+	q := findLastCategoryByPlayerAndYear
 	err := database.db.QueryRow(q, name, surname, name, surname).Scan(&category)
 	if err != nil {
 		return category, fmt.Errorf("Error getting last known category: %v", err)
@@ -301,14 +303,14 @@ func (database *DB) EndOfCategory(ctx context.Context, year int, category string
 	q := findEndByYearAndCategory
 	rows, err := database.db.QueryContext(ctx, q, year, category)
 	if err != nil {
-		return end, fmt.Errorf("Error getting the first exercise: %v", err)
+		return end, fmt.Errorf("Error getting the last exercise: %v", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		err := rows.Scan(&end)
 		if err != nil {
-			return end, fmt.Errorf("Error getting the first exercise: %v", err)
+			return end, fmt.Errorf("Error getting the last exercise: %v", err)
 		}
 	}
 	return end, nil
@@ -331,4 +333,55 @@ func (database *DB) MaxScoreForCategory(ctx context.Context, year int, category 
 		maxScore += i
 	}
 	return maxScore, nil
+}
+
+// PseudoReelo retreives a pseudo-Reelo for a given player in the specified year
+func (database *DB) PseudoReelo(ctx context.Context, name, surname string, year int) (float64, error) {
+	var pseudo float64
+	q := findPseudoReeloByPlayerAndYear
+	rows, err := database.db.QueryContext(ctx, q, name, surname, year)
+	if err != nil {
+		return pseudo, fmt.Errorf("Error getting pseudo-Reelo: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&pseudo)
+		if err != nil {
+			return pseudo, fmt.Errorf("Error getting pseudo-Reelo: %v", err)
+		}
+	}
+	return pseudo, nil
+}
+
+// Category retreives the category in which the given player has partecipated
+// during the specified year
+func (database *DB) Category(ctx context.Context, name, surname string, year int) (string, error) {
+	var category string
+	q := findCategoryByPlayerAndYear
+	rows, err := database.db.QueryContext(ctx, q, name, surname, year)
+	if err != nil {
+		return category, fmt.Errorf("Error getting category: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&category)
+		if err != nil {
+			return category, fmt.Errorf("Error getting category: %v", err)
+		}
+	}
+
+	return category, nil
+}
+
+// ResultID returns the id of a result given a player a year and a category
+func (database *DB) ResultID(name, surname string, year int, category string) (int, error) {
+	var id int
+	q := findResultIDByNameAndSurnameAndYearAndCategory
+	err := database.db.QueryRow(q, name, surname, year, category).Scan(&id)
+	if err != nil {
+		return id, fmt.Errorf("Error getting result id: %v", err)
+	}
+	return id, nil
 }

@@ -58,6 +58,9 @@ func (database DB) InserRankingFile(
 		return err
 	}
 	for _, line := range file {
+		if line.Name == "" && line.Surname == "" {
+			continue
+		}
 		city := line.City
 		if isParis {
 			city = "paris"
@@ -109,5 +112,21 @@ no_partecipazione = ?`
 		c.MultiplicativeFactor,
 		c.AntiExploit,
 		c.NoPartecipationPenalty)
+	return err
+}
+
+// UpdatePseudoReelo updates the pseudo reelo associated with the given id
+func (database *DB) UpdatePseudoReelo(ctx context.Context,
+	name, surname string, year int, category string, pseudoReelo float64) error {
+	id, err := database.ResultID(name, surname, year, category)
+	if err != nil {
+		return err
+	}
+	q := `
+UPDATE Risultato SET
+pseudo_reelo = ?
+WHERE id = ?`
+
+	_, err = database.db.ExecContext(ctx, q, pseudoReelo, id)
 	return err
 }
