@@ -28,7 +28,7 @@ func Auth(next http.Handler) http.HandlerFunc {
 			})
 		if !tkn.Valid {
 			log.Println("Invalid token")
-			http.Error(w, "invalid token", http.StatusUnauthorized)
+			http.Error(w, "Autenticazione non valida - esci dall'applicazione e autenticati nuovamente", http.StatusUnauthorized)
 			return
 		}
 		if err != nil {
