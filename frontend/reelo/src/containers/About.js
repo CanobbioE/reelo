@@ -21,31 +21,27 @@ export default function About(props) {
 					<dt>
 						<strong> Ideazione:</strong>
 					</dt>
-					<dd> Cesco Reale </dd>
+					<dd> Cesco Reale.</dd>
 					<dt>
 						<strong>Comitato scientifico: </strong>
 					</dt>
-					<dd>
-						Fabio Angelini, Marco Broglia, Andrea Nari, Marco Pellegrini, Cesco
-						Reale
-					</dd>
+					<dd>Marco Broglia, Andrea Nari, Marco Pellegrini, Cesco Reale.</dd>
 					<dt>
 						<strong>Implementazione: </strong>
 					</dt>
-					<dd> Anna Bernardi </dd>
-					<dd> Edoardo Canobbio </dd>
+					<dd>Edoardo Canobbio, in collaborazione con Anna Bernardi. </dd>
 					<dt>
 						<strong>Comitato tecnico: </strong>
 					</dt>
 					<dd>
-						Fabio Angelini, Anna Bernardi, Edoardo Canobbio, Mirko Cappuccia
+						Fabio Angelini, Anna Bernardi, Edoardo Canobbio, Mirko Cappuccia.
 					</dd>
 
 					<dt>
 						<strong>Consulenti: </strong>
 					</dt>
 					<dd>
-						David Barbato, Maurizio De Leo, Francesco Morandin, Alberto Saracco
+						David Barbato, Maurizio De Leo, Francesco Morandin, Alberto Saracco.
 					</dd>
 				</dl>
 			</Grid>
