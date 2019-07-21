@@ -9,7 +9,7 @@ CREATE TABLE Giocatore (
 	id int AUTO_INCREMENT,
 	nome varchar(255) NOT NULL,
 	cognome varchar(255) NOT NULL,
-	reelo int,
+	reelo float,
 	PRIMARY KEY (id)
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE Risultato (
 	esercizi int,
 	punteggio int,
 	posizione int,
-	pseudo_reelo int,
+	pseudo_reelo float,
 	PRIMARY KEY (id)
 );
 
