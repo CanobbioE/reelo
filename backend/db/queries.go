@@ -45,24 +45,28 @@ JOIN Giocatore U ON U.id = P.giocatore
 WHERE U.nome = ? AND U.cognome = ? AND G.anno = ? `
 
 	findAvgScoresByYear = `
-SELECT AVG(R.punteggio) FROM Risultato R
-JOIN Partecipazione P ON P.risultato = R.id
-JOIN Giochi G ON G.id = P.giochi
-WHERE G.anno = ?`
+SELECT AVG(X.avg) FROM (
+	SELECT AVG(? * R.esercizi + R.punteggio) AS avg
+	FROM Risultato R
+	JOIN Partecipazione P ON P.risultato = R.id
+	JOIN Giochi G ON G.id = P.giochi
+	WHERE G.anno = ?
+	GROUP BY G.categoria) AS X
+`
 
-	findAvgScoresByYearAndCategory = `
-SELECT AVG(R.punteggio) FROM Risultato R
+	findAvgPseudoReeloByYearAndCategory = `
+SELECT IFNULL(AVG(R.pseudo_reelo), -1) FROM Risultato R
 JOIN Partecipazione P ON P.risultato = R.id
 JOIN Giochi G ON G.id = P.giochi
 WHERE G.anno = ? AND G.categoria = ?`
 
 	findMaxScoreByYearAndCategory = `
-SELECT MAX(R.punteggio) FROM Risultato R
+SELECT IFNULL(MAX(R.punteggio), -1) FROM Risultato R
 JOIN Partecipazione P ON P.risultato = R.id
 JOIN Giochi G ON G.id = P.giochi
 WHERE G.anno = ? AND G.categoria = ?`
 
-	findCategoryByPlayerAndYear = `
+	findLastCategoryByPlayerAndYear = `
 SELECT G.categoria FROM Giochi G
 JOIN Partecipazione P ON P.giochi = G.id
 JOIN Giocatore U ON U.id = P.giocatore
@@ -82,7 +86,8 @@ WHERE U.nome = ? AND U.cognome = ?
 AND G.anno = ? AND G.categoria = ?`
 
 	findAllPlayersRanks = `
-SELECT U.nome, U.cognome, G.categoria, U.reelo FROM Giocatore U
+SELECT U.nome, U.cognome, G.categoria, U.reelo
+FROM Giocatore U
 JOIN Partecipazione P ON P.giocatore = U.id
 JOIN Giochi G ON G.id = P.giochi
 WHERE (G.anno, U.id) IN (
@@ -105,6 +110,26 @@ FROM Giochi
 WHERE anno = ?
 AND categoria = ?
 `
-)
 
-// last played years:
+	findPseudoReeloByPlayerAndYear = `
+SELECT R.pseudo_reelo FROM Risultato R
+JOIN Partecipazione P ON P.risultato = R.id
+JOIN Giocatore U ON U.id = P.giocatore
+JOIN Giochi G ON G.id = P.giochi
+WHERE U.nome = ? AND U.cognome = ? AND G.anno = ?`
+
+	findCategoryByPlayerAndYear = `
+SELECT G.categoria FROM Giochi G
+JOIN Partecipazione P ON P.giochi = G.id
+JOIN Giocatore U ON U.id = P.giocatore
+WHERE U.nome = ? AND U.cognome = ? AND G.anno = ?`
+
+	findResultIDByNameAndSurnameAndYearAndCategory = `
+SELECT R.id
+FROM Risultato R
+JOIN Partecipazione P ON P.risultato = R.id
+JOIN Giocatore U ON U.id = P.Giocatore
+JOIN Giochi G ON G.id = P.giochi
+WHERE U.nome = ? AND U.cognome = ? AND G.anno = ? AND G.categoria = ?
+	`
+)

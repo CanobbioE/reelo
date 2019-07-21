@@ -12,7 +12,7 @@ function Ranks(props) {
 	}, []);
 
 	const rows = props.ranks.rows;
-	const labels = ['Nome', 'Cognome', 'Categoria', 'Reelo'];
+	const labels = ['#', 'Nome', 'Cognome', 'Categoria', 'Reelo'];
 
 	const content = (
 		<Grid container item xs={12} justify="space-around">

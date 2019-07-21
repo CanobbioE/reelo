@@ -9,9 +9,14 @@ import (
 )
 
 // CalculateAllReelo recalculates the Reelo score
-// for every single player in the database
-func CalculateAllReelo() error {
-	log.Println("Recalculating reelo")
+// for every single player in the database.
+// If the doPseudo is true, then the pseudo-reelo gets recalculated aswell
+func CalculateAllReelo(doPseudo bool) error {
+	if doPseudo {
+		log.Println("(Re)calculating pseudo-Reelo...")
+	}
+	log.Println("(Re)calculating Reelo...")
+
 	elo.InitCostants()
 	ctx := context.Background()
 	db := rdb.NewDB()
@@ -19,7 +24,24 @@ func CalculateAllReelo() error {
 	if err != nil {
 		return err
 	}
+
 	for _, player := range players {
+		if player.Name == "" || player.Surname == "" {
+			continue
+		}
+		if doPseudo {
+			years, err := db.PlayerPartecipationYears(ctx, player.Name, player.Surname)
+			if err != nil {
+				return err
+			}
+			for _, year := range years {
+				err := elo.PseudoReelo(ctx, player.Name, player.Surname, year)
+				if err != nil {
+					return err
+				}
+			}
+		}
+
 		elo, err := elo.Reelo(ctx, player.Name, player.Surname)
 		if err != nil {
 			return err
@@ -31,5 +53,6 @@ func CalculateAllReelo() error {
 			return err
 		}
 	}
+	log.Println("Reelo (re)calculated.")
 	return nil
 }

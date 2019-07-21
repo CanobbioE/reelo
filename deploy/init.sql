@@ -29,6 +29,7 @@ CREATE TABLE Risultato (
 	esercizi int,
 	punteggio int,
 	posizione int,
+	pseudo_reelo int,
 	PRIMARY KEY (id)
 );
 

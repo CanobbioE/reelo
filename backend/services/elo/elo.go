@@ -1,15 +1,8 @@
-/*
-Package elo defines the custom algorithm, and all the useful function used
-to calculate the REELO for a given user.
-Disclaimer: comments that starts with three '#' represents the steps
-to calculate the REELO taken directly from the given documentation.
-*/
 package elo
 
 import (
 	"context"
 	"log"
-	"math"
 
 	rdb "github.com/CanobbioE/reelo/backend/db"
 )
@@ -25,6 +18,8 @@ var (
 
 // InitCostants retrieves the costants in the database, if anything goes wrong
 // it will fallback to the hardcoded values
+// Variables names are chosen consistently with the formula
+// provided by the scientific committee
 func InitCostants() {
 	db := rdb.NewDB()
 	defer db.Close()
@@ -43,206 +38,192 @@ func InitCostants() {
 	noPartecipationPenalty = c.NoPartecipationPenalty
 }
 
-// Reelo calculates a player's ELO using a custom algorithm
-func Reelo(ctx context.Context, name, surname string) (float64, error) {
-	var reelo float64
-	var weights []float64
+// PseudoReelo calculates a basic version of a player's ELO.
+// This score does not take aging, anti-exploit and category
+// promotion into consideration.
+func PseudoReelo(ctx context.Context, name, surname string, year int) error {
+	var isParis bool
 	db := rdb.NewDB()
 	defer db.Close()
 
+	//### Steps from 1 to 5
+	// There could be more than one category for a year,
+	// this could happen in case of namesakes or international results
+	categories, err := db.Categories(ctx, name, surname, year)
+	if err != nil {
+		return err
+	}
+
+	for _, c := range categories {
+		isParis, err = db.IsResultFromParis(ctx, name, surname, year, c)
+		if err != nil {
+			return err
+		}
+		if isParis {
+			break
+		}
+	}
+
+	for _, c := range categories {
+		reelo, err := oneYearScore(ctx, name, surname, c, year, isParis)
+		if err != nil {
+			return err
+		}
+		// TODO: this should be in a service, not here
+		err = db.UpdatePseudoReelo(ctx, name, surname, year, c, reelo)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Reelo calculates a player's ELO using a custom algorithm
+func Reelo(ctx context.Context, name, surname string) (float64, error) {
+	var reelo float64
+	var sumOfWeights float64
+
+	db := rdb.NewDB()
+	defer db.Close()
+
+	// Get some usefull values from db:
+	//
+	// A list of years in which the player has partecipated
+	// It's used to iterate over the results as well as to check if the
+	// anti-exploit mechanism should take effect.
+	years, err := db.PlayerPartecipationYears(ctx, name, surname)
+	if err != nil {
+		return reelo, err
+	}
+	// The last category known in which the player has partecipated.
+	// It's used to check for category promotion.
 	lastKnownCategoryForPlayer, err := db.LastKnownCategoryForPlayer(name, surname)
 	if err != nil {
 		return reelo, err
 	}
+	// The last year known in which the player has partecipated.
+	// It is used to calculate the aging factor and if the anti-exploit mechanism
+	// should take effect.
 	lastKnownYear, err := db.LastKnownYear()
 	if err != nil {
 		return reelo, err
 	}
-	partecipationYears, err := db.PlayerPartecipationYears(ctx, name, surname)
-	if err != nil {
-		return reelo, err
-	}
 
-	//### Steps from 1 to 7
-	for _, year := range partecipationYears {
-		// There could be more than one category for a year,
-		// this could happen in case of namesakes or international results
-
-		categories, err := db.Categories(ctx, name, surname, year)
+	// Every year a player has played should have a pseudo-Reelo, which needs
+	// to be aged and promoted (if needed) to become a proper Reelo.
+	// Finally we want to calculate a weighted average of
+	// all those Reeloj and get the final score.
+	for _, year := range years {
+		// pseudo-Reelo is basically a glorified version of the K*E+D formula.
+		pseudoReelo, err := db.PseudoReelo(ctx, name, surname, year)
+		if err != nil {
+			return reelo, err
+		}
+		// the category for the current year, used to check for category promotion
+		category, err := db.Category(ctx, name, surname, year)
 		if err != nil {
 			return reelo, err
 		}
 
-		for _, c := range categories {
-			isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
-			if err != nil {
-				return reelo, err
-			}
-
-			weight, err := oneYearScore(ctx,
-				name, surname, lastKnownCategoryForPlayer, c,
-				year, lastKnownYear, &reelo, isParis)
-			if err != nil {
-				return reelo, err
-			}
-			weights = append(weights, weight)
+		err = stepSix(&pseudoReelo, lastKnownCategoryForPlayer, category, year)
+		if err != nil {
+			return reelo, err
 		}
+		stepSeven(&pseudoReelo, &sumOfWeights, lastKnownYear, year)
+		reelo += pseudoReelo
 	}
 
-	//### 8. Average:
-	// Since reelo is already the sum of weighted scores we just divide
-	// by the sum of the weights
-	var sumOfWeights float64
-	for _, w := range weights {
-		sumOfWeights += w
-	}
-
-	reelo = reelo / sumOfWeights
-
-	//### 9. Anti-Exploit:
-	// To avoid single year partecipation's exploit: if the player has only
-	// one result and it's in the most recent year, then her/his REELO is worth less
-	if len(partecipationYears) == 1 && lastKnownYear == partecipationYears[0] {
-		reelo = reelo * antiExploit
-	}
-
-	//### 10. No-partecipation penalty:
-	// If the player didn't partecipate in the most recent year, his REELO is worth less
-	if !contains(partecipationYears, lastKnownYear) {
-		reelo = reelo * noPartecipationPenalty
-	}
+	stepEight(&reelo, sumOfWeights)
+	stepNine(&reelo, years, lastKnownYear)
+	stepTen(&reelo, years, lastKnownYear)
 
 	return reelo, nil
 }
 
-func oneYearScore(ctx context.Context,
-	name, surname, lastKnownCategoryForPlayer, category string,
-	year, lastKnownYear int, reelo *float64, isParis bool) (float64, error) {
+// oneYearScore is used to calculate a baseScore using steps from 1 to 5.
+// This baseScore (a.k.a. pseudo-Reelo) refers to a single year.
+// This needs to be calculated for every year the player has played.
+func oneYearScore(ctx context.Context, name, surname, category string,
+	year int, isParis bool) (float64, error) {
+	var baseScore float64
 	db := rdb.NewDB()
 	defer db.Close()
 
-	// Variables names are chosen consistently with the formula
-	// provided by the scientific committee
+	// the first exercise a player is supposed to solve for the given category
 	t, err := db.StartOfCategory(context.Background(), year, category)
 	if err != nil {
-		return 0, err
+		return baseScore, err
 	}
-
+	// the last exercise a player is supposed to solve for the given category
 	n, err := db.EndOfCategory(context.Background(), year, category)
 	if err != nil {
-		return 0, err
+		return baseScore, err
 	}
-
+	// the maximum number of solvable exercises for the given category
 	eMax := float64(n - t + 1)
 	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
 	if err != nil {
-		return 0, err
+		return baseScore, err
 	}
-
+	// the maximum score obtainable in the given category
 	dMax := float64(maxScoreForCat)
+	// the player's score for this year-category
 	d, err := db.Score(name, surname, year, isParis)
 	if err != nil {
-		return 0, err
+		return baseScore, err
 	}
-
+	// the number of exercises solved by the player for this year-category
 	exercises, err := db.Exercises(name, surname, year, isParis)
 	if err != nil {
-		return 0, err
+		return baseScore, err
 	}
 	e := float64(exercises)
 
-	//### 1. Base score:
-	// Is the sum of the difficulty D and the number of completed exercises
-	baseScore := exercisesCostant*e + d
-
-	//### 2. International results:
-	// If the result is from paris let's multiply for pFinal
-	if isParis {
-		baseScore = baseScore * pFinal
-	}
-
-	//### 3. Category homogenization:
-	categoriesHomogenization(&baseScore, t, n, d, e, eMax, dMax)
-
-	//### 4. Score normailzation:
-	// Scores are normalized to the average of averages of this year's categories
-	avgCatScore, err := db.AvgScoresOfCategories(year)
+	stepOne(&baseScore, e, d)
+	stepTwo(&baseScore, isParis)
+	stepThree(&baseScore, t, n, d, e, eMax, dMax)
+	err = stepFour(&baseScore, year)
 	if err != nil {
-		return 0, err
+		return baseScore, err
 	}
+	stepFive(&baseScore)
 
-	baseScore = baseScore / avgCatScore
-
-	//### 5. Multiplicative factor:
-	// just to have a big nice number let's multiply for a costant
-	baseScore = baseScore * multiplicativeFactor
-
-	//### 6. Category promotion:
-	categoryPromotion(&baseScore, lastKnownCategoryForPlayer, category, year)
-
-	//### 7. Aging:
-	// Most recent scores should weight more than past years ones
-	agingFactor := 1 - float64(5)/72*math.Log2(float64(lastKnownYear-year+1))
-	baseScore = baseScore * agingFactor
-
-	*reelo = *reelo + baseScore
-	return agingFactor, nil
+	return baseScore, nil
 }
 
-//### 3. Categories homogenization:
-// For each exercises a player is not supposed to solve we calculate
-// her/his probabilty of solving it.
-// To the base score we should add:
-// (K + i) * {1 - [i/N+1] * [1 - (K*e+d)/(KeMax+dMax)]}
-//
-// Where:
-//
-// exercisesCostant = K
-// errorFactor = 1 - [(K*e+d) / (K*eMax+dMax)]
-// difficultyFactor = i/(n+1)
-// nonResolutionProbability = 1 - difficultyFactor*errorFactor
-func categoriesHomogenization(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
-	for i := 1; i <= t-1; i++ {
-		errorFactor := float64(1 - (exercisesCostant*e+d)/(exercisesCostant*eMax+dMax))
-		difficultyFactor := float64(i) / float64(n+1)
-		nonResolutionProbability := 1 - difficultyFactor*errorFactor
-		*baseScore += (exercisesCostant + float64(i)) * nonResolutionProbability
-	}
-}
-
-//### 6. Category promotion:
-// If in the year we are using to calculate the ELO,
-// the player's category is inferior to the category she/he
-// has played most recently, then we convert this year's score
-// to the most recent category
-func categoryPromotion(baseScore *float64,
-	lastKnownCategoryForPlayer, category string,
-	year int) error {
+func maxPseudoReelo(year int, category string) (float64, error) {
+	var pseudoReelo float64
 	db := rdb.NewDB()
 	defer db.Close()
-	if categoryFromString(lastKnownCategoryForPlayer) > categoryFromString(category) {
-		oldAvg, err := db.AvgScore(year, category)
-		if err != nil {
-			return err
-		}
-		newAvg, err := db.AvgScore(year, lastKnownCategoryForPlayer)
-		if err != nil {
-			return err
-		}
-		newMax, err := db.MaxScore(year, lastKnownCategoryForPlayer)
-		if err != nil {
-			return err
-		}
-		thisYearScore := *baseScore
 
-		convertedScore := thisYearScore * newAvg / oldAvg
-		// Do not exceed the maximum obtainable score
-		if convertedScore > newMax {
-			convertedScore = newMax
-		}
-		*baseScore = convertedScore
+	t, err := db.StartOfCategory(context.Background(), year, category)
+	if err != nil {
+		return pseudoReelo, err
 	}
-	return nil
+	n, err := db.EndOfCategory(context.Background(), year, category)
+	if err != nil {
+		return pseudoReelo, err
+	}
+
+	// Here eMax correspond to e
+	eMax := float64(n - t + 1)
+	e := eMax
+	// Here dMax correspond to d
+	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
+	if err != nil {
+		return pseudoReelo, err
+	}
+	// the maximum score obtainable in the given category
+	dMax := float64(maxScoreForCat)
+	d := dMax
+
+	stepOne(&pseudoReelo, e, d)
+	stepTwo(&pseudoReelo, true)
+	stepThree(&pseudoReelo, t, n, d, e, eMax, dMax)
+	stepFour(&pseudoReelo, year)
+	stepFive(&pseudoReelo)
+
+	return pseudoReelo, nil
 }
 
 func contains(array []int, item int) bool {
