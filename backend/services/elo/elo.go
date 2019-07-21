@@ -55,9 +55,12 @@ func PseudoReelo(ctx context.Context, name, surname string, year int) error {
 	}
 
 	for _, c := range categories {
-		isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
+		isParis, err = db.IsResultFromParis(ctx, name, surname, year, c)
 		if err != nil {
 			return err
+		}
+		if isParis {
+			break
 		}
 	}
 

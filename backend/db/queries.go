@@ -86,7 +86,8 @@ WHERE U.nome = ? AND U.cognome = ?
 AND G.anno = ? AND G.categoria = ?`
 
 	findAllPlayersRanks = `
-SELECT U.nome, U.cognome, G.categoria, U.reelo FROM Giocatore U
+SELECT U.nome, U.cognome, G.categoria, U.reelo
+FROM Giocatore U
 JOIN Partecipazione P ON P.giocatore = U.id
 JOIN Giochi G ON G.id = P.giochi
 WHERE (G.anno, U.id) IN (

@@ -8,8 +8,12 @@ export default function About(props) {
 				<Typography variant="h4">Reelo</Typography>
 				<Typography variant="subtitle1">
 					<em>
-						Il nome REELO vuole richiamare il sistema ELO e in Esperanto
-						significa "numero reale".
+						La classifica REELO nasce con l'obiettivo di creare una graduatoria
+						per i giochi matematici che tenga conto dei risultati di ogni
+						concorrente attraverso gli anni, in analogia alla classifica
+						scacchistica ELO e alla classifica tennistica ATP. Il nome REELO
+						vuole richiamare il sistema Elo e in Esperanto significa "numero
+						reale".
 					</em>
 				</Typography>
 
@@ -19,12 +23,6 @@ export default function About(props) {
 					</dt>
 					<dd> Cesco Reale </dd>
 					<dt>
-						<strong>Implementazione: </strong>
-					</dt>
-					<dd> Fabio Angelini </dd>
-					<dd> Anna Bernardi </dd>
-					<dd> Edoardo Canobbio </dd>
-					<dt>
 						<strong>Comitato scientifico: </strong>
 					</dt>
 					<dd>
@@ -32,11 +30,22 @@ export default function About(props) {
 						Reale
 					</dd>
 					<dt>
-						<strong>Collaboratori: </strong>
+						<strong>Implementazione: </strong>
+					</dt>
+					<dd> Anna Bernardi </dd>
+					<dd> Edoardo Canobbio </dd>
+					<dt>
+						<strong>Comitato tecnico: </strong>
 					</dt>
 					<dd>
-						David Barbato, Mirko Cappuccia, Maurizio De Leo, Francesco Moradin,
-						Alberto Saracco
+						Fabio Angelini, Anna Bernardi, Edoardo Canobbio, Mirko Cappuccia
+					</dd>
+
+					<dt>
+						<strong>Consulenti: </strong>
+					</dt>
+					<dd>
+						David Barbato, Maurizio De Leo, Francesco Morandin, Alberto Saracco
 					</dd>
 				</dl>
 			</Grid>

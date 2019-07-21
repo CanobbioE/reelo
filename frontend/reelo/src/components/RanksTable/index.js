@@ -30,10 +30,11 @@ const RanksTable = props => {
 		));
 
 	const renderRows = () =>
-		props.rows.map(row => {
+		props.rows.map((row, i) => {
 			if (!isValidRow(row)) return null;
 			return (
 				<TableRow key={row.id} className={row.id % 2 ? 'ranks-table-row' : ''}>
+					<TableCell> {i + 1}</TableCell>
 					<TableCell>{row.name}</TableCell>
 					<TableCell>{row.surname}</TableCell>
 					<TableCell>{row.category}</TableCell>
