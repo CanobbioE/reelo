@@ -31,6 +31,7 @@ function EditAlgorithm(props) {
 			props.algorithm.mult,
 			props.algorithm.exp,
 			props.algorithm.np,
+			props.algorithm.currentValues,
 		);
 		if (props.algorithm.error === '') {
 			setDone(true);
