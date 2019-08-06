@@ -45,12 +45,14 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("\n\nFile parsed succesfully\n")
 
-	err = services.CalculateAllReelo(true)
-	if err != nil {
-		log.Printf("Error recalculating reelo file: %v", err)
-		http.Error(w, "can't recalculate reelo", http.StatusInternalServerError)
-	}
-	log.Println("Recalculated REELO for all players")
+	go func() {
+		err = services.CalculateAllReelo(true)
+		if err != nil {
+			log.Printf("Error recalculating reelo file: %v", err)
+			return
+		}
+		log.Println("Recalculated REELO for all players")
+	}()
 
 	services.Backup()
 	return
