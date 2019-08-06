@@ -7,6 +7,17 @@ export const EditAlgForm = props => {
 		fx(event.target.value);
 	};
 
+	const shouldDisable = props => {
+		return (
+			props.year === '' &&
+			props.ex === '' &&
+			props.final === '' &&
+			props.mult === '' &&
+			props.exp === '' &&
+			props.np === ''
+		);
+	};
+
 	return (
 		<form onSubmit={props.onSubmit}>
 			<Grid item container justify="center" spacing={24} xs={10}>
@@ -14,7 +25,6 @@ export const EditAlgForm = props => {
 					<TextField
 						variant="outlined"
 						fullWidth
-						required
 						value={props.year}
 						label="Anno di inizio"
 						onChange={handleChanges(props.onYearChange)}
@@ -26,7 +36,6 @@ export const EditAlgForm = props => {
 
 				<Grid item xs={10}>
 					<TextField
-						required
 						variant="outlined"
 						fullWidth
 						value={props.ex}
@@ -40,7 +49,6 @@ export const EditAlgForm = props => {
 
 				<Grid item xs={10}>
 					<TextField
-						required
 						variant="outlined"
 						fullWidth
 						value={props.final}
@@ -54,7 +62,6 @@ export const EditAlgForm = props => {
 
 				<Grid item xs={10}>
 					<TextField
-						required
 						variant="outlined"
 						fullWidth
 						value={props.mult}
@@ -68,7 +75,6 @@ export const EditAlgForm = props => {
 
 				<Grid item xs={10}>
 					<TextField
-						required
 						variant="outlined"
 						fullWidth
 						value={props.exp}
@@ -83,7 +89,6 @@ export const EditAlgForm = props => {
 
 				<Grid item xs={10}>
 					<TextField
-						required
 						variant="outlined"
 						fullWidth
 						value={props.np}
@@ -102,7 +107,11 @@ export const EditAlgForm = props => {
 					justify="space-around"
 					alignItems="flex-end">
 					<Grid item xs={4}>
-						<Button type="submit" variant="contained" color="primary">
+						<Button
+							type="submit"
+							variant="contained"
+							color="primary"
+							disabled={shouldDisable(props)}>
 							Aggiorna variabili
 						</Button>
 					</Grid>

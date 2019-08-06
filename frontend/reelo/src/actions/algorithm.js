@@ -67,11 +67,26 @@ export const fetchVars = () => async dispatch => {
 		console.log(e);
 	}
 };
-export const updateAlg = (year, ex, final, mult, exp, np) => async dispatch => {
+export const updateAlg = (
+	year,
+	ex,
+	final,
+	mult,
+	exp,
+	np,
+	curr,
+) => async dispatch => {
 	dispatch({
 		type: ALG_POST_LOADING,
 	});
 	try {
+		// TODO: OMG this is orrible please use Object.keys
+		if (year === '') year = curr.year;
+		if (ex === '') ex = curr.ex;
+		if (final === '') final = curr.final;
+		if (mult === '') mult = curr.mult;
+		if (exp === '') exp = curr.exp;
+		if (np === '') np = curr.np;
 		const v = {
 			year: parseInt(year.replace(',', '.')),
 			ex: parseFloat(ex.replace(',', '.')),
