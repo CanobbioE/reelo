@@ -1,8 +1,6 @@
 export default class Globals {
 	static port = '8080';
-	static baseURL = `${window.location.protocol}//${window.location.hostname}:${
-		Globals.port
-	}`;
+	static baseURL = `${window.location.protocol}//${window.location.hostname}:${Globals.port}`;
 
 	// All the APIs endpoints
 	static API = {
@@ -11,6 +9,8 @@ export default class Globals {
 		ranks: '/ranks',
 		force: '/force-reelo',
 		algorithm: '/algorithm',
+		count: '/count',
+		years: '/years',
 	};
 
 	// All the routes in this app

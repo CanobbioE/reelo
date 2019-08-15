@@ -31,3 +31,14 @@ export const ALG_POST_FAIL = 'alg_post_fail';
 export const ALG_NP_CHANGED = 'alg_np_changed';
 export const ALG_FETCH_SUCCESS = 'alg_fetch_success';
 export const ALG_POST_SUCCESS = 'alg_post_success';
+
+export const RANKS_PAGE_SET = 'ranks_page_up';
+export const RANKS_SIZE_SET = 'ranks_size_up';
+
+export const RANKS_COUNT_LOADING = 'ranks_count_loading';
+export const RANKS_COUNT_ERROR = 'ranks_count_error';
+export const RANKS_COUNT_SUCCESS = 'ranks_count_success';
+
+export const RANKS_YEARS_LOADING = 'ranks_years_loading';
+export const RANKS_YEARS_ERROR = 'ranks_years_error';
+export const RANKS_YEARS_SUCCESS = 'ranks_years_success';

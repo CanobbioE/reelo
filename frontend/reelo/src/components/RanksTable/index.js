@@ -6,9 +6,10 @@ import {
 	TableCell,
 	TableHead,
 	Paper,
-	withStyles,
+	TableFooter,
+	TablePagination,
 } from '@material-ui/core';
-
+import {withStyles} from '@material-ui/core/styles';
 import './RanksTable.css';
 
 const styles = theme => ({
@@ -18,10 +19,14 @@ const styles = theme => ({
 	tableHeaderCell: {
 		color: theme.palette.secondary.main,
 	},
+	hover: {
+		backgroundColor: '#d3bdfb',
+	},
 });
 
 const RanksTable = props => {
 	const {classes} = props;
+
 	const renderHeader = () =>
 		props.labels.map(label => (
 			<TableCell className={classes.tableHeaderCell} key={label}>
@@ -29,12 +34,22 @@ const RanksTable = props => {
 			</TableCell>
 		));
 
+	const renderLabels = ({from, to, count}) =>
+		`Dal ${from} al ${to} di ${count} (pagina ${props.page} di ${(
+			count / 10
+		).toFixed()})`;
+
 	const renderRows = () =>
 		props.rows.map((row, i) => {
 			if (!isValidRow(row)) return null;
 			return (
-				<TableRow key={row.id} className={i % 2 ? 'ranks-table-row' : ''}>
-					<TableCell> {i + 1}</TableCell>
+				<TableRow
+					onMouseOver={() => props.onHover(i)}
+					key={row.id}
+					className={
+						props.hovered === i ? classes.hover : i % 2 ? 'grey-bg' : ''
+					}>
+					<TableCell> {i + props.rowsPerPage * (props.page - 1) + 1}</TableCell>
 					<TableCell>{row.name}</TableCell>
 					<TableCell>{row.surname}</TableCell>
 					<TableCell>{row.category}</TableCell>
@@ -44,12 +59,26 @@ const RanksTable = props => {
 		});
 
 	return (
-		<Paper className="scrollbar">
-			<Table>
+		<Paper className="paper scrollable">
+			<Table className="paper">
 				<TableHead className={classes.tableHeader}>
 					<TableRow>{renderHeader()}</TableRow>
 				</TableHead>
 				<TableBody>{renderRows()}</TableBody>
+				<TableFooter>
+					<TableRow>
+						<TablePagination
+							rowsPerPageOptions={[10, 50, 100, props.count]}
+							onChangeRowsPerPage={props.onChangeRowsPerPage}
+							rowsPerPage={props.rowsPerPage}
+							count={props.count}
+							page={props.page - 1}
+							onChangePage={props.onChangePage}
+							labelDisplayedRows={renderLabels}
+							labelRowsPerPage="Risultati per pagina:"
+						/>
+					</TableRow>
+				</TableFooter>
 			</Table>
 		</Paper>
 	);

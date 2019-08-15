@@ -5,7 +5,7 @@ import React, {Component} from 'react';
 import {Provider} from 'react-redux';
 import reduxThunk from 'redux-thunk';
 
-import ClippedDrawer from './components/Drawer/Drawer';
+import NavBar from './components/NavBar';
 import {properties} from './config/Properties';
 import Globals from './config/Globals';
 import reducers from './reducers';
@@ -31,15 +31,18 @@ class Router extends Component {
 			<MuiThemeProvider theme={properties.theme}>
 				<Provider className="bg-white" store={store}>
 					<BrowserRouter>
-						<ClippedDrawer>
-							<div>
-								<Route exact path={Globals.routes.home} component={Ranks} />
-								<Route exact path={Globals.routes.about} component={About} />
-								<Route exact path={Globals.routes.upload} component={Upload} />
-								<Route exact path={Globals.routes.admin} component={Admin} />
-								<Route exact path={Globals.routes.varchange} component={EditAlgorithm} />
-							</div>
-						</ClippedDrawer>
+						<NavBar />
+						<div>
+							<Route exact path={Globals.routes.home} component={Ranks} />
+							<Route exact path={Globals.routes.about} component={About} />
+							<Route exact path={Globals.routes.upload} component={Upload} />
+							<Route exact path={Globals.routes.admin} component={Admin} />
+							<Route
+								exact
+								path={Globals.routes.varchange}
+								component={EditAlgorithm}
+							/>
+						</div>
 					</BrowserRouter>
 				</Provider>
 			</MuiThemeProvider>

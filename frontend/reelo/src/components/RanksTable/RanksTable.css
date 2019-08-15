@@ -17,6 +17,16 @@
 	border-radius: 10px;
 	background-color: #555;
 }
-.ranks-table-row {
+
+.grey-bg {
 	background-color: #f5f5f5;
+}
+
+.ranks-table-row:hover {
+	cursor: pointer;
+	background-color: #d3bdfb;
+}
+
+.paper {
+	overflow-x: scroll;
 }

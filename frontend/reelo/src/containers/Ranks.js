@@ -1,27 +1,157 @@
-import {Grid, Typography, Button} from '@material-ui/core';
-import React, {useEffect} from 'react';
+import {Grid, Typography, Fab, Button} from '@material-ui/core';
+import React, {useEffect, useState} from 'react';
 import RanksTable from '../components/RanksTable';
+import DetailsTable from '../components/DetailsTable';
+import ArrowForward from '@material-ui/icons/ArrowRight';
+import {withStyles} from '@material-ui/core/styles';
 import {connect} from 'react-redux';
 import {compose} from 'redux';
-import {fetchRanks, forceReelo} from '../actions';
+import {
+	fetchRanks,
+	forceReelo,
+	setRankPage,
+	setRankSize,
+	fetchTotalRanks,
+	fetchAllYears,
+} from '../actions';
 import LoadingIcon from '../components/LoadingIcon';
 
+const styles = theme => ({
+	details: {
+		color: '#f5f5f5',
+		paddingLeft: '15px !important',
+	},
+});
+
 function Ranks(props) {
+	const {classes} = props;
+	const [details, setDetails] = useState(false);
+	const [hovered, setHovered] = useState(-1);
 	useEffect(() => {
-		props.fetchRanks();
+		props.setRankPage(1);
+		props.setRankSize(10);
+		props.fetchTotalRanks();
+		props.fetchAllYears();
+		props.fetchRanks(1, 10);
 	}, []);
 
 	const rows = props.ranks.rows;
 	const labels = ['#', 'Nome', 'Cognome', 'Categoria', 'Reelo'];
+	var detailsLabels = [];
+	props.ranks.years.forEach(() => {
+		detailsLabels = detailsLabels.concat([
+			'Anno',
+			'Categoria',
+			'Esercizi',
+			'Punteggio',
+			'Tempo',
+			'Pre-REELO',
+			'Posizione',
+		]);
+	});
+
+	const ndRow = (id, y) => ({
+		id: `${id}-${y}`,
+		year: y,
+		category: 'Non partecipato',
+		e: 'N/D',
+		d: 'N/D',
+		time: 0,
+		pseudoReelo: 'N/D',
+		position: 'N/D',
+	});
+
+	var detailsRows = [];
+	rows.forEach(row => {
+		var subRow = [];
+		const h = row.history;
+		props.ranks.years.forEach(y => {
+			if (!h[y]) {
+				subRow = subRow.concat(ndRow(row.id, y));
+			} else {
+				subRow = subRow.concat({
+					id: `${row.id}-${y}`,
+					year: y,
+					category: h[y].category.toUpperCase(),
+					e: `${h[y].e}/${h[y].eMax}=${(h[y].e / h[y].eMax).toFixed(2)}`,
+					d: `${h[y].d}/${h[y].dMax}=${(h[y].d / h[y].dMax).toFixed(2)}`,
+					time: h[y].time > 0 ? h[y].time : 'N/D',
+					pseudoReelo: h[y].pseudoReelo,
+					position: h[y].position,
+				});
+			}
+		});
+		detailsRows.push(subRow);
+	});
+
+	const handleHover = o => {
+		setHovered(o);
+	};
+	const handlePageChange = (event, page) => {
+		props.setRankPage(page + 1);
+		props.fetchRanks(page + 1, props.ranks.size);
+	};
+
+	const handleSizeChange = event => {
+		props.setRankPage(1);
+		const size = parseInt(event.target.value, 10);
+		props.setRankSize(size);
+		props.fetchRanks(1, size);
+	};
 
 	const content = (
-		<Grid container item xs={12} justify="space-around">
-			<Grid item xs={1}>
-				<LoadingIcon show={props.ranks.loading} />
+		<Grid
+			container
+			item
+			spacing={8}
+			xs={12}
+			justify={details ? 'flex-start' : 'center'}
+			alignItems={details ? 'stretch' : 'center'}>
+			{props.ranks.loading && (
+				<Grid item xs={1}>
+					<LoadingIcon show={props.ranks.loading} />
+				</Grid>
+			)}
+			<Grid item xs={details ? 4 : 10}>
+				{!props.ranks.loading && (
+					<RanksTable
+						onChangeRowsPerPage={handleSizeChange}
+						onChangePage={handlePageChange}
+						rows={rows}
+						labels={labels}
+						page={props.ranks.page}
+						count={props.ranks.count}
+						rowsPerPage={props.ranks.size}
+						onHover={handleHover}
+						hovered={hovered}
+					/>
+				)}
 			</Grid>
-			<Grid item xs={12}>
-				{!props.ranks.loading && <RanksTable rows={rows} labels={labels} />}
-			</Grid>
+			{!details && (
+				<Grid item xs={2}>
+					<Fab
+						variant="extended"
+						className={classes.details}
+						onClick={() => setDetails(true)}
+						size="small"
+						color="primary">
+						Dettagli
+						<ArrowForward />
+					</Fab>
+				</Grid>
+			)}
+			{details && (
+				<Grid item xs={8} onClick={() => setDetails(false)}>
+					{!props.ranks.loading && (
+						<DetailsTable
+							onHover={handleHover}
+							hovered={hovered}
+							rows={detailsRows}
+							labels={detailsLabels}
+						/>
+					)}
+				</Grid>
+			)}
 		</Grid>
 	);
 
@@ -35,6 +165,7 @@ function Ranks(props) {
 			</Typography>
 		</Grid>
 	);
+
 	return (
 		<Grid container justify="center">
 			<Grid item container spacing={24} xs={10}>
@@ -47,7 +178,7 @@ function Ranks(props) {
 						<Button
 							onClick={() => {
 								props.forceReelo();
-								props.fetchRanks();
+								props.fetchRanks(props.ranks.page);
 							}}
 							variant="contained"
 							color="primary">
@@ -67,8 +198,15 @@ function mapStateToProps({ranks, auth}) {
 const composedComponent = compose(
 	connect(
 		mapStateToProps,
-		{fetchRanks, forceReelo},
+		{
+			fetchRanks,
+			forceReelo,
+			setRankPage,
+			fetchTotalRanks,
+			setRankSize,
+			fetchAllYears,
+		},
 	),
 );
 
-export default composedComponent(Ranks);
+export default withStyles(styles)(composedComponent(Ranks));
