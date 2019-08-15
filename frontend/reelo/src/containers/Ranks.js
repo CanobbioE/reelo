@@ -106,7 +106,7 @@ function Ranks(props) {
 			spacing={8}
 			xs={12}
 			justify={details ? 'flex-start' : 'center'}
-			alignItems={details ? 'stretch' : 'center'}>
+			alignItems={details ? 'stretch' : 'flex-start'}>
 			{props.ranks.loading && (
 				<Grid item xs={1}>
 					<LoadingIcon show={props.ranks.loading} />
