@@ -5,6 +5,8 @@ const (
 	findPasswordByUsername       = `SELECT parolachiave FROM Utenti WHERE nomeutente = ?`
 	findAllPlayers               = `SELECT nome, cognome FROM Giocatore`
 	findMaxYear                  = `SELECT MAX(anno) FROM Giochi`
+	countAllPlayers              = `SELECT COUNT(U.id) FROM Giocatore U`
+	findAllYears                 = `SELECT DISTINCT anno FROM Giochi`
 
 	findAllCostants = `
 	SELECT anno_inizio, k_esercizi, finale, fattore_moltiplicativo, exploit, no_partecipazione
@@ -95,7 +97,17 @@ WHERE (G.anno, U.id) IN (
 	JOIN Partecipazione P ON P.giochi = G.id
 	JOIN Giocatore U ON U.id = P.giocatore
 	GROUP BY U.id
-)`
+)
+LIMIT ?, ?`
+
+	findResultByPlayerAndYear = `
+SELECT G.categoria, R.tempo, R.esercizi, R.punteggio, R.pseudo_reelo, R.posizione
+FROM  Giochi G
+JOIN Partecipazione P ON P.giochi = G.id
+JOIN Risultato R ON R.id = P.risultato
+JOIN Giocatore U ON U.id = P.giocatore
+WHERE U.nome = ? AND U.cognome = ? AND G.anno = ?
+`
 
 	findStartByYearAndCategory = `
 SELECT inizio

@@ -45,7 +45,9 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/ranks", controllers.GetRanks).Methods("GET")
+	router.HandleFunc("/ranks/", controllers.GetRanks).Methods("GET")
+	router.HandleFunc("/years", controllers.GetYears).Methods("GET")
+	router.HandleFunc("/count", controllers.GetPlayersCount).Methods("GET")
 	router.HandleFunc("/admin", controllers.Login).Methods("POST")
 	router.HandleFunc("/upload", middlewares.Auth(
 		http.HandlerFunc(controllers.Upload))).Methods("POST")

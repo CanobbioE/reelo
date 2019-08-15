@@ -8,8 +8,22 @@ import (
 )
 
 // GetRanks returns a list of all the ranks in the database
-func GetRanks() ([]dto.Rank, error) {
+func GetRanks(page, size int) ([]dto.Rank, error) {
 	db := rdb.NewDB()
 	defer db.Close()
-	return db.AllRanks(context.Background())
+	return db.AllRanks(context.Background(), page, size)
+}
+
+// GetPlayersCount returns how many players are stored in the DB
+func GetPlayersCount() (int, error) {
+	db := rdb.NewDB()
+	defer db.Close()
+	return db.CountAllPlayers(context.Background())
+}
+
+// GetHistory returns the history details for the players
+func GetHistory(name, surname string) (dto.PlayerHistory, error) {
+	db := rdb.NewDB()
+	defer db.Close()
+	return db.PlayerHistory(context.Background(), name, surname)
 }

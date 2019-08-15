@@ -254,12 +254,24 @@ func (database *DB) IsResultFromParis(ctx context.Context, name, surname string,
 	return false, nil
 }
 
+// CountAllPlayers returns the nomber of tuples in the table "Giocatori".
+func (database *DB) CountAllPlayers(ctx context.Context) (int, error) {
+	var n int
+	q := countAllPlayers
+	err := database.db.QueryRow(q).Scan(&n)
+	if err != nil {
+		return n, fmt.Errorf("Error getting players count: %v", err)
+	}
+	return n, nil
+}
+
 // AllRanks returns a list of all the player and ranks inside the database.
 // A rank is composed by a player's name, surname, reelo and last category
-// into which he has played
-func (database *DB) AllRanks(ctx context.Context) (ranks []dto.Rank, err error) {
+// into which he has played.
+// Page number and page size are used for pagination.
+func (database *DB) AllRanks(ctx context.Context, page, size int) (ranks []dto.Rank, err error) {
 	q := findAllPlayersRanks
-	rows, err := database.db.QueryContext(ctx, q)
+	rows, err := database.db.QueryContext(ctx, q, (page-1)*size, size)
 	if err != nil {
 		log.Printf("Error getting all ranks: %v", err)
 		return ranks, err
@@ -384,4 +396,86 @@ func (database *DB) ResultID(name, surname string, year int, category string) (i
 		return id, fmt.Errorf("Error getting result id: %v", err)
 	}
 	return id, nil
+}
+
+// PlayerHistory retrieve a user history details.
+func (database *DB) PlayerHistory(ctx context.Context, name, surname string) (dto.PlayerHistory, error) {
+
+	ph := make(map[int]dto.History)
+	q := findResultByPlayerAndYear
+
+	// Find all players partecipation years
+	years, err := database.PlayerPartecipationYears(ctx, name, surname)
+	if err != nil {
+		log.Printf("Error getting player history: %v", err)
+		return ph, err
+	}
+
+	for _, y := range years {
+		rows, err := database.db.QueryContext(ctx, q, name, surname, y)
+		if err != nil {
+			log.Printf("Error getting player history: %v", err)
+			return ph, err
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var res dto.History
+
+			// Saving most of the results
+			err := rows.Scan(&res.Category, &res.Time,
+				&res.Exercises, &res.Score,
+				&res.PseudoReelo, &res.Position)
+			if err != nil {
+				log.Printf("Error getting player history: %v", err)
+				return ph, err
+			}
+
+			// Finding other cool stuff
+			dMax, err := database.MaxScoreForCategory(ctx, y, res.Category)
+			if err != nil {
+				log.Printf("Error getting player history: %v", err)
+				return ph, err
+			}
+
+			t, err := database.StartOfCategory(ctx, y, res.Category)
+			if err != nil {
+				log.Printf("Error getting player history: %v", err)
+				return ph, err
+			}
+
+			n, err := database.EndOfCategory(ctx, y, res.Category)
+			if err != nil {
+				log.Printf("Error getting player history: %v", err)
+				return ph, err
+			}
+
+			res.MaxScore = dMax
+			res.MaxExercises = n - t + 1
+			ph[y] = res
+		}
+	}
+
+	return ph, nil
+}
+
+// AllYears return a list of all the stored years
+func (database *DB) AllYears(ctx context.Context) ([]int, error) {
+	var years []int
+	q := findAllYears
+	rows, err := database.db.QueryContext(ctx, q)
+	if err != nil {
+		return years, fmt.Errorf("Error getting all years: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var y int
+		err := rows.Scan(&y)
+		if err != nil {
+			return years, fmt.Errorf("Error getting all years: %v", err)
+		}
+		years = append(years, y)
+	}
+	return years, nil
 }
