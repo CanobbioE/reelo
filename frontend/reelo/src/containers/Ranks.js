@@ -176,9 +176,9 @@ function Ranks(props) {
 				<Grid item xs={12}>
 					{!props.auth.authenticated ? null : (
 						<Button
-							onClick={() => {
-								props.forceReelo();
-								props.fetchRanks(props.ranks.page);
+							onClick={async () => {
+								await props.forceReelo();
+								props.fetchRanks(1, 10);
 							}}
 							variant="contained"
 							color="primary">
