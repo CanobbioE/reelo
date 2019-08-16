@@ -98,6 +98,7 @@ WHERE (G.anno, U.id) IN (
 	JOIN Giocatore U ON U.id = P.giocatore
 	GROUP BY U.id
 )
+ORDER BY U.reelo DESC
 LIMIT ?, ?`
 
 	findResultByPlayerAndYear = `
