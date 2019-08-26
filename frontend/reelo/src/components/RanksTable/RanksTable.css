@@ -29,15 +29,3 @@
 .paper {
 	overflow-x: scroll;
 }
-
-#root
-	> div:nth-child(2)
-	> div
-	> div.MuiGrid-container-112.MuiGrid-item-113.MuiGrid-grid-xs-10-150
-	> form
-	> div
-	> div:nth-child(1)
-	> div
-	> input {
-	height: auto !important;
-}

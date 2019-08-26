@@ -17,3 +17,7 @@ body {
 .padding-r-10 {
 	padding-right: 10px;
 }
+
+input.MuiInputBase-inputType-236 {
+	height: auto !important;
+}
