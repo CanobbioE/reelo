@@ -15,9 +15,11 @@ import {
 } from '@material-ui/core';
 import LoadingIcon from './LoadingIcon';
 
+import './RanksTable/RanksTable.css';
+
 const styles = () => ({
 	filePicker: {
-		height: 'auto',
+		height: 'auto !important',
 	},
 });
 
@@ -96,9 +98,6 @@ const UploadForm = props => {
 				<Grid item xs={12}>
 					<Input
 						className={classes.filePicker}
-						style="height: auto"
-						label="Documento"
-						name="Documento"
 						type="file"
 						onChange={handleFileSelection(props.onFileInput)}
 						disableUnderline
