@@ -17,7 +17,7 @@ import LoadingIcon from './LoadingIcon';
 
 const styles = () => ({
 	filePicker: {
-		height: 'auto !important',
+		height: 'auto',
 	},
 });
 
@@ -96,6 +96,7 @@ const UploadForm = props => {
 				<Grid item xs={12}>
 					<Input
 						className={classes.filePicker}
+						style="height: auto"
 						label="Documento"
 						name="Documento"
 						type="file"
