@@ -1,5 +1,7 @@
 package elo
 
+import "strings"
+
 type category int
 
 // Enum to compare categories
@@ -23,7 +25,7 @@ func (c category) String() string {
 // CategoryFromString returns a Category from the given string
 func categoryFromString(s string) category {
 	for i, c := range toString {
-		if c == s {
+		if strings.ToUpper(c) == s {
 			return category(i)
 		}
 	}

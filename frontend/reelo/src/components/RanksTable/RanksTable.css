@@ -1,6 +1,5 @@
 .scrollbar {
-	overflow-y: scroll;
-	max-height: 70vh !important;
+	overflow-x: scroll;
 }
 
 .scrollbar::-webkit-scrollbar-track {
@@ -15,7 +14,7 @@
 
 .scrollbar::-webkit-scrollbar-thumb {
 	border-radius: 10px;
-	background-color: #555;
+	background-color: lightgrey;
 }
 
 .grey-bg {

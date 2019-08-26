@@ -1,4 +1,5 @@
 import React from 'react';
+import {withStyles} from '@material-ui/core/styles';
 import {
 	Grid,
 	Input,
@@ -14,9 +15,16 @@ import {
 } from '@material-ui/core';
 import LoadingIcon from './LoadingIcon';
 
+const styles = () => ({
+	filePicker: {
+		height: 'auto !important',
+	},
+});
+
 const categories = ['c1', 'c2', 'ce', 'cm', 'l1', 'l2', 'gp', 'hc'];
 
-export const UploadForm = props => {
+const UploadForm = props => {
+	const {classes} = props;
 	const handleSubmit = event => {
 		event.preventDefault();
 		props.onSubmit(
@@ -87,8 +95,9 @@ export const UploadForm = props => {
 			<Grid item container spacing={24}>
 				<Grid item xs={12}>
 					<Input
-						style={{height: 'auto'}}
+						className={classes.filePicker}
 						label="Documento"
+						name="Documento"
 						type="file"
 						onChange={handleFileSelection(props.onFileInput)}
 						disableUnderline
@@ -220,3 +229,5 @@ export const UploadForm = props => {
 		</form>
 	);
 };
+
+export default withStyles(styles)(UploadForm);

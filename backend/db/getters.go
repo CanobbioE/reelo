@@ -10,6 +10,20 @@ import (
 
 // TODO: refactor me into just two functions: queryMultiple and querySingle
 
+// GameID retrieves the id of the game from the specified year and category.
+// If it doesn't find any result it will return -1.
+func (database *DB) GameID(ctx context.Context, year, category string, isParis bool) (int, error) {
+	id := -1
+	q := adaptToParis(findGameIDByYearAndCategory, isParis)
+	err := database.db.QueryRow(q, year, category).Scan(&id)
+	if err != nil {
+		if err.Error() != "sql: no rows in result set" {
+			return id, fmt.Errorf("Error getting games id: %v", err)
+		}
+	}
+	return id, nil
+}
+
 // PlayerID retrieves a player id from the database given its name and surname
 func (database *DB) PlayerID(ctx context.Context, name, surname string) (int, error) {
 	var id int

@@ -24,6 +24,9 @@ const styles = theme => ({
 	appname: {
 		textDecoration: 'none',
 	},
+	navbtn: {
+		marginRight: theme.spacing.unit * 3,
+	},
 });
 
 function NavBar(props) {
@@ -35,7 +38,9 @@ function NavBar(props) {
 			to={Globals.routes.home}
 			onClick={props.signout}
 			color="secondary">
-			Esci
+			<Typography color="secondary" variant="subtitle1">
+				Esci
+			</Typography>
 		</Button>
 	) : null;
 
@@ -43,32 +48,48 @@ function NavBar(props) {
 		<div className={classes.root}>
 			<AppBar position="static" color="primary">
 				<Toolbar>
-					<Typography variant="h6" color="secondary">
-						<Button component={Link} to={Globals.routes.home} color="inherit">
+					<Button
+						className={classes.navbtn}
+						component={Link}
+						to={Globals.routes.home}
+						color="inherit">
+						<Typography color="secondary" variant="subtitle1">
 							Classifiche
-						</Button>
+						</Typography>
+					</Button>
 
-						{props.auth.authenticated && (
-							<Button
-								component={Link}
-								to={Globals.routes.upload}
-								color="inherit">
+					{props.auth.authenticated && (
+						<Button
+							className={classes.navbtn}
+							component={Link}
+							to={Globals.routes.upload}
+							color="inherit">
+							<Typography color="secondary" variant="subtitle1">
 								Carica Classifiche
-							</Button>
-						)}
-
-						{props.auth.authenticated && (
-							<Button
-								component={Link}
-								to={Globals.routes.varchange}
-								color="inherit">
-								Modifica Algoritmo
-							</Button>
-						)}
-						<Button component={Link} to={Globals.routes.about} color="inherit">
-							Informazioni
+							</Typography>
 						</Button>
-					</Typography>
+					)}
+
+					{props.auth.authenticated && (
+						<Button
+							className={classes.navbtn}
+							component={Link}
+							to={Globals.routes.varchange}
+							color="inherit">
+							<Typography color="secondary" variant="subtitle1">
+								Modifica Algoritmo
+							</Typography>
+						</Button>
+					)}
+					<Button
+						className={classes.navbtn}
+						component={Link}
+						to={Globals.routes.about}
+						color="inherit">
+						<Typography color="secondary" variant="subtitle1">
+							Informazioni
+						</Typography>
+					</Button>
 
 					<div className={classes.menuButton}>{logBtn}</div>
 				</Toolbar>

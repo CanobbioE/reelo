@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/services"
@@ -35,25 +36,53 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := services.DeleteIfAlreadyExists(uploadInfo); err != nil {
+		log.Printf("Error while checking ranks existence: %v", err)
+		http.Error(w, "can't check existence", http.StatusBadRequest)
+		return
+	}
+
 	// We want to take the error returned by the parser
 	// and have it displayed in the FE
+	// TODO: error parser
 	err = services.ParseFileWithInfo(file, uploadInfo)
 	if err != nil {
 		log.Printf("Error while parsing file: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
-	log.Printf("\n\nFile parsed succesfully\n")
-
-	go func() {
-		err = services.CalculateAllReelo(true)
-		if err != nil {
-			log.Printf("Error recalculating reelo file: %v", err)
-			return
-		}
-		log.Println("Recalculated REELO for all players")
-	}()
+	log.Printf("File parsed succesfully\n\n")
 
 	services.Backup()
+	return
+}
+
+// CheckRankExistence is called to verify if a year-category ranking file has been already uploaded
+func CheckRankExistence(w http.ResponseWriter, r *http.Request) {
+	year := string(r.URL.Query().Get("y"))
+	category := string(r.URL.Query().Get("cat"))
+	isParis, err := strconv.ParseBool(r.URL.Query().Get("isparis"))
+	if err != nil {
+		log.Printf("Error reading query string: %v", err)
+		http.Error(w, fmt.Sprintf("can't read query string: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	exists, err := services.DoesRankExist(year, category, isParis)
+	if err != nil {
+		log.Printf("Error checking rank existence: %v", err)
+		http.Error(w, fmt.Sprintf("can't check existencce: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	ret, err := json.Marshal(exists)
+	if err != nil {
+		log.Printf("Error marshalling exists: %v", err)
+		http.Error(w, "cannot marshal", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(ret)
 	return
 }

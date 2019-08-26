@@ -15,6 +15,7 @@ func ForceReelo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Recalculated (forced) Reelo for all players")
+
 	return
 }
 
@@ -27,5 +28,7 @@ func ForcePseudoReelo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("Recalculated (forced) Reelo and pseudo-Reelo for all players")
+
+	services.Backup()
 	return
 }

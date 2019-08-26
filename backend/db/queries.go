@@ -12,6 +12,12 @@ const (
 	SELECT anno_inizio, k_esercizi, finale, fattore_moltiplicativo, exploit, no_partecipazione
 	FROM Costanti`
 
+	findGameIDByYearAndCategory = `
+SELECT G.id FROM Giochi G
+JOIN Partecipazione P ON P.giochi = G.id
+WHERE G.anno = ? AND G.categoria = ?
+`
+
 	findResultsByNameAndSurname = `
 SELECT R.tempo, R.esercizi, R.punteggio, G.anno, G.categoria
 FROM Giocatore U

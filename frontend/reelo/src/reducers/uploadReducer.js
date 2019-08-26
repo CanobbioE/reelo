@@ -61,7 +61,7 @@ export default (state = INITIAL_STATE, action) => {
 		case PARIS_UPLOAD_CHANGED:
 			return {...state, error: '', isParis: action.payload};
 		case RANK_UPLOAD_ERROR_RESET:
-			return {...state, error: ''};
+			return {...state, error: '', loading: false};
 		case START_UPLOAD_CHANGED:
 			return {...state, start: action.payload};
 		case END_UPLOAD_CHANGED:

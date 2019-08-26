@@ -11,6 +11,7 @@ export default class Globals {
 		algorithm: '/algorithm',
 		count: '/count',
 		years: '/years',
+		exist: '/upload/exist',
 	};
 
 	// All the routes in this app
