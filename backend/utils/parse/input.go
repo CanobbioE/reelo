@@ -115,6 +115,9 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 							value := extractValue(fName, index, deltaName, splitted, result)
 							result.Name = strings.Title(value)
 						}
+
+						result.Name = strings.ReplaceAll(result.Name, "_", " ")
+						result.Name = strings.ReplaceAll(result.Name, "-", " ")
 					}
 
 				case "esercizi":

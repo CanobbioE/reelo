@@ -21,8 +21,8 @@ func (database *DB) Add(ctx context.Context, table string, params ...interface{}
 			" WHERE nome = \"%s\" AND cognome = \"%s\"", params...)
 
 	case "risultato":
-		q1 = fmt.Sprintf("INSERT INTO Risultato (tempo, esercizi, punteggio, posizione)"+
-			" VALUES (%d, %d, %d, %d)", params...)
+		q1 = fmt.Sprintf("INSERT INTO Risultato (tempo, esercizi, punteggio, posizione, pseudo_reelo)"+
+			" VALUES (%d, %d, %d, %d, %d)", params...)
 
 		q2 = fmt.Sprintf("SELECT MAX(id) FROM Risultato "+
 			"WHERE tempo = %d AND esercizi = %d AND punteggio = %d", params...)
@@ -76,7 +76,7 @@ func (database DB) InserRankingFile(
 		if err != nil {
 			return err
 		}
-		resultsID, err := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points, line.Position)
+		resultsID, err := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points, line.Position, 0)
 		if err != nil {
 			return err
 		}
@@ -128,5 +128,13 @@ pseudo_reelo = ?
 WHERE id = ?`
 
 	_, err = database.db.ExecContext(ctx, q, pseudoReelo, id)
+	return err
+}
+
+// DeleteResultsFrom deletes all the results from a given year
+func (database *DB) DeleteResultsFrom(ctx context.Context, gamesID int) error {
+	q := `DELETE FROM Giochi WHERE id = ?`
+
+	_, err := database.db.ExecContext(ctx, q, gamesID)
 	return err
 }

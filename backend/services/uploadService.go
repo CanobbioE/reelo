@@ -84,3 +84,36 @@ func SaveRankingFile(src io.Reader, year, category string, isParis bool) error {
 	return nil
 
 }
+
+// DeleteIfAlreadyExists search for results from the year+category contained in
+// info. If the year+category exists in the database, all the results gets erased.
+func DeleteIfAlreadyExists(info dto.UploadInfo) error {
+	db := rdb.NewDB()
+	defer db.Close()
+
+	id, err := db.GameID(context.Background(), info.Year, info.Category, info.IsParis)
+	if err != nil {
+		return err
+	}
+
+	if id != -1 {
+		if err := db.DeleteResultsFrom(context.Background(), id); err != nil {
+			return err
+		}
+		log.Printf("Deleted results with id: %v\n", id)
+	}
+	return nil
+}
+
+// DoesRankExist is called to verify if a year-category ranking file has been already uploaded
+func DoesRankExist(year, category string, isParis bool) (bool, error) {
+	db := rdb.NewDB()
+	defer db.Close()
+
+	id, err := db.GameID(context.Background(), year, category, isParis)
+	if err != nil {
+		return false, err
+	}
+
+	return id != -1, nil
+}

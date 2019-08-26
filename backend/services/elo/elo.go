@@ -54,15 +54,19 @@ func PseudoReelo(ctx context.Context, name, surname string, year int) error {
 		return err
 	}
 
-	for _, c := range categories {
-		isParis, err = db.IsResultFromParis(ctx, name, surname, year, c)
+	var parisIndex int
+	for i, c := range categories {
+		isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
 		if err != nil {
 			return err
 		}
 		if isParis {
+			parisIndex = i
 			break
 		}
 	}
+
+	categories = dumbNamesakeGuard(categories, parisIndex, isParis)
 
 	for _, c := range categories {
 		reelo, err := oneYearScore(ctx, name, surname, c, year, isParis)
@@ -233,4 +237,24 @@ func contains(array []int, item int) bool {
 		}
 	}
 	return false
+}
+
+func dumbNamesakeGuard(categories []string, parisIndex int, isParis bool) []string {
+	db := rdb.NewDB()
+	defer db.Close()
+
+	if (len(categories) > 1 && !isParis) || (len(categories) > 2 && isParis) {
+		maxC := categoryFromString("CE")
+		for _, c := range categories {
+			if tmp := categoryFromString(c); tmp >= maxC {
+				maxC = tmp
+			}
+		}
+		log.Printf("FOUND NAMESAKE - Categories: %v\nConsidering only the highest result: %v.\n", categories, maxC)
+		if isParis {
+			return []string{categories[parisIndex], maxC.String()}
+		}
+		return []string{maxC.String()}
+	}
+	return categories
 }
