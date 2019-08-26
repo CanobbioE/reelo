@@ -63,7 +63,7 @@ function Ranks(props) {
 		category: 'Non partecipato',
 		e: 'N/D',
 		d: 'N/D',
-		time: 0,
+		// time: 0,
 		pseudoReelo: 'N/D',
 		position: 'N/D',
 	});
