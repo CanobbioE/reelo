@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {withStyles} from '@material-ui/core/styles';
 import {connect} from 'react-redux';
 import {compose} from 'redux';
 import {
@@ -7,7 +8,7 @@ import {
 	DialogContentText,
 	DialogContent,
 } from '@material-ui/core';
-import {UploadForm} from '../components/UploadForm';
+import UploadForm from '../components/UploadForm';
 import RequireAuth from './RequireAuth';
 import DialogAlert from '../components/DialogAlert';
 import {
@@ -20,19 +21,38 @@ import {
 	updateUploadIsParis,
 	uploadFile,
 	resetUploadForm,
+	checkExistence,
 } from '../actions';
 
+const styles = () => ({
+	title: {
+		marginTop: '28px',
+		marginBottom: '15px',
+	},
+});
+
 function Upload(props) {
+	const {classes} = props;
 	const [alertOpen, setAlertOpen] = useState(props.uploadForm.error !== '');
+	// const [dialogOpen, setDialogOpen] = useState(false);
+	const handleSubmit = async (file, cat, y, isParis, fmt, s, e) => {
+		var exists = await props.checkExistence(y, cat, isParis);
+		if (exists) {
+			if (window.confirm('stai caricando una classifica già presente')) {
+				props.uploadFile(file, cat, y, isParis, fmt, s, e);
+			}
+		} else {
+			props.uploadFile(file, cat, y, isParis, fmt, s, e);
+		}
+	};
 	const info = (
 		<Grid item xs={10}>
+			<Typography variant="h4" className={classes.title}>
+				Caricamento
+			</Typography>
 			<Typography variant="subtitle1">
 				Utilizza questa pagina per inserire un file classifica con estensione
 				".txt".
-			</Typography>
-			<Typography variant="subtitle2">
-				Utilizza l'apposita sezione per specificare la disposizione dei dati
-				all'interno del file. (e.g. "nome cognome sede punteggio tempo").
 			</Typography>
 			<br />
 		</Grid>
@@ -57,7 +77,11 @@ function Upload(props) {
 				{error}
 			</DialogContentText>
 			<DialogContentText id="alert-dialog-description">
-				Se possibile cerca di sistemare il documento.
+				Se possibile cerca di sistemare il documento. Ricordando che a volte i
+				nomi/cognomi multipli non vengono riconosciuti. Per ovviare al problema
+				sostituisci gli spazi tra i nomi/cognomi multipli con dei trattini
+				bassi. <br />
+				Ad esempio "maria giovanna da vinci" diventerà "maria_giovanna da_vinci"
 			</DialogContentText>
 		</DialogContent>
 	);
@@ -69,7 +93,7 @@ function Upload(props) {
 			{info}
 			<Grid container item xs={10}>
 				<UploadForm
-					onSubmit={props.uploadFile}
+					onSubmit={handleSubmit}
 					onFileInput={props.updateUploadFile}
 					fileValue={props.uploadForm.file}
 					onFormatInput={props.updateUploadFormat}
@@ -120,8 +144,9 @@ const composedComponent = compose(
 			resetUploadForm,
 			updateUploadStart,
 			updateUploadEnd,
+			checkExistence,
 		},
 	),
 );
 
-export default composedComponent(Upload);
+export default withStyles(styles)(composedComponent(Upload));

@@ -16,10 +16,15 @@ import {
 } from '../actions';
 import LoadingIcon from '../components/LoadingIcon';
 
-const styles = theme => ({
+const styles = () => ({
 	details: {
 		color: '#f5f5f5',
 		paddingLeft: '15px !important',
+		marginLeft: '10px',
+	},
+	title: {
+		marginTop: '28px',
+		marginBottom: '15px',
 	},
 });
 
@@ -38,17 +43,19 @@ function Ranks(props) {
 	const rows = props.ranks.rows;
 	const labels = ['#', 'Nome', 'Cognome', 'Categoria', 'Reelo'];
 	var detailsLabels = [];
-	props.ranks.years.forEach(() => {
-		detailsLabels = detailsLabels.concat([
-			'Anno',
-			'Categoria',
-			'Esercizi',
-			'Punteggio',
-			'Tempo',
-			'Pre-REELO',
-			'Posizione',
-		]);
-	});
+	if (props.ranks && props.ranks.years) {
+		props.ranks.years.forEach(() => {
+			detailsLabels = detailsLabels.concat([
+				'Anno',
+				'Categoria',
+				'Esercizi',
+				'Punteggio',
+				//'Tempo',
+				'Pre-REELO',
+				'Posizione',
+			]);
+		});
+	}
 
 	const ndRow = (id, y) => ({
 		id: `${id}-${y}`,
@@ -62,28 +69,29 @@ function Ranks(props) {
 	});
 
 	var detailsRows = [];
-	rows.forEach(row => {
-		var subRow = [];
-		const h = row.history;
-		props.ranks.years.forEach(y => {
-			if (!h[y]) {
-				subRow = subRow.concat(ndRow(row.id, y));
-			} else {
-				subRow = subRow.concat({
-					id: `${row.id}-${y}`,
-					year: y,
-					category: h[y].category.toUpperCase(),
-					e: `${h[y].e}/${h[y].eMax}=${(h[y].e / h[y].eMax).toFixed(2)}`,
-					d: `${h[y].d}/${h[y].dMax}=${(h[y].d / h[y].dMax).toFixed(2)}`,
-					time: h[y].time > 0 ? h[y].time : 'N/D',
-					pseudoReelo: h[y].pseudoReelo,
-					position: h[y].position,
-				});
-			}
+	if (rows) {
+		rows.forEach(row => {
+			var subRow = [];
+			const h = row.history;
+			props.ranks.years.forEach(y => {
+				if (!h[y]) {
+					subRow = subRow.concat(ndRow(row.id, y));
+				} else {
+					subRow = subRow.concat({
+						id: `${row.id}-${y}`,
+						year: y,
+						category: h[y].category.toUpperCase(),
+						e: `${h[y].e}/${h[y].eMax}=${(h[y].e / h[y].eMax).toFixed(2)}`,
+						d: `${h[y].d}/${h[y].dMax}=${(h[y].d / h[y].dMax).toFixed(2)}`,
+						//time: h[y].time > 0 ? h[y].time : 'N/D',
+						pseudoReelo: h[y].pseudoReelo.toFixed(0),
+						position: h[y].position,
+					});
+				}
+			});
+			detailsRows.push(subRow);
 		});
-		detailsRows.push(subRow);
-	});
-
+	}
 	const handleHover = o => {
 		setHovered(o);
 	};
@@ -141,9 +149,10 @@ function Ranks(props) {
 				</Grid>
 			)}
 			{details && (
-				<Grid item xs={8} onClick={() => setDetails(false)}>
+				<Grid item xs={8}>
 					{!props.ranks.loading && (
 						<DetailsTable
+							onClose={() => setDetails(false)}
 							onHover={handleHover}
 							hovered={hovered}
 							rows={detailsRows}
@@ -170,15 +179,17 @@ function Ranks(props) {
 		<Grid container justify="center">
 			<Grid item container spacing={24} xs={10}>
 				<Grid item xs={12}>
-					<Typography variant="h4">Classifiche</Typography>
+					<Typography variant="h4" className={classes.title}>
+						Classifiche
+					</Typography>
 				</Grid>
 				{props.ranks.error === '' && rows ? content : error}
 				<Grid item xs={12}>
 					{!props.auth.authenticated ? null : (
 						<Button
-							onClick={() => {
-								props.forceReelo();
-								props.fetchRanks(props.ranks.page);
+							onClick={async () => {
+								await props.forceReelo();
+								await props.fetchRanks(props.ranks.page, 10);
 							}}
 							variant="contained"
 							color="primary">

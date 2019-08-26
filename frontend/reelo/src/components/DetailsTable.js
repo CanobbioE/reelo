@@ -6,16 +6,18 @@ import {
 	TableCell,
 	TableHead,
 	Paper,
+	TableFooter,
 } from '@material-ui/core';
+import './RanksTable/RanksTable.css';
 import {withStyles} from '@material-ui/core/styles';
 
 const styles = theme => ({
 	tableHeader: {
 		backgroundColor: theme.palette.primary.main,
+		cursor: 'pointer',
 	},
 	tableHeaderCell: {
 		color: theme.palette.secondary.main,
-		cursor: 'pointer',
 	},
 	divider: {
 		borderRight: '2px solid black',
@@ -73,12 +75,15 @@ const DetailsTable = props => {
 		));
 
 	return (
-		<Paper className="paper scrollable">
+		<Paper className="paper scrollbar">
 			<Table className="paper">
-				<TableHead className={classes.tableHeader}>
+				<TableHead className={classes.tableHeader} onClick={props.onClose}>
 					<TableRow>{renderHeader()}</TableRow>
 				</TableHead>
 				<TableBody>{renderRows()}</TableBody>
+				<TableFooter>
+					<TableRow></TableRow>
+				</TableFooter>
 			</Table>
 		</Paper>
 	);

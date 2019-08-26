@@ -59,7 +59,7 @@ const RanksTable = props => {
 		});
 
 	return (
-		<Paper className="paper scrollable">
+		<Paper className="paper scrollbar">
 			<Table className="paper">
 				<TableHead className={classes.tableHeader}>
 					<TableRow>{renderHeader()}</TableRow>

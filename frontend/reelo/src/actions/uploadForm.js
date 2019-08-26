@@ -14,6 +14,31 @@ import {
 } from '../utils/Types';
 import Globals from '../config/Globals';
 
+export const checkExistence = (year, category, isParis) => async dispatch => {
+	dispatch({
+		type: RANK_UPLOAD_LOADING,
+	});
+	try {
+		const response = await axios.get(
+			`${Globals.baseURL}${Globals.API.exist}/?y=${year}&cat=${category}&isparis=${isParis}`,
+			{
+				headers: {
+					Authorization: localStorage.getItem('token'),
+				},
+			},
+		);
+		dispatch({
+			type: RANK_UPLOAD_ERROR_RESET,
+		});
+		return response.data;
+	} catch (e) {
+		dispatch({
+			type: RANK_UPLOAD_FAIL,
+			payload: e.response.data,
+		});
+	}
+};
+
 export const updateUploadFile = file => {
 	return {
 		type: FILE_UPLOAD_CHANGED,
@@ -37,14 +62,14 @@ export const updateUploadIsParis = isParis => {
 export const updateUploadYear = year => {
 	return {
 		type: YEAR_UPLOAD_CHANGED,
-		payload: year,
+		payload: year.trim(),
 	};
 };
 
 export const updateUploadCategory = category => {
 	return {
 		type: CATEGORY_UPLOAD_CHANGED,
-		payload: category,
+		payload: category.trim(),
 	};
 };
 
@@ -58,14 +83,14 @@ export const updateUploadFormat = format => {
 export const updateUploadStart = start => {
 	return {
 		type: START_UPLOAD_CHANGED,
-		payload: start,
+		payload: start.trim(),
 	};
 };
 
 export const updateUploadEnd = end => {
 	return {
 		type: END_UPLOAD_CHANGED,
-		payload: end,
+		payload: end.trim(),
 	};
 };
 
@@ -119,7 +144,7 @@ export const uploadFile = (
 			year: year,
 			isParis: isParis,
 			token: jwt,
-			format: mappedFormat,
+			format: mappedFormat.trim(),
 			start: start,
 			end: end,
 		});

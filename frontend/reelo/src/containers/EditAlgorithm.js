@@ -6,6 +6,7 @@ import RequireAuth from './RequireAuth';
 import {EditAlgForm} from '../components/EditAlgForm';
 import Globals from '../config/Globals';
 // import doneImg from '../assets/images/done-checkmark.png';
+import {withStyles} from '@material-ui/core/styles';
 import {
 	updateAlgYear,
 	updateAlgEx,
@@ -16,7 +17,16 @@ import {
 	fetchVars,
 	updateAlg,
 } from '../actions';
+
+const styles = () => ({
+	title: {
+		marginTop: '28px',
+		marginBottom: '15px',
+	},
+});
+
 function EditAlgorithm(props) {
+	const {classes} = props;
 	useEffect(() => {
 		props.fetchVars();
 	}, []);
@@ -42,6 +52,10 @@ function EditAlgorithm(props) {
 
 	const info = (
 		<Grid item xs={10}>
+			<Typography variant="h4" className={classes.title}>
+				Modifica algoritmo
+			</Typography>
+
 			<Typography variant="subtitle1">
 				Utilizza questa pagina per modificare alcune delle costanti che vengono
 				utilizzate nell'algoritmo per il calcolo del REELO
@@ -106,4 +120,4 @@ const composedComponent = compose(
 	),
 );
 
-export default composedComponent(EditAlgorithm);
+export default withStyles(styles)(composedComponent(EditAlgorithm));

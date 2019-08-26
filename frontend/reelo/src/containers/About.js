@@ -1,11 +1,23 @@
 import {Grid, Typography} from '@material-ui/core';
 import React from 'react';
 
-export default function About(props) {
+import {withStyles} from '@material-ui/core/styles';
+
+const styles = () => ({
+	title: {
+		marginTop: '28px',
+		marginBottom: '15px',
+	},
+});
+
+function About(props) {
+	const {classes} = props;
 	return (
 		<Grid container justify="center">
 			<Grid item xs={10}>
-				<Typography variant="h4">Reelo</Typography>
+				<Typography variant="h4" className={classes.title}>
+					Reelo
+				</Typography>
 				<Typography variant="subtitle1">
 					<em>
 						La classifica REELO nasce con l'obiettivo di creare una graduatoria
@@ -48,3 +60,5 @@ export default function About(props) {
 		</Grid>
 	);
 }
+
+export default withStyles(styles)(About);
