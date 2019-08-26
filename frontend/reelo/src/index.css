@@ -9,15 +9,6 @@ body {
 	background-color: #fff !important;
 }
 
-/* TODO: move to proper file */
-.ClippedDrawer-drawerPaper-5 {
-	box-shadow: 1px 1px 1px grey;
-}
-
-.padding-r-10 {
-	padding-right: 10px;
-}
-
-input.MuiInputBase-inputType-236 {
+#file-picker {
 	height: auto !important;
 }

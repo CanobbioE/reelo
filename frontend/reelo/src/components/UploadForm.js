@@ -26,7 +26,6 @@ const styles = () => ({
 const categories = ['c1', 'c2', 'ce', 'cm', 'l1', 'l2', 'gp', 'hc'];
 
 const UploadForm = props => {
-	const {classes} = props;
 	const handleSubmit = event => {
 		event.preventDefault();
 		props.onSubmit(
@@ -97,7 +96,7 @@ const UploadForm = props => {
 			<Grid item container spacing={24}>
 				<Grid item xs={12}>
 					<Input
-						className={classes.filePicker}
+						id="file-picker"
 						type="file"
 						onChange={handleFileSelection(props.onFileInput)}
 						disableUnderline
