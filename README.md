@@ -6,19 +6,21 @@ Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's
 
 ### Back end
 
-- Handle double surnames !!
+- Handle double surnames ~
 - API limiter (?)
 - Refactor db
 - Better error handling
 - Better auth handling
-- Pagination (?)
+- Paris
+- user analysis
 
 ### Front end
 
 - i18n (?)
-- Caching
+- Caching ~
 - Better cookies handling
 - A bit of refactoring wouldn't hurt
+- Ranks filters (order by, search, show only category, show year)
 
 ## Application flow
 
