@@ -41,3 +41,14 @@ type GameInfo struct {
 	Start    int
 	End      int
 }
+
+// AnalysisHistory represents a player's history divided by years
+type AnalysisHistory map[int][]History
+
+// History represents one year's result
+type History struct {
+	City     string
+	Category string
+	IsParis  bool
+	Year     int
+}

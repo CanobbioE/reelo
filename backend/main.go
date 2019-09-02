@@ -48,6 +48,10 @@ func main() {
 	router := mux.NewRouter()
 
 	// Routing
+
+	router.Handle("/purge",
+		middlewares.Auth(http.HandlerFunc(controllers.PurgePlayers))).Methods("POST")
+
 	router.HandleFunc("/ranks/", controllers.GetRanks).Methods("GET")
 
 	router.HandleFunc("/years", controllers.GetYears).Methods("GET")

@@ -2,31 +2,32 @@ package elo
 
 import "strings"
 
-type category int
+// Category represents the numerical value for a category
+type Category int
 
 // Enum to compare categories
 const (
-	CE category = iota
+	CE Category = iota
 	CM
 	C1
 	C2
 	L1
-	GP
 	L2
-	HC
+	GP
+	HC = iota - 1 // H.C. and GP are considered the same
 )
 
 var toString = []string{"CE", "CM", "C1", "C2", "L1", "GP", "L2", "HC"}
 
-func (c category) String() string {
+func (c Category) String() string {
 	return toString[c]
 }
 
 // CategoryFromString returns a Category from the given string
-func categoryFromString(s string) category {
+func CategoryFromString(s string) Category {
 	for i, c := range toString {
 		if strings.ToUpper(c) == s {
-			return category(i)
+			return Category(i)
 		}
 	}
 	return -1
