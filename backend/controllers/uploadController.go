@@ -51,7 +51,6 @@ func Upload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)
 		return
 	}
-	log.Printf("File parsed succesfully\n\n")
 
 	services.Backup()
 	return

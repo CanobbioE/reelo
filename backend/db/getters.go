@@ -14,8 +14,8 @@ import (
 // If it doesn't find any result it will return -1.
 func (database *DB) GameID(ctx context.Context, year, category string, isParis bool) (int, error) {
 	id := -1
-	q := adaptToParis(findGameIDByYearAndCategory, isParis)
-	err := database.db.QueryRow(q, year, category).Scan(&id)
+	q := findGameIDByYearAndCategoryAndIsParis
+	err := database.db.QueryRow(q, year, category, isParis).Scan(&id)
 	if err != nil {
 		if err.Error() != "sql: no rows in result set" {
 			return id, fmt.Errorf("Error getting games id: %v", err)
@@ -492,4 +492,43 @@ func (database *DB) AllYears(ctx context.Context) ([]int, error) {
 		years = append(years, y)
 	}
 	return years, nil
+}
+
+// AnalysisHistory retrieves a player history used to do user'sanalysis
+func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (AnalysisHistory, error) {
+	ah := make(AnalysisHistory)
+	q := findPlayerAnalysisHistoryByPlayer
+
+	rows, err := database.db.QueryContext(ctx, q, name, surname)
+	if err != nil {
+		log.Printf("Error getting player history: %v", err)
+		return ah, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var y int
+		var cat, city string
+		var isParis bool
+
+		err := rows.Scan(y, cat, isParis, city)
+		if err != nil {
+			log.Printf("Error getting player history: %v", err)
+			return ah, err
+		}
+
+		s := History{
+			Category: cat,
+			IsParis:  isParis,
+			City:     city,
+			Year:     y,
+		}
+
+		if _, ok := ah[y]; !ok {
+			ah[y] = []History{}
+		}
+		ah[y] = append(ah[y], s)
+	}
+
+	return ah, nil
 }

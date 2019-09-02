@@ -22,4 +22,5 @@ type History struct {
 	MaxScore     int     `json:"dMax"`
 	Time         int     `json:"time"`
 	Position     int     `json:"position"`
+	IsParis      bool    `json:"isParis"`
 }

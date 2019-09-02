@@ -244,9 +244,9 @@ func dumbNamesakeGuard(categories []string, parisIndex int, isParis bool) []stri
 	defer db.Close()
 
 	if (len(categories) > 1 && !isParis) || (len(categories) > 2 && isParis) {
-		maxC := categoryFromString("CE")
+		maxC := CategoryFromString("CE")
 		for _, c := range categories {
-			if tmp := categoryFromString(c); tmp >= maxC {
+			if tmp := CategoryFromString(c); tmp >= maxC {
 				maxC = tmp
 			}
 		}

@@ -32,11 +32,11 @@ func (database *DB) Add(ctx context.Context, table string, params ...interface{}
 			"VALUES (%d, %d, %d, \"%s\")", params...)
 
 	case "giochi":
-		q1 = fmt.Sprintf("INSERT INTO Giochi (anno, categoria, inizio, fine)"+
-			" VALUES (%d, \"%s\", %d, %d)", params...)
+		q1 = fmt.Sprintf("INSERT INTO Giochi (anno, categoria, inizio, fine, internazionale)"+
+			" VALUES (%d, \"%s\", %d, %d, %t)", params...)
 
 		q2 = fmt.Sprintf("SELECT id FROM Giochi"+
-			" WHERE anno = %d AND categoria = %s", params...)
+			" WHERE anno = %d AND categoria = %s AND inizio = %d AND fine = %d AND internazionale = %t", params...)
 	}
 	id, err := database.performAndReturn(ctx, q1, q2)
 	if err != nil {
@@ -53,7 +53,7 @@ func (database DB) InserRankingFile(
 	isParis bool) error {
 
 	gamesID, err := database.Add(ctx, "giochi",
-		gameInfo.Year, gameInfo.Category, gameInfo.Start, gameInfo.End)
+		gameInfo.Year, gameInfo.Category, gameInfo.Start, gameInfo.End, isParis)
 	if err != nil {
 		return err
 	}

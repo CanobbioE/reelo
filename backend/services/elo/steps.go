@@ -70,7 +70,7 @@ func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 	db := rdb.NewDB()
 	defer db.Close()
 
-	if categoryFromString(lastKnownCategoryForPlayer) > categoryFromString(category) {
+	if CategoryFromString(lastKnownCategoryForPlayer) > CategoryFromString(category) {
 		oldAvg, err := db.AvgPseudoReelo(year, category)
 		if err != nil {
 			return err
