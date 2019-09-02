@@ -47,6 +47,7 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 		log.Printf("parse.File() returned warning: %v\n", warning)
 		return warning
 	}
+	log.Printf("File parsed succesfully\n\n")
 
 	gameInfo := rdb.GameInfo{
 		year,
@@ -56,6 +57,8 @@ func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
 	}
 
 	db.InserRankingFile(context.Background(), results, gameInfo, isParis)
+
+	log.Printf("File inserted succesfully\n\n")
 	return nil
 }
 
@@ -101,6 +104,8 @@ func DeleteIfAlreadyExists(info dto.UploadInfo) error {
 			return err
 		}
 		log.Printf("Deleted results with id: %v\n", id)
+	} else {
+		log.Println("Nothing to delete")
 	}
 	return nil
 }

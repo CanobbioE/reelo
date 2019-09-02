@@ -12,10 +12,9 @@ const (
 	SELECT anno_inizio, k_esercizi, finale, fattore_moltiplicativo, exploit, no_partecipazione
 	FROM Costanti`
 
-	findGameIDByYearAndCategory = `
+	findGameIDByYearAndCategoryAndIsParis = `
 SELECT G.id FROM Giochi G
-JOIN Partecipazione P ON P.giochi = G.id
-WHERE G.anno = ? AND G.categoria = ?
+WHERE G.anno = ? AND G.categoria = ? AND G.internazionale = ?
 `
 
 	findResultsByNameAndSurname = `
@@ -151,4 +150,12 @@ JOIN Giocatore U ON U.id = P.Giocatore
 JOIN Giochi G ON G.id = P.giochi
 WHERE U.nome = ? AND U.cognome = ? AND G.anno = ? AND G.categoria = ?
 	`
+
+	findPlayerAnalysisHistoryByPlayer = `
+SELECT G.anno, G.categoria, G.internazionale, P.sede FROM Giochi G
+JOIN Partecipazione P ON P.giochi = G.id
+JOIN Giocatore U ON U.id = P.giocatore
+WHERE U.nome = ? AND U.cognome = ?
+ORDER BY G.anno
+`
 )
