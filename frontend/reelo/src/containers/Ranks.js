@@ -13,6 +13,7 @@ import {
 	setRankSize,
 	fetchTotalRanks,
 	fetchAllYears,
+	purgePlayers,
 } from '../actions';
 import LoadingIcon from '../components/LoadingIcon';
 
@@ -196,6 +197,16 @@ function Ranks(props) {
 							Ricalcola REELO
 						</Button>
 					)}
+					{!props.auth.authenticated ? null : (
+						<Button
+							onClick={async () => {
+								await props.purgePlayers();
+							}}
+							variant="contained"
+							color="primary">
+							Ripara sinonimi
+						</Button>
+					)}
 				</Grid>
 			</Grid>
 		</Grid>
@@ -216,6 +227,7 @@ const composedComponent = compose(
 			fetchTotalRanks,
 			setRankSize,
 			fetchAllYears,
+			purgePlayers,
 		},
 	),
 );

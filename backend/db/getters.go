@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sort"
 
 	"github.com/CanobbioE/reelo/backend/dto"
 )
@@ -495,14 +496,15 @@ func (database *DB) AllYears(ctx context.Context) ([]int, error) {
 }
 
 // AnalysisHistory retrieves a player history used to do user'sanalysis
-func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (AnalysisHistory, error) {
+func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (AnalysisHistory, []int, error) {
 	ah := make(AnalysisHistory)
+	var years []int
 	q := findPlayerAnalysisHistoryByPlayer
 
 	rows, err := database.db.QueryContext(ctx, q, name, surname)
 	if err != nil {
 		log.Printf("Error getting player history: %v", err)
-		return ah, err
+		return ah, years, err
 	}
 	defer rows.Close()
 
@@ -511,11 +513,13 @@ func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (
 		var cat, city string
 		var isParis bool
 
-		err := rows.Scan(y, cat, isParis, city)
+		err := rows.Scan(&y, &cat, &isParis, &city)
 		if err != nil {
 			log.Printf("Error getting player history: %v", err)
-			return ah, err
+			return ah, years, err
 		}
+
+		years = append(years, y)
 
 		s := History{
 			Category: cat,
@@ -530,5 +534,6 @@ func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (
 		ah[y] = append(ah[y], s)
 	}
 
-	return ah, nil
+	sort.Ints(years)
+	return ah, years, nil
 }

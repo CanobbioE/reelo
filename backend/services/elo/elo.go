@@ -5,6 +5,7 @@ import (
 	"log"
 
 	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/utils/category"
 )
 
 var (
@@ -124,12 +125,12 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 			return reelo, err
 		}
 		// the category for the current year, used to check for category promotion
-		category, err := db.Category(ctx, name, surname, year)
+		cat, err := db.Category(ctx, name, surname, year)
 		if err != nil {
 			return reelo, err
 		}
 
-		err = stepSix(&pseudoReelo, lastKnownCategoryForPlayer, category, year)
+		err = stepSix(&pseudoReelo, lastKnownCategoryForPlayer, cat, year)
 		if err != nil {
 			return reelo, err
 		}
@@ -147,25 +148,25 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 // oneYearScore is used to calculate a baseScore using steps from 1 to 5.
 // This baseScore (a.k.a. pseudo-Reelo) refers to a single year.
 // This needs to be calculated for every year the player has played.
-func oneYearScore(ctx context.Context, name, surname, category string,
+func oneYearScore(ctx context.Context, name, surname, cat string,
 	year int, isParis bool) (float64, error) {
 	var baseScore float64
 	db := rdb.NewDB()
 	defer db.Close()
 
 	// the first exercise a player is supposed to solve for the given category
-	t, err := db.StartOfCategory(context.Background(), year, category)
+	t, err := db.StartOfCategory(context.Background(), year, cat)
 	if err != nil {
 		return baseScore, err
 	}
 	// the last exercise a player is supposed to solve for the given category
-	n, err := db.EndOfCategory(context.Background(), year, category)
+	n, err := db.EndOfCategory(context.Background(), year, cat)
 	if err != nil {
 		return baseScore, err
 	}
 	// the maximum number of solvable exercises for the given category
 	eMax := float64(n - t + 1)
-	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
+	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, cat)
 	if err != nil {
 		return baseScore, err
 	}
@@ -195,16 +196,16 @@ func oneYearScore(ctx context.Context, name, surname, category string,
 	return baseScore, nil
 }
 
-func maxPseudoReelo(year int, category string) (float64, error) {
+func maxPseudoReelo(year int, cat string) (float64, error) {
 	var pseudoReelo float64
 	db := rdb.NewDB()
 	defer db.Close()
 
-	t, err := db.StartOfCategory(context.Background(), year, category)
+	t, err := db.StartOfCategory(context.Background(), year, cat)
 	if err != nil {
 		return pseudoReelo, err
 	}
-	n, err := db.EndOfCategory(context.Background(), year, category)
+	n, err := db.EndOfCategory(context.Background(), year, cat)
 	if err != nil {
 		return pseudoReelo, err
 	}
@@ -213,7 +214,7 @@ func maxPseudoReelo(year int, category string) (float64, error) {
 	eMax := float64(n - t + 1)
 	e := eMax
 	// Here dMax correspond to d
-	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, category)
+	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, cat)
 	if err != nil {
 		return pseudoReelo, err
 	}
@@ -244,9 +245,9 @@ func dumbNamesakeGuard(categories []string, parisIndex int, isParis bool) []stri
 	defer db.Close()
 
 	if (len(categories) > 1 && !isParis) || (len(categories) > 2 && isParis) {
-		maxC := CategoryFromString("CE")
+		maxC := category.FromString("CE")
 		for _, c := range categories {
-			if tmp := CategoryFromString(c); tmp >= maxC {
+			if tmp := category.FromString(c); tmp >= maxC {
 				maxC = tmp
 			}
 		}
