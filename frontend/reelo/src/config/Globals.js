@@ -12,6 +12,7 @@ export default class Globals {
 		count: '/count',
 		years: '/years',
 		exist: '/upload/exist',
+		purge: '/purge',
 	};
 
 	// All the routes in this app
