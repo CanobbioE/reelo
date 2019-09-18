@@ -4,6 +4,7 @@ import (
 	"math"
 
 	rdb "github.com/CanobbioE/reelo/backend/db"
+	"github.com/CanobbioE/reelo/backend/utils/category"
 )
 
 //### 1. Base score:
@@ -66,12 +67,12 @@ func stepFive(baseScore *float64) {
 // has played most recently, then we convert this year's score
 // to the most recent category
 func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
-	category string, year int) error {
+	cat string, year int) error {
 	db := rdb.NewDB()
 	defer db.Close()
 
-	if CategoryFromString(lastKnownCategoryForPlayer) > CategoryFromString(category) {
-		oldAvg, err := db.AvgPseudoReelo(year, category)
+	if category.FromString(lastKnownCategoryForPlayer) > category.FromString(cat) {
+		oldAvg, err := db.AvgPseudoReelo(year, cat)
 		if err != nil {
 			return err
 		}
