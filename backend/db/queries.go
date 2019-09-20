@@ -4,9 +4,11 @@ const (
 	findPlayerIDByNameAndSurname = `SELECT id FROM Giocatore WHERE nome = ? AND cognome = ?`
 	findPasswordByUsername       = `SELECT parolachiave FROM Utenti WHERE nomeutente = ?`
 	findAllPlayers               = `SELECT nome, cognome FROM Giocatore`
+	findAllPlayersIDs            = `SELECT id FROM Giocatore`
 	findMaxYear                  = `SELECT MAX(anno) FROM Giochi`
 	countAllPlayers              = `SELECT COUNT(U.id) FROM Giocatore U`
 	findAllYears                 = `SELECT DISTINCT anno FROM Giochi`
+	findNameAndSurnameByID       = `SELECT nome, cognome FROM Giocatore WHERE id = ?`
 
 	findAllCostants = `
 	SELECT anno_inizio, k_esercizi, finale, fattore_moltiplicativo, exploit, no_partecipazione

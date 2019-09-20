@@ -57,6 +57,42 @@ func (database *DB) Results(ctx context.Context, name, surname string) ([]Result
 	return results, nil
 }
 
+// AllPlayersID retrieves a list of all the players IDs
+func (database *DB) AllPlayersID(ctx context.Context) ([]int, error) {
+	var ids []int
+	q := findAllPlayersIDs
+
+	rows, err := database.db.QueryContext(ctx, q)
+	if err != nil {
+		return ids, fmt.Errorf("Error getting all players id: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		err := rows.Scan(&id)
+		if err != nil {
+			return ids, fmt.Errorf("Error getting all players id: %v", err)
+		}
+		// TODO: this is gonna break once the array becomes too big... YOU NEED PAGINATION!
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
+// Player retreives the name and the surname of a user given
+// her/his ID
+func (database *DB) Player(ctx context.Context, id int) (Player, error) {
+	var player Player
+	q := findNameAndSurnameByID
+
+	err := database.db.QueryRow(q, id).Scan(&player.Name, &player.Surname)
+	if err != nil {
+		return player, fmt.Errorf("Error getting scores: %v", (err))
+	}
+	return player, nil
+}
+
 // AllPlayers retrieves all players from the database
 func (database *DB) AllPlayers(ctx context.Context) ([]Player, error) {
 	var players []Player
@@ -73,6 +109,7 @@ func (database *DB) AllPlayers(ctx context.Context) ([]Player, error) {
 		if err != nil {
 			return players, fmt.Errorf("Error getting players: %v", err)
 		}
+		// TODO: this is gonna break once the array becomes too big... YOU NEED PAGINATION!
 		players = append(players, p)
 	}
 	return players, nil
@@ -81,10 +118,12 @@ func (database *DB) AllPlayers(ctx context.Context) ([]Player, error) {
 // PlayerPartecipationYears retrieves a list of all the years a player has played
 func (database *DB) PlayerPartecipationYears(ctx context.Context, name, surname string) ([]int, error) {
 	var years []int
+
 	pID, err := database.PlayerID(ctx, name, surname)
 	if err != nil {
 		return years, err
 	}
+
 	q := findPartecipationYearsByPlayer
 	rows, err := database.db.QueryContext(ctx, q, pID)
 	if err != nil {

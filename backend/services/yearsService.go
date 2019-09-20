@@ -8,7 +8,6 @@ import (
 
 // GetYears returns a list of all the stored years
 func GetYears() ([]int, error) {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 	return db.AllYears(context.Background())
 }

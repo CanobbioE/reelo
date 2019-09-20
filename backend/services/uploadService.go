@@ -18,8 +18,7 @@ import (
 // and tries to parse each line into an entity to be saved in the database
 // appending the data defined in the upload info
 func ParseFileWithInfo(fileReader io.Reader, info dto.UploadInfo) error {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	var results []parse.LineInfo
 	year, err := strconv.Atoi(info.Year)
@@ -91,8 +90,7 @@ func SaveRankingFile(src io.Reader, year, category string, isParis bool) error {
 // DeleteIfAlreadyExists search for results from the year+category contained in
 // info. If the year+category exists in the database, all the results gets erased.
 func DeleteIfAlreadyExists(info dto.UploadInfo) error {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	id, err := db.GameID(context.Background(), info.Year, info.Category, info.IsParis)
 	if err != nil {
@@ -112,8 +110,7 @@ func DeleteIfAlreadyExists(info dto.UploadInfo) error {
 
 // DoesRankExist is called to verify if a year-category ranking file has been already uploaded
 func DoesRankExist(year, category string, isParis bool) (bool, error) {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	id, err := db.GameID(context.Background(), year, category, isParis)
 	if err != nil {

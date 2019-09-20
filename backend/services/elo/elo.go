@@ -22,8 +22,7 @@ var (
 // Variables names are chosen consistently with the formula
 // provided by the scientific committee
 func InitCostants() {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	c, err := db.ReeloCostants()
 	if err != nil {
@@ -44,8 +43,7 @@ func InitCostants() {
 // promotion into consideration.
 func PseudoReelo(ctx context.Context, name, surname string, year int) error {
 	var isParis bool
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	//### Steps from 1 to 5
 	// There could be more than one category for a year,
@@ -88,8 +86,7 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	var reelo float64
 	var sumOfWeights float64
 
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	// Get some usefull values from db:
 	//
@@ -151,8 +148,7 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 func oneYearScore(ctx context.Context, name, surname, cat string,
 	year int, isParis bool) (float64, error) {
 	var baseScore float64
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	// the first exercise a player is supposed to solve for the given category
 	t, err := db.StartOfCategory(context.Background(), year, cat)
@@ -198,8 +194,7 @@ func oneYearScore(ctx context.Context, name, surname, cat string,
 
 func maxPseudoReelo(year int, cat string) (float64, error) {
 	var pseudoReelo float64
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	t, err := db.StartOfCategory(context.Background(), year, cat)
 	if err != nil {
@@ -241,9 +236,6 @@ func contains(array []int, item int) bool {
 }
 
 func dumbNamesakeGuard(categories []string, parisIndex int, isParis bool) []string {
-	db := rdb.NewDB()
-	defer db.Close()
-
 	if (len(categories) > 1 && !isParis) || (len(categories) > 2 && isParis) {
 		maxC := category.FromString("CE")
 		for _, c := range categories {

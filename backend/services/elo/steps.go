@@ -45,8 +45,7 @@ func stepThree(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 //### 4. Score normailzation:
 // Scores are normalized to the average of averages of this year's categories
 func stepFour(baseScore *float64, year int) error {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 	avgCatScore, err := db.AvgScoresOfCategories(year, exercisesCostant)
 	if err != nil {
 		return err
@@ -68,8 +67,7 @@ func stepFive(baseScore *float64) {
 // to the most recent category
 func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 	cat string, year int) error {
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 
 	if category.FromString(lastKnownCategoryForPlayer) > category.FromString(cat) {
 		oldAvg, err := db.AvgPseudoReelo(year, cat)

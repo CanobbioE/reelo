@@ -18,9 +18,8 @@ import (
 func Login(c dto.Credentials) (int, string, error) {
 	var jwt string
 
-	db := rdb.NewDB()
+	db := rdb.Instance()
 	expPassword, err := db.Password(context.Background(), c.Username)
-	defer db.Close()
 
 	if err != nil {
 		// TODO: can't compare this error

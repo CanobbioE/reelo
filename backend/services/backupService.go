@@ -9,8 +9,7 @@ import (
 // Backup performs the backup of the database
 func Backup() {
 	log.Println("Backup started")
-	db := rdb.NewDB()
-	defer db.Close()
+	db := rdb.Instance()
 	file := db.Backup()
 	err := UploadFile(file)
 	if err != nil {
