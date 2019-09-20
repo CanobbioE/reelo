@@ -30,6 +30,7 @@ func init() {
 
 func main() {
 	// Configure Logging
+	// logFilePath := "log.txt"
 	logFilePath := os.Getenv("LOG_FILE_PATH")
 	if logFilePath != "" {
 		f, err := os.OpenFile("./"+logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
