@@ -74,12 +74,13 @@ func (ss *Solvers) SetCurrent(s Solver) {
 	ss.solvers[ss.curr()] = s
 }
 
-// NewSolver allocates a new solver containing one value
+// NewSolver allocates a new solver containing one value and moves the cursor
+// to the newly added value
 func (ss *Solvers) NewSolver(val rdb.History) {
 	solver := []rdb.History{val}
 	ss.solvers = append(ss.solvers, solver)
 	ss.size++
-	ss.current = ss.size - 1
+	ss.current = len(ss.solvers) - 1
 }
 
 // AppendToCurrent appends the given value to the current solver
