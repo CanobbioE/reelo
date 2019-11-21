@@ -64,7 +64,7 @@ export const fetchAllYears = () => async dispatch => {
 	}
 };
 
-export const fetchRanks = (page, size) => async dispatch => {
+export const fetchRanks = (page = 1, size = -1) => async dispatch => {
 	dispatch({
 		type: RANKS_FETCH_LOADING,
 	});
