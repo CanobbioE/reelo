@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"os"
+	"strconv"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -39,4 +41,22 @@ func JWTKey() []byte {
 	}
 
 	return []byte("my_secret_key")
+}
+
+// Paginate extrapolate the page's number and size from the given http request
+func Paginate(r *http.Request) (page, size int, err error) {
+	pageString := r.URL.Query().Get("page")
+	sizeString := r.URL.Query().Get("size")
+
+	page, err = strconv.Atoi(string(pageString))
+	if err != nil {
+		return page, size, fmt.Errorf("error converting page: %v", err)
+	}
+
+	size, err = strconv.Atoi(string(sizeString))
+	if err != nil {
+		return page, size, fmt.Errorf("error converting size: %v", err)
+	}
+
+	return page, size, nil
 }
