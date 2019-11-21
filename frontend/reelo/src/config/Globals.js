@@ -12,7 +12,7 @@ export default class Globals {
 		count: '/count',
 		years: '/years',
 		exist: '/upload/exist',
-		purge: '/purge',
+		namesakes: '/namesakes',
 	};
 
 	// All the routes in this app
@@ -22,5 +22,6 @@ export default class Globals {
 		upload: '/carica',
 		admin: '/amministrazione',
 		varchange: '/modifica-algoritmo',
+		namesakes: '/omonimi',
 	};
 }
