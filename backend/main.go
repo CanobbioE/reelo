@@ -49,29 +49,20 @@ func main() {
 	router := mux.NewRouter()
 
 	// Routing
-
-	router.Handle("/purge",
-		middlewares.Auth(http.HandlerFunc(controllers.PurgePlayers))).Methods("POST")
-
 	router.HandleFunc("/ranks/", controllers.GetRanks).Methods("GET")
-
 	router.HandleFunc("/years", controllers.GetYears).Methods("GET")
-
 	router.HandleFunc("/count", controllers.GetPlayersCount).Methods("GET")
-
 	router.HandleFunc("/admin", controllers.Login).Methods("POST")
-
 	router.HandleFunc("/upload", middlewares.Auth(
 		http.HandlerFunc(controllers.Upload))).Methods("POST")
-
 	router.HandleFunc("/force-reelo", middlewares.Auth(
 		http.HandlerFunc(controllers.ForcePseudoReelo))).Methods("PUT")
-
 	router.HandleFunc("/algorithm", middlewares.Auth(
 		http.HandlerFunc(controllers.HandleAlgorithm))).Methods("PATCH", "GET")
-
 	router.HandleFunc("/upload/exist/", middlewares.Auth(
 		http.HandlerFunc(controllers.CheckRankExistence))).Methods("GET")
+	router.Handle("/namesakes/", middlewares.Auth(
+		http.HandlerFunc(controllers.GetNamesakes))).Methods("GET")
 
 	// Serving
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(
