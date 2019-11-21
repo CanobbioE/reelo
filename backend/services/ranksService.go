@@ -4,11 +4,10 @@ import (
 	"context"
 
 	rdb "github.com/CanobbioE/reelo/backend/db"
-	"github.com/CanobbioE/reelo/backend/dto"
 )
 
 // GetRanks returns a list of all the ranks in the database
-func GetRanks(page, size int) ([]dto.Rank, error) {
+func GetRanks(page, size int) ([]rdb.Rank, error) {
 	db := rdb.Instance()
 	return db.AllRanks(context.Background(), page, size)
 }
@@ -20,7 +19,7 @@ func GetPlayersCount() (int, error) {
 }
 
 // GetHistory returns the history details for the players
-func GetHistory(name, surname string) (dto.PlayerHistory, error) {
+func GetHistory(name, surname string) (rdb.PlayerHistory, error) {
 	db := rdb.Instance()
 	return db.PlayerHistory(context.Background(), name, surname)
 }

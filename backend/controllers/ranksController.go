@@ -4,27 +4,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/CanobbioE/reelo/backend/services"
+	"github.com/CanobbioE/reelo/backend/utils"
 )
 
 // GetRanks returns a list of all the ranks
 // TODO: filters maybe
 func GetRanks(w http.ResponseWriter, r *http.Request) {
-	pages := r.URL.Query().Get("page")
-	sizes := r.URL.Query().Get("size")
-
-	page, err := strconv.Atoi(string(pages))
+	page, size, err := utils.Paginate(r)
 	if err != nil {
-		log.Printf("Error converting page: %v", err)
-		http.Error(w, "cannot parse query string", http.StatusBadRequest)
-		return
-	}
-
-	size, err := strconv.Atoi(string(sizes))
-	if err != nil {
-		log.Printf("Error converting size: %v", err)
+		log.Printf("Error paginating ranks: %v", err)
 		http.Error(w, "cannot parse query string", http.StatusBadRequest)
 		return
 	}

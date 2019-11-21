@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"log"
 	"sort"
-
-	"github.com/CanobbioE/reelo/backend/dto"
 )
 
 // TODO: refactor me into just two functions: queryMultiple and querySingle
@@ -93,11 +91,19 @@ func (database *DB) Player(ctx context.Context, id int) (Player, error) {
 	return player, nil
 }
 
-// AllPlayers retrieves all players from the database
-func (database *DB) AllPlayers(ctx context.Context) ([]Player, error) {
+// AllPlayers retrieves all players from the specified page of the set size
+// if the size is a negative number then all the players will be retrieved
+func (database *DB) AllPlayers(ctx context.Context, page, size int) ([]Player, error) {
 	var players []Player
 	q := findAllPlayers
-	rows, err := database.db.QueryContext(ctx, q)
+	count, err := database.CountAllPlayers(ctx)
+	if err != nil {
+		return players, err
+	}
+	if size < 0 {
+		size = count
+	}
+	rows, err := database.db.QueryContext(ctx, q, (page-1)*size, size)
 	if err != nil {
 		return players, fmt.Errorf("Error getting players: %v", err)
 	}
@@ -323,7 +329,7 @@ func (database *DB) CountAllPlayers(ctx context.Context) (int, error) {
 // A rank is composed by a player's name, surname, reelo and last category
 // into which he has played.
 // Page number and page size are used for pagination.
-func (database *DB) AllRanks(ctx context.Context, page, size int) (ranks []dto.Rank, err error) {
+func (database *DB) AllRanks(ctx context.Context, page, size int) (ranks []Rank, err error) {
 	q := findAllPlayersRanks
 	rows, err := database.db.QueryContext(ctx, q, (page-1)*size, size)
 	if err != nil {
@@ -333,7 +339,7 @@ func (database *DB) AllRanks(ctx context.Context, page, size int) (ranks []dto.R
 	defer rows.Close()
 
 	for rows.Next() {
-		var r dto.Rank
+		var r Rank
 		err := rows.Scan(&r.Name, &r.Surname, &r.Category, &r.Reelo)
 		if err != nil {
 			log.Printf("Error getting all ranks: %v", err)
@@ -453,9 +459,9 @@ func (database *DB) ResultID(name, surname string, year int, category string) (i
 }
 
 // PlayerHistory retrieve a user history details.
-func (database *DB) PlayerHistory(ctx context.Context, name, surname string) (dto.PlayerHistory, error) {
+func (database *DB) PlayerHistory(ctx context.Context, name, surname string) (PlayerHistory, error) {
 
-	ph := make(map[int]dto.History)
+	ph := make(map[int]OneYearDetails)
 	q := findResultByPlayerAndYear
 
 	// Find all players partecipation years
@@ -474,7 +480,7 @@ func (database *DB) PlayerHistory(ctx context.Context, name, surname string) (dt
 		defer rows.Close()
 
 		for rows.Next() {
-			var res dto.History
+			var res OneYearDetails
 
 			// Saving most of the results
 			err := rows.Scan(&res.Category, &res.Time,

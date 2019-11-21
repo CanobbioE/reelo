@@ -3,7 +3,7 @@ package db
 const (
 	findPlayerIDByNameAndSurname = `SELECT id FROM Giocatore WHERE nome = ? AND cognome = ?`
 	findPasswordByUsername       = `SELECT parolachiave FROM Utenti WHERE nomeutente = ?`
-	findAllPlayers               = `SELECT nome, cognome FROM Giocatore`
+	findAllPlayers               = `SELECT nome, cognome FROM Giocatore LIMIT ?, ?`
 	findAllPlayersIDs            = `SELECT id FROM Giocatore`
 	findMaxYear                  = `SELECT MAX(anno) FROM Giochi`
 	countAllPlayers              = `SELECT COUNT(U.id) FROM Giocatore U`
