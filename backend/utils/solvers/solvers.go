@@ -107,11 +107,11 @@ func (s *Solver) CanAccept(val rdb.History) bool {
 	}
 
 	for _, result := range history {
-		// Two results in one year
+		// Do not accept two results in one year
 		if result.Year == val.Year && !(result.IsParis || val.IsParis) {
 			return false
 		}
-		// Two results from paris in the same year
+		// Do not accept two results from paris in the same year
 		if result.Year == val.Year && (result.IsParis && val.IsParis) {
 			return false
 		}
