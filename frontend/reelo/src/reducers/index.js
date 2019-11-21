@@ -4,6 +4,7 @@ import authReducer from './authReducer';
 import uploadReducer from './uploadReducer';
 import ranksReducer from './ranksReducer';
 import algorithmReducer from './algorithmReducer';
+import analysisReducer from './analysisReducer';
 
 export default combineReducers({
 	loginForm: loginReducer,
@@ -11,4 +12,5 @@ export default combineReducers({
 	uploadForm: uploadReducer,
 	ranks: ranksReducer,
 	algorithm: algorithmReducer,
+	analysis: analysisReducer,
 });

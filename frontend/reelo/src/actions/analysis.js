@@ -1,27 +1,31 @@
 import axios from 'axios';
 import {
-	RANKS_FETCH_ERROR,
-	RANK_UPLOAD_ERROR_RESET,
-	RANKS_FETCH_LOADING,
+	NAMESAKE_FETCH_LOADING,
+	NAMESAKE_FETCH_ERROR,
+	NAMESAKE_FETCH_SUCCESS,
 } from '../utils/Types';
 import Globals from '../config/Globals';
 
-export const purgePlayers = () => async dispatch => {
+export const fetchNamesakes = (page = 1, size = -1) => async dispatch => {
 	dispatch({
-		type: RANKS_FETCH_LOADING,
+		type: NAMESAKE_FETCH_LOADING,
 	});
 	try {
-		await axios.post(
-			`${Globals.baseURL}${Globals.API.purge}`,
-			{},
-			{headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}},
+		const start = Date.now();
+		const response = await axios.get(
+			`${Globals.baseURL}${Globals.API.namesakes}/?page=${page}&size=${size}`,
+			{
+				headers: {Authorization: `Bearer ${localStorage.getItem('token')}`},
+			},
 		);
+		console.log(`Duration for ${size} players = ${Date.now() - start}ms `);
 		dispatch({
-			type: RANK_UPLOAD_ERROR_RESET,
+			type: NAMESAKE_FETCH_SUCCESS,
+			payload: response.data,
 		});
 	} catch (e) {
 		dispatch({
-			type: RANKS_FETCH_ERROR,
+			type: NAMESAKE_FETCH_ERROR,
 			payload: e && e.response && e.response.data,
 		});
 	}

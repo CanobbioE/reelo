@@ -42,3 +42,7 @@ export const RANKS_COUNT_SUCCESS = 'ranks_count_success';
 export const RANKS_YEARS_LOADING = 'ranks_years_loading';
 export const RANKS_YEARS_ERROR = 'ranks_years_error';
 export const RANKS_YEARS_SUCCESS = 'ranks_years_success';
+
+export const NAMESAKE_FETCH_LOADING = 'namesake_fetch_loading';
+export const NAMESAKE_FETCH_ERROR = 'namesake_fetch_error';
+export const NAMESAKE_FETCH_SUCCESS = 'namesake_fetch_success';

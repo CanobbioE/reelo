@@ -81,6 +81,19 @@ function NavBar(props) {
 							</Typography>
 						</Button>
 					)}
+
+					{props.auth.authenticated && (
+						<Button
+							className={classes.navbtn}
+							component={Link}
+							to={Globals.routes.namesakes}
+							color="inherit">
+							<Typography color="secondary" variant="subtitle1">
+								Omonimi
+							</Typography>
+						</Button>
+					)}
+
 					<Button
 						className={classes.navbtn}
 						component={Link}
