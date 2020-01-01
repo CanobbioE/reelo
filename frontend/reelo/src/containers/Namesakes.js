@@ -3,7 +3,12 @@ import {connect} from 'react-redux';
 import {compose} from 'redux';
 import {Grid, Typography} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
-import {fetchNamesakes} from '../actions';
+import {
+	fetchNamesakes,
+	updateNamesake,
+	acceptNamesake,
+	commentNamesake,
+} from '../actions';
 import {NamesakeForm} from '../components/NamesakeForm';
 import LoadingIcon from '../components/LoadingIcon';
 
@@ -22,16 +27,22 @@ const styles = theme => ({
 const Namesakes = props => {
 	const {classes} = props;
 	useEffect(() => {
-		props.fetchNamesakes(1, 100);
+		props.fetchNamesakes(1, 300);
 	}, []);
 
-	const handleMerge = i => async merge => {
-		const [ret, err] = await merge(props.analysis.namesakes[i + 1]);
-		if (err) {
-			return;
+	const handleMerge = i => merge => {
+		const ret = merge(props.analysis.namesakes[i + 1]);
+		if (ret) {
+			props.updateNamesake(i, ret);
 		}
-		props.analysis.namesakes[i] = ret;
-		props.analysis.namesakes[i + 1] = null;
+	};
+
+	const handleAccept = async namesake => {
+		await props.acceptNamesake(namesake);
+		props.fetchNamesakes(1, 300);
+		if (props.analysis.error && props.analysis.error != '') {
+			window.alert(props.analysis.error);
+		}
 	};
 
 	const renderNamesakes = () =>
@@ -41,8 +52,8 @@ const Namesakes = props => {
 			<NamesakeForm
 				key={`${namesake.playerID} ${namesake.id}`}
 				namesake={namesake}
-				onComment={c => console.log('commented', c)}
-				onAccept={solver => console.log('accepted', solver)}
+				onComment={props.commentNamesake}
+				onAccept={handleAccept}
 				onMerge={handleMerge(i)}
 			/>
 		));
@@ -100,12 +111,12 @@ function mapStateToProps({uploadForm, analysis}) {
 
 const composedComponent = compose(
 	// TODO RequireAuth,
-	connect(
-		mapStateToProps,
-		{
-			fetchNamesakes,
-		},
-	),
+	connect(mapStateToProps, {
+		fetchNamesakes,
+		updateNamesake,
+		acceptNamesake,
+		commentNamesake,
+	}),
 );
 
 export default withStyles(styles)(composedComponent(Namesakes));

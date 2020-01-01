@@ -13,6 +13,7 @@ export default class Globals {
 		years: '/years',
 		exist: '/upload/exist',
 		namesakes: '/namesakes',
+		comment: '/namesakes/comment',
 	};
 
 	// All the routes in this app

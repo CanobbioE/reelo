@@ -46,3 +46,13 @@ export const RANKS_YEARS_SUCCESS = 'ranks_years_success';
 export const NAMESAKE_FETCH_LOADING = 'namesake_fetch_loading';
 export const NAMESAKE_FETCH_ERROR = 'namesake_fetch_error';
 export const NAMESAKE_FETCH_SUCCESS = 'namesake_fetch_success';
+
+export const NAMESAKE_UPDATE = 'namesake_update';
+
+export const NAMESAKE_POST_LOADING = 'namesake_post_loading';
+export const NAMESAKE_POST_SUCCESS = 'namesake_post_success';
+export const NAMESAKE_POST_ERROR = 'namesake_post_error';
+
+export const NAMESAKE_COMMENT_LOADING = 'namesake_comment_loading';
+export const NAMESAKE_COMMENT_SUCCESS = 'namesake_comment_success';
+export const NAMESAKE_COMMENT_ERROR = 'namesake_comment_error';

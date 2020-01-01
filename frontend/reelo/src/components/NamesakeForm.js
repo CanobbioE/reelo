@@ -5,20 +5,22 @@ export const NamesakeForm = props => {
 	const namesake = props.namesake;
 
 	const [solver, setSolver] = useState([...namesake.solver]);
-	const [comment, setComment] = useState('');
+	const [comment, setComment] = useState(namesake.comment);
 	const handleChange = e => setComment(e.target.value);
 
-	const handleAccept = () => props.onAccept(solver);
-	const handleComment = () => props.onComment(comment);
+	const handleAccept = () => props.onAccept(namesake);
+	const handleComment = () => props.onComment(namesake, comment);
 	const handleMerge = () =>
-		props.onMerge(async next => {
+		props.onMerge(next => {
 			if (next && next.playerID === namesake.playerID) {
 				const tmp = [...solver, ...next.solver];
-				await setSolver(tmp);
-				console.log('set to', tmp);
-				return [tmp, null];
+				setSolver(tmp);
+				namesake.solver = tmp;
+				return namesake;
+			} else {
+				// TODO: this is lazy, i have no time to do fancier stuff
+				window.alert('Unione non valida, nulla è cambiato');
 			}
-			return [null, 'Error'];
 		});
 
 	const renderSolver = solver =>
@@ -45,7 +47,7 @@ export const NamesakeForm = props => {
 				</Button>
 			</Grid>
 			<Grid item xs={12} lg={5}>
-				<Button color="secondary" onClick={handleComment} variant="contained">
+				<Button color="primary" onClick={handleComment} variant="contained">
 					Commenta
 				</Button>
 			</Grid>
