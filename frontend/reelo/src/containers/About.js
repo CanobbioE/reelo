@@ -48,12 +48,17 @@ function About(props) {
 					<dd>
 						Fabio Angelini, Anna Bernardi, Edoardo Canobbio, Mirko Cappuccia.
 					</dd>
-
 					<dt>
-						<strong>Consulenti: </strong>
+						<strong>Consulenti comitato scientifico: </strong>
 					</dt>
 					<dd>
 						David Barbato, Maurizio De Leo, Francesco Morandin, Alberto Saracco.
+					</dd>
+					<dt>
+						<strong>Consulenti comitato tecnico: </strong>
+					</dt>
+					<dd>
+						Diego Corsatto, Carlo Frittoli, Alessio Palmero, Elia Scandaletti
 					</dd>
 				</dl>
 			</Grid>
