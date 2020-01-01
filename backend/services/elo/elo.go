@@ -178,6 +178,16 @@ func oneYearScore(ctx context.Context, name, surname, cat string,
 	if err != nil {
 		return baseScore, err
 	}
+
+	// This two checks DO NOT solve the problem, it needs manual intervention
+	if float64(exercises) > eMax {
+		log.Printf("Player %s %s has solved too many exercises (%v > %v)", name, surname, exercises, eMax)
+		exercises = 0
+	}
+	if d > dMax {
+		log.Printf("Player %s %s has scored too many  points (%v > %v)", name, surname, d, dMax)
+		d = 0
+	}
 	e := float64(exercises)
 
 	stepOne(&baseScore, e, d)

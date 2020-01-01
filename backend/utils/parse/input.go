@@ -122,6 +122,9 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 
 				case "esercizi":
 					result.Exercises, err = strconv.Atoi(splitted[index])
+					if result.Exercises > 100 {
+						err = fmt.Errorf("%v exceed max exercises", input)
+					}
 
 				case "punti":
 					result.Points, err = strconv.Atoi(splitted[index])
