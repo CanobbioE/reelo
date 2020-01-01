@@ -2,7 +2,7 @@
 
 Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's term that means "real number".
 
-## TODO
+## TODOS
 
 ### Back end
 
@@ -12,7 +12,7 @@ Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's
 - Better error handling
 - Better auth handling
 - Paris
-- user analysis
+- Back end structure should be refactored
 
 ### Front end
 
@@ -21,16 +21,6 @@ Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's
 - Better cookies handling
 - A bit of refactoring wouldn't hurt
 - Ranks filters (order by, search, show only category, show year)
-
-## Application flow
-
-There's two types of user: Admin and Standard.
-
-**Admin** needs to login -> Admin loads a ranking file -> file get parsed -> if parsing error Admin will be prompted to fix it -> parsed file gets converted into entity -> entity goes into db -> after all entities for the file are in the db Reelo gets (re)calculated for al the entities.
-
-**Admin** needs to login -> Admin changes variables -> db gets updated -> Reelo gets recalculated for all entities.
-
-**User** will visit the rankings page -> server returns a list of all the entities and their Reelo -> User is happy =).
 
 ## Credits
 
