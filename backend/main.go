@@ -1,8 +1,7 @@
 package main
 
-/* TODOs to ask to scientific committee
-* Double check category order
-* How to handle paris (do I exclude results from paris on every query?
+/* TODO:
+ * change elo service to use only IDs and not name/surname
  */
 import (
 	"io"
@@ -21,8 +20,6 @@ import (
 )
 
 func init() {
-	// TODO: Check db integrity
-	// TODO: Call parse.All() if we have stuff in Ranks folder
 	parse.GetCities()
 	elo.InitCostants()
 	log.Println("App initialized")
@@ -49,6 +46,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// Routing
+	router.HandleFunc("/update-database", controllers.UpdateDB).Methods("GET")
 	router.HandleFunc("/ranks/", controllers.GetRanks).Methods("GET")
 	router.HandleFunc("/years", controllers.GetYears).Methods("GET")
 	router.HandleFunc("/count", controllers.GetPlayersCount).Methods("GET")
@@ -63,6 +61,10 @@ func main() {
 		http.HandlerFunc(controllers.CheckRankExistence))).Methods("GET")
 	router.Handle("/namesakes/", middlewares.Auth(
 		http.HandlerFunc(controllers.GetNamesakes))).Methods("GET")
+	router.Handle("/namesakes", middlewares.Auth(
+		http.HandlerFunc(controllers.UpdateNamesake))).Methods("POST")
+	router.Handle("/namesakes/comment", middlewares.Auth(
+		http.HandlerFunc(controllers.CommentNamesake))).Methods("POST", "PATCH")
 
 	// Serving
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(

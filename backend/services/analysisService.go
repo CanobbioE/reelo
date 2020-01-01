@@ -53,6 +53,10 @@ func solvePlayer(player rdb.Player) ([]dto.Namesake, error) {
 	if err != nil {
 		return namesakes, err
 	}
+	comment, err := db.Comment(playerID)
+	if err != nil {
+		return namesakes, err
+	}
 
 	// years is sorted
 	for _, y := range years {
@@ -79,8 +83,50 @@ func solvePlayer(player rdb.Player) ([]dto.Namesake, error) {
 				PlayerID: playerID,
 				Solver:   *solver,
 				ID:       i,
+				Comment:  comment,
 			})
 		}
 	}
 	return namesakes, nil
+}
+
+// UpdateNamesake changes a player history
+func UpdateNamesake(n dto.Namesake) error {
+	db := rdb.Instance()
+	ctx := context.Background()
+	// destructuring dto
+	oldID := n.PlayerID
+	accentID := n.ID
+	name := n.Name
+	surname := n.Surname
+	history := n.Solver.ToHistory()
+	accent := rdb.CreateAccent(history[0].Year, accentID, history[0].City)
+	// create new player
+	newID, err := db.Add(ctx, "giocatore", name, surname, accent)
+	if err != nil {
+		return err
+	}
+
+	// Edit the old player's history by reassigning her/his results to the new player's ID
+	err = db.HistorySwitcheroo(ctx, oldID, newID, history)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// CommentNamesake adds a comment to a namesake
+func CommentNamesake(n dto.Namesake) error {
+	db := rdb.Instance()
+	ctx := context.Background()
+	if db.ContainsComment(ctx, n.PlayerID) {
+		if err := db.CommentPlayer(ctx, n.Comment, n.PlayerID); err != nil {
+			return err
+		}
+	} else {
+		if _, err := db.Add(ctx, "commenti", n.PlayerID, n.Comment); err != nil {
+			return err
+		}
+	}
+	return nil
 }

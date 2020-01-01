@@ -9,6 +9,7 @@ const (
 	countAllPlayers              = `SELECT COUNT(U.id) FROM Giocatore U`
 	findAllYears                 = `SELECT DISTINCT anno FROM Giochi`
 	findNameAndSurnameByID       = `SELECT nome, cognome FROM Giocatore WHERE id = ?`
+	findCommentByPlayerID        = `SELECT testo FROM Commenti WHERE giocatore = ?`
 
 	findAllCostants = `
 	SELECT anno_inizio, k_esercizi, finale, fattore_moltiplicativo, exploit, no_partecipazione
@@ -152,12 +153,26 @@ JOIN Giocatore U ON U.id = P.Giocatore
 JOIN Giochi G ON G.id = P.giochi
 WHERE U.nome = ? AND U.cognome = ? AND G.anno = ? AND G.categoria = ?
 	`
+	findResultIDByPlayerIDAndYearAndCategory = `
+SELECT R.id
+FROM Risultato R
+JOIN Partecipazione P ON P.risultato = R.id
+JOIN Giochi G ON G.id = P.giochi
+WHERE P.Giocatore = ? AND G.anno = ? AND G.categoria = ?
+	`
 
 	findPlayerAnalysisHistoryByPlayer = `
 SELECT G.anno, G.categoria, G.internazionale, P.sede FROM Giochi G
 JOIN Partecipazione P ON P.giochi = G.id
 JOIN Giocatore U ON U.id = P.giocatore
 WHERE U.nome = ? AND U.cognome = ?
+ORDER BY G.anno
+`
+
+	findPlayerAnalysisHistoryByPlayerID = `
+SELECT G.anno, G.categoria, G.internazionale, P.sede FROM Giochi G
+JOIN Partecipazione P ON P.giochi = G.id
+WHERE P.Giocatore = ?
 ORDER BY G.anno
 `
 )

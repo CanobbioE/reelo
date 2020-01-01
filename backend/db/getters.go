@@ -449,9 +449,19 @@ func (database *DB) Category(ctx context.Context, name, surname string, year int
 
 // ResultID returns the id of a result given a player a year and a category
 func (database *DB) ResultID(name, surname string, year int, category string) (int, error) {
-	var id int
 	q := findResultIDByNameAndSurnameAndYearAndCategory
-	err := database.db.QueryRow(q, name, surname, year, category).Scan(&id)
+	return database.resultID(q, name, surname, year, category)
+}
+
+// ResultIDByPlayerID returns the id of a result given a player's ID a year and a category
+func (database *DB) ResultIDByPlayerID(id, year int, category string) (int, error) {
+	q := findResultIDByPlayerIDAndYearAndCategory
+	return database.resultID(q, id, year, category)
+}
+
+func (database *DB) resultID(query string, params ...interface{}) (int, error) {
+	var id int
+	err := database.db.QueryRow(query, params...).Scan(&id)
 	if err != nil {
 		return id, fmt.Errorf("Error getting result id: %v", err)
 	}
@@ -540,15 +550,31 @@ func (database *DB) AllYears(ctx context.Context) ([]int, error) {
 	return years, nil
 }
 
-// AnalysisHistory retrieves a player history used to do user'sanalysis
+// AnalysisHistoryByID retrieves a player history used to do user'sanalysis by ID
+// The first returned value is a map where the keys are the partecipation years and
+// the values are the player's history for that year.
+// The second returned value is an array of the map's keys, in ascending order.
+func (database *DB) AnalysisHistoryByID(ctx context.Context, id int) (AnalysisHistory, []int, error) {
+	q := findPlayerAnalysisHistoryByPlayerID
+	return database.analysisHistory(ctx, q, id)
+}
+
+// AnalysisHistory retrieves a player history used to do user'sanalysis.
+// The first returned value is a map where the keys are the partecipation years and
+// the values are the player's history for that year.
+// The second returned value is an array of the map's keys, in ascending order.
 func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (AnalysisHistory, []int, error) {
-	ah := make(AnalysisHistory)
-	var years []int
 	q := findPlayerAnalysisHistoryByPlayer
 
-	rows, err := database.db.QueryContext(ctx, q, name, surname)
+	return database.analysisHistory(ctx, q, name, surname)
+}
+
+func (database *DB) analysisHistory(ctx context.Context, query string, params ...interface{}) (AnalysisHistory, []int, error) {
+	ah := make(AnalysisHistory)
+	var years []int
+	rows, err := database.db.QueryContext(ctx, query, params...)
 	if err != nil {
-		log.Printf("Error getting player history: %v", err)
+		log.Printf("Error getting player's analysis history: %v", err)
 		return ah, years, err
 	}
 	defer rows.Close()
@@ -560,7 +586,7 @@ func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (
 
 		err := rows.Scan(&y, &cat, &isParis, &city)
 		if err != nil {
-			log.Printf("Error getting player history: %v", err)
+			log.Printf("Error getting player's analysis history: %v", err)
 			return ah, years, err
 		}
 
@@ -581,4 +607,16 @@ func (database *DB) AnalysisHistory(ctx context.Context, name, surname string) (
 
 	sort.Ints(years)
 	return ah, years, nil
+}
+
+// Comment retrieves any comment for te given player id
+func (database *DB) Comment(id int) (string, error) {
+	var comment string
+	q := findCommentByPlayerID
+
+	err := database.db.QueryRow(q, id).Scan(&comment)
+	if err != nil && err.Error() != "sql: no rows in result set" {
+		return comment, fmt.Errorf("Error getting comment: %v", (err))
+	}
+	return comment, nil
 }

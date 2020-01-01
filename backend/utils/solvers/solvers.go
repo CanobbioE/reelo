@@ -132,3 +132,8 @@ func (s *Solver) CanAccept(val rdb.History) bool {
 
 	return true
 }
+
+// ToHistory converts a solver to an array of historys
+func (s *Solver) ToHistory() []rdb.History {
+	return []rdb.History(*s)
+}

@@ -9,4 +9,5 @@ type Namesake struct {
 	PlayerID int            `json:"playerID"`
 	Solver   solvers.Solver `json:"solver"`
 	ID       int            `json:"id"`
+	Comment  string         `json:"comment"`
 }

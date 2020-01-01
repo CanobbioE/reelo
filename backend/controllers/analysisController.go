@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 
+	"github.com/CanobbioE/reelo/backend/dto"
 	"github.com/CanobbioE/reelo/backend/services"
 	"github.com/CanobbioE/reelo/backend/utils"
 )
@@ -27,7 +29,6 @@ func GetNamesakes(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot get namesakes", http.StatusBadRequest)
 		return
 	}
-	log.Println("Done getting!")
 
 	ret, err := json.Marshal(namesakes)
 	if err != nil {
@@ -38,5 +39,52 @@ func GetNamesakes(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(ret)
+	return
+}
+
+// UpdateNamesake changes the history for a given player
+func UpdateNamesake(w http.ResponseWriter, r *http.Request) {
+	var n dto.Namesake
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error while reading namesake body: %v", err)
+		http.Error(w, "can't update namesake", http.StatusBadRequest)
+		return
+	}
+	err = json.Unmarshal(body, &n)
+	if err != nil {
+		log.Printf("Error while unmarshalling namesake: %v", err)
+		http.Error(w, "can't update namesake", http.StatusBadRequest)
+		return
+	}
+
+	err = services.UpdateNamesake(n)
+	if err != nil {
+		log.Printf("Error updating namesake: %v", err)
+		http.Error(w, "can't update namesake", http.StatusInternalServerError)
+		return
+	}
+}
+
+// CommentNamesake adds a comment to a namesake
+func CommentNamesake(w http.ResponseWriter, r *http.Request) {
+	var n dto.Namesake
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error while reading namesake body: %v", err)
+		http.Error(w, "can't comment namesake", http.StatusBadRequest)
+		return
+	}
+	err = json.Unmarshal(body, &n)
+	if err != nil {
+		log.Printf("Error while unmarshalling namesake: %v", err)
+		http.Error(w, "can't comment namesake", http.StatusBadRequest)
+		return
+	}
+	if err = services.CommentNamesake(n); err != nil {
+		log.Printf("Error commenting namesake: %v", err)
+		http.Error(w, "can't comment namesake", http.StatusInternalServerError)
+		return
+	}
 	return
 }

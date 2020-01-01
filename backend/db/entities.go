@@ -22,6 +22,7 @@ type Player struct {
 	Name    string
 	Surname string
 	Reelo   int
+	Accent  string
 }
 
 // Costants represents all the costants used to calculate the reelo score
@@ -51,6 +52,10 @@ type History struct {
 	Category string
 	IsParis  bool
 	Year     int
+}
+
+func (h History) isEqual(b History) bool {
+	return h.Year == b.Year && h.Category == b.Category && h.City == b.City && h.IsParis == b.IsParis
 }
 
 // Rank represents one entry of a ranking
