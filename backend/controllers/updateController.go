@@ -11,6 +11,7 @@ import (
 // UpdateDB is to be called from CLI, it is used to automate db updates.
 // In production is an empty function
 func UpdateDB(w http.ResponseWriter, r *http.Request) {
+	log.Println("Called")
 	ctx := context.Background()
 	db := rdb.Instance()
 	ids, err := db.AllPlayersID(ctx)
