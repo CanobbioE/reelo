@@ -49,6 +49,11 @@ const Namesakes = props => {
 		}
 	};
 
+	const handleComment = async (namesake, comment) => {
+		await props.commentNamesake(namesake, comment);
+		props.fetchNamesakes(page, 300);
+	};
+
 	const renderNamesakes = () =>
 		props.analysis &&
 		props.analysis.namesakes &&
@@ -56,7 +61,7 @@ const Namesakes = props => {
 			<NamesakeForm
 				key={`${namesake.playerID} ${namesake.id}`}
 				namesake={namesake}
-				onComment={props.commentNamesake}
+				onComment={handleComment}
 				onAccept={handleAccept}
 				onMerge={handleMerge(i)}
 			/>
