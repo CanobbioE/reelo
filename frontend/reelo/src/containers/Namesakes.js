@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {connect} from 'react-redux';
 import {compose} from 'redux';
-import {Grid, Typography} from '@material-ui/core';
+import {Grid, Typography, Button} from '@material-ui/core';
 import {withStyles} from '@material-ui/core/styles';
 import {
 	fetchNamesakes,
@@ -26,9 +26,10 @@ const styles = theme => ({
 
 const Namesakes = props => {
 	const {classes} = props;
+	const [page, setPage] = useState(1);
 	useEffect(() => {
-		props.fetchNamesakes(1, 300);
-	}, []);
+		props.fetchNamesakes(page, 300);
+	}, [page]);
 
 	const handleMerge = i => merge => {
 		const ret = merge(props.analysis.namesakes[i + 1]);
@@ -38,9 +39,12 @@ const Namesakes = props => {
 	};
 
 	const handleAccept = async namesake => {
+		if (!window.confirm('Sicuro di voler confermare la soluzione proposta?')) {
+			return;
+		}
 		await props.acceptNamesake(namesake);
-		props.fetchNamesakes(1, 300);
-		if (props.analysis.error && props.analysis.error != '') {
+		props.fetchNamesakes(page, 300);
+		if (props.analysis.error && props.analysis.error !== '') {
 			window.alert(props.analysis.error);
 		}
 	};
@@ -72,6 +76,63 @@ const Namesakes = props => {
 				<Typography variant="h4" className={classes.title}>
 					Risoluzione Omonimi
 				</Typography>
+			</Grid>
+			<Grid item xs={11}>
+				<Typography variant="subtitle1">
+					Utilizza questa pagina per risolvere i casi di omonimia. Ci sono tre
+					azioni disponibili:
+					<dl>
+						<dt>
+							<b>Accetta:</b>
+						</dt>
+						<dd>
+							Conferma la soluzione proposta e crea un nuovo giocatore con la
+							cronologia di partecipazioni proposta.
+						</dd>
+
+						<dt>
+							<b>Unisci:</b>
+						</dt>
+						<dd>
+							La cronologia del giocatore selezionato viene unita alla
+							cronologia del suo omonimo sottostante. Se i due giocatori non
+							sono omonimi non succede nulla. La modifica viene attuata solo una
+							volta premuto il pulsante "Accetta".
+						</dd>
+
+						<dt>
+							<b>Commenta:</b>
+						</dt>
+						<dd>
+							Semplicemente aggiunge un commento in modo da poi risolvere
+							manualmente l'omonimia. Nessuna modifica drastica viene applicata.
+							Non necessita che venga premuto il tasto "Accetta".
+						</dd>
+					</dl>
+					Per questioni di performanza i giocatori vengono analizzati a pagine
+					di 300 giocatori alla volta. E l'ordine in cui compaiono non &egrave;
+					costante.
+					<br />
+					<br />
+					<Grid item container spacing={8} justify="center">
+						<Grid item xs={12}>
+							<Typography align="center">
+								Al momento sei a pagina {page}
+							</Typography>
+						</Grid>
+						<Grid item>
+							<Button variant="contained" onClick={() => setPage(page - 1)}>
+								Diminuisci pagina
+							</Button>
+						</Grid>
+						<Grid item>
+							<Button variant="contained" onClick={() => setPage(page + 1)}>
+								Aumenta pagina
+							</Button>
+						</Grid>
+					</Grid>
+				</Typography>
+				<hr />
 			</Grid>
 
 			<Grid item container spacing={24} xs={10}>
