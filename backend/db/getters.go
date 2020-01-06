@@ -272,6 +272,9 @@ func (database *DB) LastKnownYear() (int, error) {
 	q := findMaxYear
 	err := database.db.QueryRow(q).Scan(&year)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return year, err
+		}
 		return year, fmt.Errorf("Error getting last known year: %v", err)
 	}
 	return year, nil
@@ -284,6 +287,9 @@ func (database *DB) LastKnownCategoryForPlayer(name, surname string) (string, er
 	q := findLastCategoryByPlayerAndYear
 	err := database.db.QueryRow(q, name, surname, name, surname).Scan(&category)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return category, err
+		}
 		return category, fmt.Errorf("Error getting last known category: %v", err)
 	}
 	return category, nil

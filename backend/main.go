@@ -11,12 +11,10 @@ import (
 
 	"github.com/CanobbioE/reelo/backend/controllers"
 	"github.com/CanobbioE/reelo/backend/middlewares"
-	"github.com/CanobbioE/reelo/backend/services"
 	"github.com/CanobbioE/reelo/backend/services/elo"
 	"github.com/CanobbioE/reelo/backend/utils/parse"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"github.com/jasonlvhit/gocron"
 )
 
 func init() {
@@ -40,8 +38,8 @@ func main() {
 	}
 
 	// Backup scheduling
-	gocron.Every(1).Days().At("03:00").Do(services.Backup)
-	gocron.Start()
+	// gocron.Every(1).Days().At("03:00").Do(services.Backup)
+	// gocron.Start()
 
 	router := mux.NewRouter()
 

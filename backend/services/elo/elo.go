@@ -95,12 +95,20 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	// anti-exploit mechanism should take effect.
 	years, err := db.PlayerPartecipationYears(ctx, name, surname)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			err = nil
+			reelo = 0
+		}
 		return reelo, err
 	}
 	// The last category known in which the player has partecipated.
 	// It's used to check for category promotion.
 	lastKnownCategoryForPlayer, err := db.LastKnownCategoryForPlayer(name, surname)
 	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			err = nil
+			reelo = 0
+		}
 		return reelo, err
 	}
 	// The last year known in which the player has partecipated.
