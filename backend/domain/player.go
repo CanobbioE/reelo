@@ -17,7 +17,6 @@ type PlayerRepository interface {
 	FindAllIDs(ctx context.Context) ([]int, error)
 	FindByID(ctx context.Context, id int) (Player, error)
 	FindAll(ctx context.Context, page, size int) ([]Player, error)
-	FindExercisesByID(ctx context.Context, id int) (int, error)
 	FindCountAll(ctx context.Context) (int, error)
 	UpdateReelo(ctx context.Context, p Player) error
 	UpdateAccent(ctx context.Context, a string)

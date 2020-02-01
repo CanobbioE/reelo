@@ -15,6 +15,7 @@ type Result struct {
 // ResultRepository is the interface for the persistency container
 type ResultRepository interface {
 	FindAllByPlayerID(ctx context.Context, id int) ([]Result, error)
+	FindExercisesByPlayerID(ctx context.Context, id int) (int, error)
 	FindScoresByYearAndPlayerIDAndGameIsParis(ctx context.Context, y, id int, ip bool) (float64, error)
 	FindExercisesByYearAndPlayerIDAndGameIsParis(ctx context.Context, y, id int, ip bool) (int, error)
 	FindAvgScoreByGameYear(ctx context.Context, y, k int) (float64, error)

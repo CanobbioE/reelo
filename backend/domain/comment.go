@@ -11,6 +11,7 @@ type Comment struct {
 
 // CommentRepository is the interface for the persistency container
 type CommentRepository interface {
+	Store(ctx context.Context, c Comment) (int, error)
 	FindByID(ctx context.Context, id int) (string, error)
 	UpdateTextByPlayerID(ctx context.Context, id int, t string)
 	CheckExistenceByPlayerID(ctx context.Context, id int) bool
