@@ -1,4 +1,6 @@
-package domain
+package usecases
+
+import "context"
 
 // History is a map of results details indexed by year
 type History map[int]struct {
@@ -7,8 +9,9 @@ type History map[int]struct {
 	MaxScore      int           `json:"dMax"`
 }
 
-// playerHistoryByPlayerNameAndSurname(ctx context.Context, n,s string) (History, error)
-// analysisHistoryByPlayerID(ctx context.Context, id int) (History, []int, error)
-// analysisHistoryByPlayerNameAndSurname(ctx context.Context, n, s string) (History, []int, error)
+// HistoryRepository is the interface for the persistency container
+type HistoryRepository interface {
+	FindByPlayerID(ctx context.Context, id int) (History, []int, error)
+}
 
 // HistorySwitcheroo(ctx context.Context, oldID, newID int, newHistory []History) error
