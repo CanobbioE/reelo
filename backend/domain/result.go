@@ -16,11 +16,11 @@ type Result struct {
 type ResultRepository interface {
 	FindAllByPlayerID(ctx context.Context, id int) ([]Result, error)
 	FindExercisesByPlayerID(ctx context.Context, id int) (int, error)
-	FindScoresByYearAndPlayerIDAndGameIsParis(ctx context.Context, y, id int, ip bool) (float64, error)
+	FindScoreByYearAndPlayerIDAndGameIsParis(ctx context.Context, y, id int, ip bool) (float64, error)
 	FindExercisesByYearAndPlayerIDAndGameIsParis(ctx context.Context, y, id int, ip bool) (int, error)
 	FindAvgScoreByGameYear(ctx context.Context, y, k int) (float64, error)
 	FindAvgPseudoReeloByGameYearAndCategory(ctx context.Context, y int, c string) (float64, error)
-	FindMaxScoreByGameYearAndCategory(ctx context.Context, y int, c string) (int, error)
+	FindMaxScoreByGameYearAndCategory(ctx context.Context, y int, c string) (float64, error)
 	FindPseudoReeloByPlayerIDAndGameYear(ctx context.Context, id, y int) (float64, error)
 	FindIDByPlayerIDAndGameYearAndCategory(ctx context.Context, id, y int, c string) (int, error)
 	UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx context.Context, id, y int, c string, pr float64) error
