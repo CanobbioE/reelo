@@ -12,13 +12,13 @@ import (
 
 // Logger is the interface for the logging utility
 type Logger interface {
-	Log(params ...interface{})
+	Log(msg string, args ...interface{})
 }
 
 // Interactor is used to interact with the externally injected repositories
 type Interactor struct {
 	CommentRepository       domain.CommentRepository
-	CostantsRepository      domain.CommentRepository
+	CostantsRepository      domain.CostantsRepository
 	GameRepository          domain.GameRepository
 	PartecipationRepository domain.PartecipationRepository
 	PlayerRepository        domain.PlayerRepository
@@ -49,7 +49,7 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 	}
 
 	i.Logger.Log("File parsed succesfully\n\n")
-	i.InserRankingFile(context.Background(), results, game)
+	i.GameRepository.InserRankingFile(context.Background(), results, game)
 	i.Logger.Log("File inserted succesfully\n\n")
 	return nil
 }
@@ -85,8 +85,8 @@ func (i *Interactor) DoesRankExist(year int, category string, isParis bool) (boo
 	return id != -1, nil
 }
 
-// InserRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
-func (i *Interactor) InserRankingFile(ctx context.Context, file []parse.LineInfo, game domain.Game) error {
+// InsertRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
+func (i *Interactor) InsertRankingFile(ctx context.Context, file []parse.LineInfo, game domain.Game) error {
 	/*
 		gamesID, err := database.Add(ctx, "giochi",
 			gameInfo.Year, gameInfo.Category, gameInfo.Start, gameInfo.End, isParis)

@@ -14,6 +14,7 @@ type Game struct {
 
 // GameRepository is the interface for the persistency container
 type GameRepository interface {
+	Store(ctx context.Context, g Game) (int64, error)
 	FindIDByYearAndCategoryAndIsParis(ctx context.Context, y int, c string, ip bool) (int, error)
 	FindDistinctYearsByPlayerID(ctx context.Context, id int) ([]int, error)
 	FindCategoriesByYearAndPlayer(ctx context.Context, y, id int) ([]string, error)

@@ -1,6 +1,10 @@
 package interactor
 
-import "context"
+import (
+	"context"
+
+	"github.com/CanobbioE/reelo/backend/usecases"
+)
 
 // AddComment creates or updates a comment for the given player
 func (i *Interactor) AddComment(namesake usecases.Namesake) error {

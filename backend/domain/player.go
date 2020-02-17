@@ -13,12 +13,13 @@ type Player struct {
 
 // PlayerRepository is the interface for the persistency container
 type PlayerRepository interface {
+	Store(ctx context.Context, p Player) (int64, error)
 	FindIDByNameAndSurname(ctx context.Context, n, s string) (int, error)
 	FindAllIDs(ctx context.Context) ([]int, error)
 	FindByID(ctx context.Context, id int) (Player, error)
 	FindAll(ctx context.Context, page, size int) ([]Player, error)
 	FindCountAll(ctx context.Context) (int, error)
 	UpdateReelo(ctx context.Context, p Player) error
-	UpdateAccent(ctx context.Context, a string)
+	UpdateAccent(ctx context.Context, p Player) error
 	CheckExistenceByID(ctx context.Context, id int) bool
 }

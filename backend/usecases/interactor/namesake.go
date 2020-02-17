@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/CanobbioE/reelo/backend/utils/solvers"
 	"golang.org/x/sync/errgroup"
 )

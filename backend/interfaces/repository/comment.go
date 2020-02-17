@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/CanobbioE/reelo/backend/domain"
 )
@@ -21,16 +22,52 @@ func NewDbCommentRepo(dbHandlers map[string]DbHandler) *DbCommentRepo {
 }
 
 // Store inserts a new comment in the repository
-func (db *DbCommentRepo) Store(ctx context.Context, c domain.Comment) (int, error) {
-	return 0, nil
+func (db *DbCommentRepo) Store(ctx context.Context, c domain.Comment) (int64, error) {
+	s := `INSERT INTO Commenti (giocatore, testo) VALUES (%d, "%s")`
+	s = fmt.Sprintf(s, c.Player.ID, c.Text)
+
+	result, err := db.dbHandler.Execute(ctx, s)
+	if err != nil {
+		return -1, err
+	}
+	return result.LastInsertId()
 }
 
-// FindByID retrieves a comment from the repository, given the id
-func (db *DbCommentRepo) FindByID(ctx context.Context) (domain.Comment, error) {
+// FindTextByPlayerID retrieves a comment from the repository, given the id
+func (db *DbCommentRepo) FindTextByPlayerID(ctx context.Context, id int) (string, error) {
+	var text string
+	q := `SELECT testo FROM Commenti WHERE giocatore = %d`
+	q = fmt.Sprintf(q, id)
+
+	err := QueryRow(ctx, q, db.dbHandler, &text)
+	return text, err
 }
 
 // UpdateTextByPlayerID updates a comment defined by the player's id
-func (db *DbCommentRepo) UpdateTextByPlayerID(ctx context.Context, id int, t string) error {}
+func (db *DbCommentRepo) UpdateTextByPlayerID(ctx context.Context, t string, id int) error {
+	s := `UPDATE Commenti SET testo = "%s" WHERE giocatore = %d`
+	s = fmt.Sprintf(s, t, id)
+	_, err := db.dbHandler.Execute(ctx, s)
+	return err
+}
 
 // CheckExistenceByPlayerID returns true if the repo contains a comment with for the given player id
-func (db *DbCommentRepo) CheckExistenceByPlayerID(ctx context.Context, id int) bool {}
+func (db *DbCommentRepo) CheckExistenceByPlayerID(ctx context.Context, id int) bool {
+	q := `SELECT * FROM Commenti WHERE giocatore = ?`
+
+	rows, err := db.dbHandler.Query(ctx, q, id)
+	if err != nil {
+		return false
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		return true
+	}
+	return false
+}
+
+// CreateAccent returns an identifier based on a player's first year and first city of partecipation
+func CreateAccent(year, num int, city string) string {
+	return fmt.Sprintf("%d %s %d", year, city, num)
+}

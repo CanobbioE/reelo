@@ -1,9 +1,12 @@
 package repository
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
-// UserREPO is the handler name
-const UserREPO = "UserRepo"
+// USERREPO is the handler name
+const USERREPO = "UserRepo"
 
 // DbUserRepo id the repository for Users
 type DbUserRepo DbRepo
@@ -16,7 +19,12 @@ func NewDbUserRepo(dbHandlers map[string]DbHandler) *DbUserRepo {
 	}
 }
 
-// FindPasswordByUsername retrieves a user's password given its username
+// FindPasswordByUsername retrieves a user's password given its username.
+// Expects the password to be hashed
 func (db *DbUserRepo) FindPasswordByUsername(ctx context.Context, u string) (string, error) {
-	return "", nil
+	var hash string
+	q := `SELECT parolachiave FROM Utenti WHERE nomeutente = %s`
+	q = fmt.Sprintf(q, u)
+	err := QueryRow(ctx, q, db.dbHandler, &hash)
+	return hash, err
 }
