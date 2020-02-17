@@ -1,10 +1,11 @@
-package elo
+package interactor
 
 type exercises struct {
 	start int
 	end   int
 }
 
+// Scores is a map of what each category has to complete
 //TODO: "Scores" should be something like "Exercises each category has to complete"
 type Scores map[string]exercises
 

@@ -2,12 +2,21 @@ package solvers
 
 import (
 	"fmt"
-
-	rdb "github.com/CanobbioE/reelo/backend/db"
 )
 
+// SlimPartecipation represents a simplified partecipation relationship
+type SlimPartecipation struct {
+	City, Category                                                 string
+	IsParis                                                        bool
+	Year, MaxExercises, MaxScore, Score, Exercises, Time, Position int
+	PseudoReelo                                                    float64
+}
+
+// History is a collection of simplified partecipations
+type History []SlimPartecipation
+
 // Solver is an array of histories
-type Solver []rdb.History
+type Solver History
 
 // Solvers is a an array of Solvers, which are arrays of histories.
 // The solvers length is equal to the number of plausible histories found.
@@ -76,15 +85,15 @@ func (ss *Solvers) SetCurrent(s Solver) {
 
 // NewSolver allocates a new solver containing one value and moves the cursor
 // to the newly added value
-func (ss *Solvers) NewSolver(val rdb.History) {
-	solver := []rdb.History{val}
+func (ss *Solvers) NewSolver(val SlimPartecipation) {
+	solver := Solver{val}
 	ss.solvers = append(ss.solvers, solver)
 	ss.size++
 	ss.current = len(ss.solvers) - 1
 }
 
 // AppendToCurrent appends the given value to the current solver
-func (ss *Solvers) AppendToCurrent(val rdb.History) {
+func (ss *Solvers) AppendToCurrent(val SlimPartecipation) {
 	ss.solvers[ss.curr()] = append(ss.solvers[ss.curr()], val)
 }
 
@@ -99,7 +108,7 @@ func (ss *Solvers) HasNext() bool {
 // CanAccept checks if a given value belongs to the current solver.
 // The value's cosistency is checked against the last inserted value
 // in the current solver. We expect to get the results in chronological order.
-func (s *Solver) CanAccept(val rdb.History) bool {
+func (s *Solver) CanAccept(val SlimPartecipation) bool {
 	history := *s
 	// If there are no results, accept anything
 	if len(history) == 0 {
@@ -133,7 +142,7 @@ func (s *Solver) CanAccept(val rdb.History) bool {
 	return true
 }
 
-// ToHistory converts a solver to an array of historys
-func (s *Solver) ToHistory() []rdb.History {
-	return []rdb.History(*s)
+// ToHistory converts a solver to an history
+func (s *Solver) ToHistory() History {
+	return History(*s)
 }

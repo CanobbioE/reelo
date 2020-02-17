@@ -2,23 +2,36 @@ package usecases
 
 import (
 	"context"
-
-	"github.com/CanobbioE/reelo/backend/domain"
 )
 
-// ResultDetails represents details on a parteciaption
-type ResultDetails struct {
-	Partecipation domain.Partecipation `json:"partecipation"`
-	MaxExercises  int                  `json:"eMax"`
-	MaxScore      int                  `json:"dMax"`
+// SlimPartecipation represents a simplified partecipation relationship
+type SlimPartecipation struct {
+	City         string  `json:"city"`
+	Category     string  `json:"category"`
+	IsParis      bool    `json:"isParis"`
+	Year         int     `json:"year"`
+	MaxExercises int     `json:"eMax"`
+	MaxScore     int     `json:"dMax"`
+	Score        int     `json:"d"`
+	Exercises    int     `json:"e"`
+	Time         int     `json:"time"`
+	Position     int     `json:"position"`
+	PseudoReelo  float64 `json:"pseudoReelo"`
 }
 
-// History is a map of results details indexed by year
-type History map[int]ResultDetails
+// History is a collection of simplified partecipations
+type History []SlimPartecipation
+
+// SlimPartecipationByYear is a slim partecipation indexed by parteciaption year to simplify resarch
+type SlimPartecipationByYear map[int]SlimPartecipation
+
+// HistoryByYear is an history indexed by parteciaption year to simplify resarch
+type HistoryByYear map[int]History
 
 // HistoryRepository is the interface for the persistency container
 type HistoryRepository interface {
-	FindByPlayerID(ctx context.Context, id int) (History, []int, error)
+	FindByPlayerIDAndYear(ctx context.Context, id, y int) (SlimPartecipationByYear, error)
+	FindByPlayerIDOrderByYear(ctx context.Context, id int) (HistoryByYear, []int, int)
 }
 
 // HistorySwitcheroo(ctx context.Context, oldID, newID int, newHistory []History) error

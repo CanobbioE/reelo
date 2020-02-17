@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/interfaces/webinterface/dto"
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
@@ -88,7 +88,7 @@ func (wh *WebserviceHandler) Upload(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	var game domain.Game
+	var uploadInfo dto.FileUpload
 	err = json.Unmarshal([]byte(r.FormValue("data")), &uploadInfo)
 	if err != nil {
 		log.Printf("Error while unmarshalling upload data: %v", err)
@@ -96,7 +96,7 @@ func (wh *WebserviceHandler) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := wh.Interactor.DeleteIfAlreadyExists(game); err != nil {
+	if err := wh.Interactor.DeleteIfAlreadyExists(uploadInfo.Game); err != nil {
 		log.Printf("Error while checking ranks existence: %v", err)
 		http.Error(w, "can't check existence", http.StatusBadRequest)
 		return
@@ -105,7 +105,7 @@ func (wh *WebserviceHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	// We want to take the error returned by the parser
 	// and have it displayed in the FE
 	// TODO: error parser
-	err = wh.Interactor.ParseFileWithInfo(file, game)
+	err = wh.Interactor.ParseFileWithInfo(file, uploadInfo.Game, uploadInfo.Format)
 	if err != nil {
 		log.Printf("Error while parsing file: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)

@@ -11,6 +11,7 @@ import (
 
 type rewriter func(io.Writer, io.Reader) error
 
+// RunRewriters runs all the given rewriters on the origin reader
 func RunRewriters(rews []rewriter, orig io.Reader) (io.Reader, error) {
 	var (
 		src bytes.Buffer
@@ -31,6 +32,7 @@ func RunRewriters(rews []rewriter, orig io.Reader) (io.Reader, error) {
 	return &src, nil
 }
 
+// Rews is a slice of rewriters
 var Rews = []rewriter{
 	// Fix CRLF madness
 	func(w io.Writer, r io.Reader) error {

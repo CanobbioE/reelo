@@ -20,5 +20,5 @@ type LineInfo struct {
 }
 
 // DataAll represents a collection of data divided by year
-// map[year][]User
+// map[year][]Player
 type DataAll map[int][]LineInfo

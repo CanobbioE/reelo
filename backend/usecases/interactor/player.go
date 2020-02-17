@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/CanobbioE/reelo/backend/domain"
-	"github.com/CanobbioE/reelo/backend/usecases/elo"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -25,7 +24,7 @@ func (i *Interactor) CalculateAllReelo(doPseudo bool) error {
 	}
 	i.Logger.Log("(Re)calculating Reelo...")
 
-	elo.InitCostants()
+	i.InitCostants()
 	ids, err := i.PlayerRepository.FindAllIDs(ctx)
 	if err != nil {
 		return err
@@ -62,14 +61,14 @@ func (i *Interactor) CalculatePlayerReelo(player domain.Player, doPseudo bool) e
 		}
 
 		for _, year := range years {
-			err := elo.PseudoReelo(ctx, player.Name, player.Surname, year)
+			err := i.PseudoReelo(ctx, player, year)
 			if err != nil {
 				return err
 			}
 		}
 	}
 
-	elo, err := elo.Reelo(ctx, player.Name, player.Surname)
+	elo, err := i.Reelo(ctx, player)
 	if err != nil {
 		return err
 	}

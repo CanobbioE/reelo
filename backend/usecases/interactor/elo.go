@@ -1,22 +1,20 @@
-package elo
+package interactor
 
 import (
 	"context"
 	"log"
 
-	"github.com/CanobbioE/reelo/backend/usecases/interactor"
+	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/utils/category"
 )
-
-
 
 // InitCostants retrieves the costants in the database, if anything goes wrong
 // it will fallback to the hardcoded values
 // Variables names are chosen consistently with the formula
 // provided by the scientific committee
-func (i *interactor.Interactor) InitCostants() {
+func (i *Interactor) InitCostants() {
 
-	c, err := i..ReeloCostants()
+	c, err := i.CostantsRepository.ReeloCostants()
 	if err != nil {
 		log.Printf("Error initializing costants: %v", err)
 		log.Println("Falling back to the hardcoded configuration")
@@ -33,24 +31,31 @@ func (i *interactor.Interactor) InitCostants() {
 // PseudoReelo calculates a basic version of a player's ELO.
 // This score does not take aging, anti-exploit and category
 // promotion into consideration.
-func PseudoReelo(ctx context.Context, name, surname string, year int) error {
+func (i *Interactor) PseudoReelo(ctx context.Context, palyer domain.Player, year int) error {
 	var isParis bool
-	db := rdb.Instance()
 
 	//### Steps from 1 to 5
 	// There could be more than one category for a year,
 	// this could happen in case of namesakes or international results
-	categories, err := db.Categories(ctx, name, surname, year)
+	categories, err := i.GameRepository.FindCategoriesByYearAndPlayer(ctx, player.ID, year)
 	if err != nil {
 		return err
 	}
 
 	var parisIndex int
 	for i, c := range categories {
-		isParis, err := db.IsResultFromParis(ctx, name, surname, year, c)
+		cities, err := i.FindCitiesByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c)
 		if err != nil {
 			return err
 		}
+
+		for _, city := range cities {
+			if city == "paris" {
+				isParis == true
+				break
+			}
+		}
+
 		if isParis {
 			parisIndex = i
 			break
@@ -64,8 +69,7 @@ func PseudoReelo(ctx context.Context, name, surname string, year int) error {
 		if err != nil {
 			return err
 		}
-		// TODO: this should be in a service, not here
-		err = db.UpdatePseudoReelo(ctx, name, surname, year, c, reelo)
+		err = i.ResultRepository.UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c, isParis)
 		if err != nil {
 			return err
 		}
@@ -74,31 +78,29 @@ func PseudoReelo(ctx context.Context, name, surname string, year int) error {
 }
 
 // Reelo calculates a player's ELO using a custom algorithm
-func Reelo(ctx context.Context, name, surname string) (float64, error) {
+func Reelo(ctx context.Context, player domain.Player) (float64, error) {
 	var reelo float64
 	var sumOfWeights float64
-
-	db := rdb.Instance()
 
 	// Get some usefull values from db:
 	//
 	// A list of years in which the player has partecipated
 	// It's used to iterate over the results as well as to check if the
 	// anti-exploit mechanism should take effect.
-	years, err := db.PlayerPartecipationYears(ctx, name, surname)
+	years, err := i.GameRepository.FindDistinctYearsByPlayerID(ctx, player.ID)
 	if err != nil {
 		return reelo, err
 	}
 	// The last category known in which the player has partecipated.
 	// It's used to check for category promotion.
-	lastKnownCategoryForPlayer, err := db.LastKnownCategoryForPlayer(name, surname)
+	lastKnownCategoryForPlayer, err := i.GameRepository.FindMaxCategoryByPlayerID(ctx, player.ID)
 	if err != nil {
 		return reelo, err
 	}
 	// The last year known in which the player has partecipated.
 	// It is used to calculate the aging factor and if the anti-exploit mechanism
 	// should take effect.
-	lastKnownYear, err := db.LastKnownYear()
+	lastKnownYear, err := i.GameRepository.FindMaxYear(ctx)
 	if err != nil {
 		return reelo, err
 	}
@@ -109,12 +111,12 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 	// all those Reeloj and get the final score.
 	for _, year := range years {
 		// pseudo-Reelo is basically a glorified version of the K*E+D formula.
-		pseudoReelo, err := db.PseudoReelo(ctx, name, surname, year)
+		pseudoReelo, err := i.ResultRepository.FindPseudoReeloByPlayerIDAndGameYear(ctx, player.ID, year)
 		if err != nil {
 			return reelo, err
 		}
 		// the category for the current year, used to check for category promotion
-		cat, err := db.Category(ctx, name, surname, year)
+		cat, err := i.GameRepository.FindCategoryByPlayerIDAndGameYear(ctx, player.ID, year)
 		if err != nil {
 			return reelo, err
 		}
@@ -137,36 +139,35 @@ func Reelo(ctx context.Context, name, surname string) (float64, error) {
 // oneYearScore is used to calculate a baseScore using steps from 1 to 5.
 // This baseScore (a.k.a. pseudo-Reelo) refers to a single year.
 // This needs to be calculated for every year the player has played.
-func oneYearScore(ctx context.Context, name, surname, cat string,
+func oneYearScore(ctx context.Context, player domain.Player, cat string,
 	year int, isParis bool) (float64, error) {
 	var baseScore float64
-	db := rdb.Instance()
 
 	// the first exercise a player is supposed to solve for the given category
-	t, err := db.StartOfCategory(context.Background(), year, cat)
+	t, err := i.GameRepository.FindStartByYearAndCategory(ctx, year, cat)
 	if err != nil {
 		return baseScore, err
 	}
 	// the last exercise a player is supposed to solve for the given category
-	n, err := db.EndOfCategory(context.Background(), year, cat)
+	n, err := i.GameRepository.FindEndByYearAndCategory(ctx, year, cat)
 	if err != nil {
 		return baseScore, err
 	}
 	// the maximum number of solvable exercises for the given category
 	eMax := float64(n - t + 1)
-	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, cat)
+	maxScoreForCat, err := i.GameRepository.FindMaxCategoryByPlayerID(player.ID, year, cat)
 	if err != nil {
 		return baseScore, err
 	}
 	// the maximum score obtainable in the given category
 	dMax := float64(maxScoreForCat)
 	// the player's score for this year-category
-	d, err := db.Score(name, surname, year, isParis)
+	d, err := i.ResultRepository.FindScoreByYearAndPlayerIDAndGameIsParis(ctx, year, player.ID, isParis)
 	if err != nil {
 		return baseScore, err
 	}
 	// the number of exercises solved by the player for this year-category
-	exercises, err := db.Exercises(name, surname, year, isParis)
+	exercises, err := i.ResultRepository.FindExercisesByYearAndPlayerIDAndGameIsParis(ctx, year, player.ID, isParis)
 	if err != nil {
 		return baseScore, err
 	}
@@ -196,13 +197,12 @@ func oneYearScore(ctx context.Context, name, surname, cat string,
 
 func maxPseudoReelo(year int, cat string) (float64, error) {
 	var pseudoReelo float64
-	db := rdb.Instance()
 
-	t, err := db.StartOfCategory(context.Background(), year, cat)
+	t, err := i.GameRepository.FindStartByYearAndCategory(context.Background(), year, cat)
 	if err != nil {
 		return pseudoReelo, err
 	}
-	n, err := db.EndOfCategory(context.Background(), year, cat)
+	n, err := i.GameRepository.FindEndByYearAndCategory(context.Background(), year, cat)
 	if err != nil {
 		return pseudoReelo, err
 	}
@@ -211,7 +211,7 @@ func maxPseudoReelo(year int, cat string) (float64, error) {
 	eMax := float64(n - t + 1)
 	e := eMax
 	// Here dMax correspond to d
-	maxScoreForCat, err := db.MaxScoreForCategory(context.Background(), year, cat)
+	maxScoreForCat, err := i.GameRepository.FindMaxScoreByGameYearAndCategory(context.Background(), year, cat)
 	if err != nil {
 		return pseudoReelo, err
 	}

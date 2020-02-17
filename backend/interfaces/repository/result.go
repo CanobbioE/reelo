@@ -17,7 +17,7 @@ type DbResultRepo DbRepo
 func NewDbResultRepo(dbHandlers map[string]DbHandler) *DbResultRepo {
 	return &DbResultRepo{
 		dbHandlers: dbHandlers,
-		dbHandler:  dbHandlers[ResultREPO],
+		dbHandler:  dbHandlers[RESULTREPO],
 	}
 }
 
