@@ -41,7 +41,6 @@ func NewHandler(cfg Config) (*Handler, error) {
 
 	db, err := sql.Open(cfg.DbDriver, dataSourceName)
 	if err != nil {
-		log.Printf("Error opening the database: %s", err)
 		return handler, err
 	}
 	db.SetMaxOpenConns(cfg.MaxConnections)
@@ -52,7 +51,7 @@ func NewHandler(cfg Config) (*Handler, error) {
 	for tries <= cfg.MaxConnTries {
 		if err := db.PingContext(context.Background()); err != nil {
 			if tries == cfg.MaxConnTries {
-				log.Printf("Error connecting to the database: %s", err)
+				return handler, err
 			}
 			tries++
 			time.Sleep(time.Duration(tries*100) * time.Millisecond)
