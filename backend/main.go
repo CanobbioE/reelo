@@ -56,7 +56,7 @@ func main() {
 		dbHandlers[repo] = dbHandler
 	}
 
-	interactor := interactor.Interactor{
+	interactor := &interactor.Interactor{
 		CommentRepository:       repository.NewDbCommentRepo(dbHandlers),
 		CostantsRepository:      repository.NewDbCostantsRepo(dbHandlers),
 		GameRepository:          repository.NewDbGameRepo(dbHandlers),
@@ -67,7 +67,7 @@ func main() {
 		HistoryRepository:       repository.NewDbHistoryRepo(dbHandlers),
 		Logger:                  logger,
 	}
-	wh := webinterface.WebserviceHandler{interactor}
+	wh := webinterface.WebserviceHandler{Interactor: interactor}
 
 	router := mux.NewRouter()
 

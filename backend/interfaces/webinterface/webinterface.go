@@ -12,6 +12,7 @@ import (
 // Interactor define the usecases behaviour, using an interface allows
 // to change implementation as needed
 type Interactor interface {
+	AnalysisHistory(player domain.Player) (usecases.HistoryByYear, []int, error)
 	AddComment(namesake usecases.Namesake) error
 	CalculateAllReelo(doPseudo bool) error
 	CalculateMaxScoreObtainable(game domain.Game) (int, error)
@@ -26,7 +27,7 @@ type Interactor interface {
 	InsertRankingFile(ctx context.Context, file []parse.LineInfo, game domain.Game) error
 	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) error
 	PlayersCount() (int, error)
-	PlayerHistory(player domain.Player) (usecases.History, []int, error)
+	PlayerHistory(player domain.Player, year int) (usecases.SlimPartecipationByYear, error)
 	UpdateCostants(costants domain.Costants) error
 	UpdateNamesake(n usecases.Namesake) error
 }
