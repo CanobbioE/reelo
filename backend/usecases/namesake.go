@@ -10,4 +10,5 @@ type Namesake struct {
 	Comment domain.Comment `json:"comment"`
 	Solver  solvers.Solver `json:"solver"`
 	ID      int            `json:"id"`
+	Player  domain.Player  `json:"player"`
 }

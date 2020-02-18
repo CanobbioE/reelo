@@ -24,7 +24,7 @@ type Interactor interface {
 	ListYears() ([]int, error)
 	Login(user usecases.User) (int, string, error)
 	InsertRankingFile(ctx context.Context, file []parse.LineInfo, game domain.Game) error
-	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format string) error
+	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) error
 	PlayersCount() (int, error)
 	PlayerHistory(player domain.Player) (usecases.History, []int, error)
 	UpdateCostants(costants domain.Costants) error

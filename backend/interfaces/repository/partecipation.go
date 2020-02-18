@@ -119,3 +119,14 @@ func (db *DbPartecipationRepo) FindAll(ctx context.Context, page, size int) ([]d
 	}
 	return partecipations, nil
 }
+
+// UpdatePlayerIDByGameID updates all the parteciaptions that contains
+// the specified gameID by changing the player ID to the specified one
+func (db *DbPartecipationRepo) UpdatePlayerIDByGameID(ctx context.Context, pid, gid int) error {
+	q := `UPDATE Partecipazione SET Giocatore = %d  WHERE Giochi = %d`
+
+	q = fmt.Sprintf(q, pid, gid)
+
+	_, err := db.dbHandler.Execute(ctx, q)
+	return err
+}

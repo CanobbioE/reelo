@@ -4,7 +4,7 @@ import "context"
 
 // DbHandler is a high level interface for repository interrogation
 type DbHandler interface {
-	Execute(ctx context.Context, stmt string) (Result, error)
+	ExecContext(ctx context.Context, stmt string) (Result, error)
 	Query(ctx context.Context, stmt string, args ...interface{}) (Row, error)
 }
 

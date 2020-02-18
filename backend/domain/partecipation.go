@@ -16,4 +16,5 @@ type PartecipationRepository interface {
 	Store(ctx context.Context, p Partecipation) (int64, error)
 	FindCitiesByPlayerIDAndGameYearAndCategory(ctx context.Context, id, y int, c string) ([]string, error)
 	FindAll(ctx context.Context, page, size int) ([]Partecipation, error)
+	UpdatePlayerIDByGameID(ctx context.Context, pid, gid int) error
 }

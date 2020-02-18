@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/usecases"
@@ -24,8 +25,20 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, error) 
 	for _, player := range players {
 		player := player
 		errs.Go(func() error {
+			history, years, err := i.HistoryRepository.FindByPlayerIDOrderByYear(ctx, player.ID)
+			if err != nil {
+				return err
+			}
+			comment := domain.Comment{Text: ""}
+			if i.CommentRepository.CheckExistenceByPlayerID(context.Background(), player.ID) {
+				comment, err = i.CommentRepository.FindByPlayerID(context.Background(), player.ID)
+				if err != nil {
+					return err
+				}
+			}
+
 			// solvedPlayer is an array of dto.Namesake objects
-			solvedPlayer, err := solvePlayer(player)
+			solvedPlayer, err := solvePlayer(player, history, years, comment)
 			if solvedPlayer != nil {
 				namesakes = append(namesakes, solvedPlayer...)
 			}
@@ -37,30 +50,20 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, error) 
 }
 
 // SolvePlayer executes the logic to determinate if a player has namesakes
-func solvePlayer(player domain.Player) ([]usecases.Namesake, error) {
+func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []int, comment domain.Comment) ([]usecases.Namesake, error) {
 	ss := solvers.New()
-	ctx := context.Background()
 	var namesakes []usecases.Namesake
 	namesakes = nil
-
-	history, years, err := i.HistoryRepository.FindByPlayerID(ctx, player.ID)
-	if err != nil {
-		return namesakes, err
-	}
-	comment, err := i.CommentRepository.CheckExistenceByPlayerID(context.Background(), player.ID)
-	if err != nil {
-		return namesakes, err
-	}
 
 	// years is sorted
 	for _, y := range years {
 		for _, result := range history[y] {
 			for ss.Next() {
-				if ss.Current().CanAccept(result) {
-					ss.AppendToCurrent(result)
+				if ss.Current().CanAccept(solvers.SlimPartecipation(result)) {
+					ss.AppendToCurrent(solvers.SlimPartecipation(result))
 					break
 				} else if !ss.HasNext() {
-					ss.NewSolver(result)
+					ss.NewSolver(solvers.SlimPartecipation(result))
 				}
 			}
 			ss.ResetCursor()
@@ -81,22 +84,40 @@ func solvePlayer(player domain.Player) ([]usecases.Namesake, error) {
 	return namesakes, nil
 }
 
-// UpdateNamesake changes a player history
+// UpdateNamesake changes a player history by assigning the history specified by the given
+// Namesake to a newly created player. The new player has the same name/surname of the old player
+// (hence it's a namesake) but has a different accent
 func (i *Interactor) UpdateNamesake(n usecases.Namesake) error {
 	ctx := context.Background()
 	oldID := n.Player.ID
-	// accent := rdb.CreateAccent(history[0].Year, accentID, history[0].City)
-	newID, err := i.PlayerRepository.Store(ctx, namesake.Player)
+	oldHistories, years, err := i.HistoryRepository.FindByPlayerIDOrderByYear(ctx, oldID)
+	if err != nil {
+		return err
+	}
+	accent := fmt.Sprintf("%d %s %d", years[0], oldHistories[years[0]][0].City, n.ID)
+	p := n.Player
+	p.Accent = accent
+	newID, err := i.PlayerRepository.Store(ctx, p)
 	if err != nil {
 		return err
 	}
 
 	// Edit the old player's history by reassigning her/his results to the new player's ID
-	/*
-		err = db.HistorySwitcheroo(ctx, oldID, newID, history)
-		if err != nil {
-			return err
+	for _, newEntry := range n.Solver.ToHistory() {
+		if oldHistory, ok := oldHistories[newEntry.Year]; ok {
+			for _, oldEntry := range oldHistory {
+				if oldEntry.IsEqual(usecases.SlimPartecipation(newEntry)) {
+					oldEntryID, err := i.ResultRepository.FindIDByPlayerIDAndGameYearAndCategory(ctx, oldID, oldEntry.Year, oldEntry.Category)
+					if err != nil {
+						return err
+					}
+					if err := i.PartecipationRepository.UpdatePlayerIDByGameID(ctx, int(newID), oldEntryID); err != nil {
+						return err
+					}
+				}
+			}
+
 		}
-	*/
+	}
 	return nil
 }

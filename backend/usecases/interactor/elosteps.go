@@ -1,7 +1,6 @@
 package interactor
 
 import (
-	"context"
 	"math"
 
 	"github.com/CanobbioE/reelo/backend/utils/category"
@@ -44,13 +43,8 @@ func stepThree(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 
 //### 4. Score normailzation:
 // Scores are normalized to the average of averages of this year's categories
-func stepFour(baseScore *float64, year int) error {
-	avgCatScore, err := i.ResultRepository.FindAvgScoreByGameYear(context.Background(), year, exercisesCostant)
-	if err != nil {
-		return err
-	}
+func stepFour(baseScore *float64, year int, avgCatScore float64) {
 	*baseScore = *baseScore / avgCatScore
-	return nil
 }
 
 //### 5. Multiplicative factor:
@@ -65,32 +59,21 @@ func stepFive(baseScore *float64) {
 // has played most recently, then we convert this year's score
 // to the most recent category
 func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
-	cat string, year int) error {
+	cat string, year int,
+	newAvg, oldAvg, newMax float64) {
 
 	if category.FromString(lastKnownCategoryForPlayer) > category.FromString(cat) {
-		oldAvg, err := i.ResultRepository.FindAvgPseudoReeloByGameYearAndCategory(context.Background(), year, cat)
-		if err != nil {
-			return err
-		}
 
-		newAvg, err := i.ResultRepository.FindAvgPseudoReeloByGameYearAndCategory(context.Background(), year, lastKnownCategoryForPlayer)
-		if err != nil {
-			return err
-		}
 		// this prevents crash in case the ranking file for the
 		// year-lastKnownCategory has not been uploaded yet
 		if newAvg < 0 {
-			return nil
+			return
 		}
 
-		newMax, err := maxPseudoReelo(year, lastKnownCategoryForPlayer)
-		if err != nil {
-			return err
-		}
 		// this prevents crash in case the ranking file for the
 		// year-lastKnownCategory has not been uploaded yet
 		if newMax < 0 {
-			return nil
+			return
 		}
 
 		thisYearScore := *baseScore
@@ -106,7 +89,6 @@ func stepSix(baseScore *float64, lastKnownCategoryForPlayer,
 		}
 		*baseScore = convertedScore
 	}
-	return nil
 }
 
 //### 7. Aging:

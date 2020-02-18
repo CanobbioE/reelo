@@ -105,7 +105,7 @@ func (wh *WebserviceHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	// We want to take the error returned by the parser
 	// and have it displayed in the FE
 	// TODO: error parser
-	err = wh.Interactor.ParseFileWithInfo(file, uploadInfo.Game, uploadInfo.Format)
+	err = wh.Interactor.ParseFileWithInfo(file, uploadInfo.Game, uploadInfo.Format, uploadInfo.City)
 	if err != nil {
 		log.Printf("Error while parsing file: %v", err)
 		http.Error(w, fmt.Sprintf("%v", err), http.StatusBadRequest)

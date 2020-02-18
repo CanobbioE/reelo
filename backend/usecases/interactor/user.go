@@ -5,15 +5,17 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
-	"github.com/CanobbioE/reelo/backend/utils"
+	"github.com/CanobbioE/reelo/backend/interfaces/webinterface/dto"
+	"github.com/CanobbioE/reelo/backend/usecases"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Login implements the login logic.
 // It returns an http status, the jwt and an eventual error.
-func (i *Interactor) Login(user User) (int, string, error) {
+func (i *Interactor) Login(user usecases.User) (int, string, error) {
 	var jwt string
 
 	expPassword, err := i.UserRepository.FindPasswordByUsername(context.Background(), user.Username)
@@ -45,14 +47,14 @@ func toHexHash(s string) string {
 }
 
 func generateJWT(username string) (string, error) {
-	jwtKey := utils.JWTKey()
+	jwtKey := JWTKey()
 
 	// Declare the expiration time of the token
 	// here, we have kept it as 3h
 	expirationTime := time.Now().Add(180 * time.Minute)
 
 	// Create the JWT claims, which includes the username and expiry time
-	c := &utils.Claims{
+	c := &dto.Claims{
 		Username: username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -65,4 +67,15 @@ func generateJWT(username string) (string, error) {
 		return tokenString, err
 	}
 	return tokenString, nil
+}
+
+// JWTKey creates the JWT key used to create the signature
+// using either the hardcoded dev string or the PROD environment variable
+func JWTKey() []byte {
+	k := os.Getenv("JWT_KEY")
+	if k == "" {
+		k = "my_secret_key"
+	}
+
+	return []byte("my_secret_key")
 }

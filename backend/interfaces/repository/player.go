@@ -35,8 +35,9 @@ func (db *DbPlayerRepo) Store(ctx context.Context, p domain.Player) (int64, erro
 }
 
 // FindIDByNameAndSurname retrieves a player id from the database given its name and surname
+// If an error occurs or the player does not exists
 func (db *DbPlayerRepo) FindIDByNameAndSurname(ctx context.Context, n, s string) (int, error) {
-	var id int
+	id := -1
 	q := `SELECT id FROM Giocatore WHERE nome = %s AND cognome = %s`
 
 	q = fmt.Sprintf(q, n, s)
@@ -131,10 +132,11 @@ func (db *DbPlayerRepo) UpdateAccent(ctx context.Context, p domain.Player) error
 	return err
 }
 
-// CheckExistenceByID returns true if the given ID exists in the repository
-func (db *DbPlayerRepo) CheckExistenceByID(ctx context.Context, id int) bool {
-	q := `SELECT id FROM Giocatore WHERE id = ?`
-	rows, err := db.dbHandler.Query(ctx, q, id)
+// CheckExistenceByNameAndSurname returns true if a player
+// with the given name and surname exists in the repository
+func (db *DbPlayerRepo) CheckExistenceByNameAndSurname(ctx context.Context, n, s string) bool {
+	q := `SELECT id FROM Giocatore WHERE nome = ? AND cognome = ?`
+	rows, err := db.dbHandler.Query(ctx, q, n, s)
 	if err != nil {
 		return false
 	}

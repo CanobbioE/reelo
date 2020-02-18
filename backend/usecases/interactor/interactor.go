@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"strings"
 
@@ -31,9 +32,9 @@ type Interactor struct {
 // ParseFileWithInfo reads the content of a buffer and verifies its correctness
 // and tries to parse each line into an entity to be saved in the database
 // appending the data defined in the upload info
-func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, format string) error {
-
-	var results []parse.LineInfo
+func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) error {
+	ctx := context.Background()
+	var lines []parse.LineInfo
 
 	category := strings.ToUpper(game.Category)
 	parsedFmt, err := parse.NewFormat(strings.Split(format, " "))
@@ -42,14 +43,66 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 	}
 
 	// this is the warning we want to return to the front end
-	results, warning := parse.File(fileReader, parsedFmt, game.Year, category)
+	lines, warning := parse.File(fileReader, parsedFmt, game.Year, category)
 	if warning != nil {
 		i.Logger.Log("parse.File() returned warning: %v\n", warning)
 		return warning
 	}
-
 	i.Logger.Log("File parsed succesfully\n\n")
-	i.GameRepository.InserRankingFile(context.Background(), results, game)
+
+	gamesID, err := i.GameRepository.Store(ctx, game)
+	if err != nil {
+		return err
+	}
+	for _, line := range lines {
+		if line.Name == "" && line.Surname == "" {
+			continue
+		}
+
+		var playerID int
+		if !i.PlayerRepository.CheckExistenceByNameAndSurname(ctx, line.Name, line.Surname) {
+			accent := fmt.Sprintf("%d %s %d", line.Year, line.City, 0)
+			p := domain.Player{
+				Name:    line.Name,
+				Surname: line.Surname,
+				Accent:  accent,
+				Reelo:   0,
+			}
+			playerID64, err := i.PlayerRepository.Store(ctx, p)
+			if err != nil {
+				return err
+			}
+			playerID = int(playerID64)
+		}
+		playerID, err = i.PlayerRepository.FindIDByNameAndSurname(ctx, line.Name, line.Surname)
+		if err != nil {
+			return err
+		}
+
+		r := domain.Result{
+			Time:        line.Time,
+			Exercises:   line.Exercises,
+			Score:       line.Points,
+			Position:    line.Position,
+			PseudoReelo: 0,
+		}
+		resultsID, err := i.ResultRepository.Store(ctx, r)
+		if err != nil {
+			return err
+		}
+
+		p := domain.Partecipation{
+			Player: domain.Player{ID: playerID},
+			Game:   domain.Game{ID: int(gamesID)},
+			Result: domain.Result{ID: int(resultsID)},
+			City:   line.City,
+		}
+		if _, err := i.PartecipationRepository.Store(ctx, p); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	i.Logger.Log("File inserted succesfully\n\n")
 	return nil
 }

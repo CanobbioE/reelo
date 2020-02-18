@@ -21,5 +21,5 @@ type PlayerRepository interface {
 	FindCountAll(ctx context.Context) (int, error)
 	UpdateReelo(ctx context.Context, p Player) error
 	UpdateAccent(ctx context.Context, p Player) error
-	CheckExistenceByID(ctx context.Context, id int) bool
+	CheckExistenceByNameAndSurname(ctx context.Context, n, s string) bool
 }

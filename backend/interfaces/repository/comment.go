@@ -67,7 +67,18 @@ func (db *DbCommentRepo) CheckExistenceByPlayerID(ctx context.Context, id int) b
 	return false
 }
 
-// CreateAccent returns an identifier based on a player's first year and first city of partecipation
-func CreateAccent(year, num int, city string) string {
-	return fmt.Sprintf("%d %s %d", year, city, num)
+// FindByPlayerID retrieve a comment given a player id
+func (db *DbCommentRepo) FindByPlayerID(ctx context.Context, id int) (domain.Comment, error) {
+	var c domain.Comment
+	q := `SELECT id, testo FROM Commenti WHERE giocatore = ?`
+
+	row, err := db.dbHandler.Query(ctx, q, id)
+	if err != nil {
+		return c, err
+	}
+	err = row.Scan(&c.ID, &c.Text)
+	if err != nil {
+		return c, err
+	}
+	return c, nil
 }

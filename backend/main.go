@@ -46,7 +46,10 @@ func main() {
 		ConnectionsLifetime: (time.Minute * 5),
 		InstanceEsists:      false,
 	}
-	dbHandler := mysqlhandler.NewHandler(cfg)
+	dbHandler, err := mysqlhandler.NewHandler(cfg)
+	if err != nil {
+		log.Fatalf("Cannot istanciate repository hanldler: %v", err)
+	}
 	dbHandlers := make(map[string]repository.DbHandler)
 	for _, repo := range repository.All() {
 		dbHandlers[repo] = dbHandler
@@ -68,25 +71,30 @@ func main() {
 	router := mux.NewRouter()
 
 	// Routing
+	// endpoint /players
 	router.HandleFunc("players/count", wh.PlayersCount).Methods("GET")
 	router.HandleFunc("players/reelo/calculate", mw.RequireAuth(
 		http.HandlerFunc(wh.ForcePseudoReelo))).Methods("POST")
 	router.HandleFunc("players/comment", mw.RequireAuth(
 		http.HandlerFunc(wh.AddComment))).Methods("POST")
 
+	// endpoint /ranks
 	router.HandleFunc("ranks/all/", wh.ListRanks).Methods("GET")
 	router.HandleFunc("ranks/upload", mw.RequireAuth(
 		http.HandlerFunc(wh.Upload))).Methods("POST")
 	router.HandleFunc("ranks/exist", wh.RankExistence).Methods("GET")
 	router.HandleFunc("ranks/years", wh.ListYears).Methods("GET")
 
+	// endpoint /auth
 	router.HandleFunc("auth/login", wh.Login).Methods("GET")
 
+	// endpoint /namesakes
 	router.HandleFunc("namesakes/all", mw.RequireAuth(
 		http.HandlerFunc(wh.ListNamesakes))).Methods("GET")
 	router.HandleFunc("namesakes/update", mw.RequireAuth(
 		http.HandlerFunc(wh.UpdateNamesake))).Methods("POST")
 
+	// endpoint /costants
 	router.HandleFunc("costants/all", mw.RequireAuth(
 		http.HandlerFunc(wh.ListCostants))).Methods("GET")
 	router.HandleFunc("costants/update", mw.RequireAuth(

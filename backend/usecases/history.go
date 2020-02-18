@@ -31,7 +31,13 @@ type HistoryByYear map[int]History
 // HistoryRepository is the interface for the persistency container
 type HistoryRepository interface {
 	FindByPlayerIDAndYear(ctx context.Context, id, y int) (SlimPartecipationByYear, error)
-	FindByPlayerIDOrderByYear(ctx context.Context, id int) (HistoryByYear, []int, int)
+	FindByPlayerIDOrderByYear(ctx context.Context, id int) (HistoryByYear, []int, error)
 }
 
 // HistorySwitcheroo(ctx context.Context, oldID, newID int, newHistory []History) error
+
+// IsEqual compares two slimPartecipations and returns true if they are equivalent,
+// false otherwise
+func (s *SlimPartecipation) IsEqual(b SlimPartecipation) bool {
+	return s.Year == b.Year && s.Category == b.Category && s.City == b.City && s.IsParis == b.IsParis
+}

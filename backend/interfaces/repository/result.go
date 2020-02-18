@@ -210,7 +210,7 @@ func (db *DbResultRepo) FindByPlayerIDAndGameYear(ctx context.Context, id, y int
 			JOIN Risultato R ON R.id = P.risultato
 			JOIN Giocatore U ON U.id = P.giocatore
 			WHERE U.id = %d AND G.anno = %d`
-	fmt.Sprintf(q, id, y)
+	q = fmt.Sprintf(q, id, y)
 
 	err := QueryRow(ctx, q, db.dbHandler, &r.Time, &r.Exercises, &r.Score, &r.PseudoReelo, &r.Position)
 

@@ -9,11 +9,11 @@ import (
 // CalculateMaxScoreObtainable calculates  the maximum score obtainable in a category for the year
 func (i *Interactor) CalculateMaxScoreObtainable(game domain.Game) (int, error) {
 	var max int
-	start, err := i.GameRepository.FindStartByYearAndCategory(context.Background())
+	start, err := i.GameRepository.FindStartByYearAndCategory(context.Background(), game.Year, game.Category)
 	if err != nil {
 		return max, err
 	}
-	end, err := i.GameRepository.FindEndByYearAndCategory(game.Year, game.Category)
+	end, err := i.GameRepository.FindEndByYearAndCategory(context.Background(), game.Year, game.Category)
 	if err != nil {
 		return max, err
 	}

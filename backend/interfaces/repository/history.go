@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/CanobbioE/reelo/backend/usecases"
 )
@@ -23,7 +24,7 @@ func NewDbHistoryRepo(dbHandlers map[string]DbHandler) *DbHistoryRepo {
 
 // FindByPlayerIDOrderByYear retrieves the history for the given player id
 func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) (usecases.HistoryByYear, []int, error) {
-	history := make(usecases.History)
+	historyByYear := make(usecases.HistoryByYear)
 	var years []int
 	q := `SELECT G.anno, G.categoria, G.internazionale, P.sede
 			FROM Giochi G
@@ -33,20 +34,27 @@ func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) 
 
 	rows, err := db.dbHandler.Query(ctx, q, id)
 	if err != nil {
-		return history, years, err
+		return historyByYear, years, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		// var p domain.Partecipation
-		var y int
-		years = append(years, y)
-		err := rows.Scan(&y)
+		var sp usecases.SlimPartecipation
+		err := rows.Scan(&sp.Year, &sp.Category, &sp.IsParis, &sp.City)
 		if err != nil {
-			return history, years, err
+			return historyByYear, years, err
 		}
+		var history []usecases.SlimPartecipation
+		history, ok := historyByYear[sp.Year]
+		if !ok {
+			history = []usecases.SlimPartecipation{}
+		}
+		history = append(history, sp)
+		historyByYear[sp.Year] = history
+		years = append(years, sp.Year)
 	}
-	return history, years, nil
+	sort.Ints(years)
+	return historyByYear, years, nil
 }
 
 // FindByPlayerIDAndYear retrieves the history for the given player id
