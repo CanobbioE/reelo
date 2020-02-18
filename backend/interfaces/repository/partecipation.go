@@ -26,7 +26,7 @@ func (db *DbPartecipationRepo) Store(ctx context.Context, p domain.Partecipation
 	s := `INSERT INTO Partecipazione (giocatore, giochi, risultato, sede)
 			VALUES (%d, %d, %d, "%s")`
 	s = fmt.Sprintf(s, p.Player.ID, p.Game.ID, p.Result.ID, p.City)
-	result, err := db.dbHandler.Execute(ctx, s)
+	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
 		return -1, err
 	}
@@ -127,6 +127,6 @@ func (db *DbPartecipationRepo) UpdatePlayerIDByGameID(ctx context.Context, pid, 
 
 	q = fmt.Sprintf(q, pid, gid)
 
-	_, err := db.dbHandler.Execute(ctx, q)
+	_, err := db.dbHandler.ExecContext(ctx, q)
 	return err
 }

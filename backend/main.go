@@ -46,6 +46,7 @@ func main() {
 		ConnectionsLifetime: (time.Minute * 5),
 		InstanceEsists:      false,
 	}
+
 	dbHandler, err := mysqlhandler.NewHandler(cfg)
 	if err != nil {
 		log.Fatalf("Cannot istanciate repository hanldler: %v", err)

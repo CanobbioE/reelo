@@ -27,7 +27,7 @@ func (db *DbPlayerRepo) Store(ctx context.Context, p domain.Player) (int64, erro
 			VALUES ("%s", "%s", "%s", 0)`
 	s = fmt.Sprintf(s, p.Name, p.Surname, p.Accent, p.Reelo)
 
-	result, err := db.dbHandler.Execute(ctx, s)
+	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
 		return -1, err
 	}
@@ -120,7 +120,7 @@ func (db *DbPlayerRepo) FindCountAll(ctx context.Context) (int, error) {
 func (db *DbPlayerRepo) UpdateReelo(ctx context.Context, p domain.Player) error {
 	s := `UPDATE Giocatore SET reelo = %d WHERE id = %d`
 	s = fmt.Sprintf(s, p.Reelo, p.ID)
-	_, err := db.dbHandler.Execute(ctx, s)
+	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
 }
 
@@ -128,7 +128,7 @@ func (db *DbPlayerRepo) UpdateReelo(ctx context.Context, p domain.Player) error 
 func (db *DbPlayerRepo) UpdateAccent(ctx context.Context, p domain.Player) error {
 	s := `UPDATE Giocatore SET accent = %s  WHERE id = %d`
 	s = fmt.Sprintf(s, p.Accent, p.ID)
-	_, err := db.dbHandler.Execute(ctx, s)
+	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
 }
 

@@ -39,7 +39,7 @@ func (db *DbCostantsRepo) UpdateAll(ctx context.Context, c domain.Costants) erro
 		c.AntiExploit,
 		c.NoPartecipationPenalty)
 
-	_, err := db.dbHandler.Execute(ctx, s)
+	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
 }
 

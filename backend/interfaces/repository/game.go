@@ -27,7 +27,7 @@ func (db *DbGameRepo) Store(ctx context.Context, g domain.Game) (int64, error) {
  VALUES (%d, "%s", %d, %d, %t)`
 
 	s = fmt.Sprintf(s, g.Year, g.Category, g.Start, g.End, g.IsParis)
-	result, err := db.dbHandler.Execute(ctx, s)
+	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
 		return -1, err
 	}

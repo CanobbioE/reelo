@@ -26,7 +26,7 @@ func (db *DbCommentRepo) Store(ctx context.Context, c domain.Comment) (int64, er
 	s := `INSERT INTO Commenti (giocatore, testo) VALUES (%d, "%s")`
 	s = fmt.Sprintf(s, c.Player.ID, c.Text)
 
-	result, err := db.dbHandler.Execute(ctx, s)
+	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
 		return -1, err
 	}
@@ -47,7 +47,7 @@ func (db *DbCommentRepo) FindTextByPlayerID(ctx context.Context, id int) (string
 func (db *DbCommentRepo) UpdateTextByPlayerID(ctx context.Context, t string, id int) error {
 	s := `UPDATE Commenti SET testo = "%s" WHERE giocatore = %d`
 	s = fmt.Sprintf(s, t, id)
-	_, err := db.dbHandler.Execute(ctx, s)
+	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
 }
 

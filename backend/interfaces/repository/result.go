@@ -27,7 +27,7 @@ func (db *DbResultRepo) Store(ctx context.Context, r domain.Result) (int64, erro
  			VALUES (%d, %d, %d, %d, %d)`
 	s = fmt.Sprintf(s, r.Time, r.Exercises, r.Score, r.Position, r.PseudoReelo)
 
-	result, err := db.dbHandler.Execute(ctx, s)
+	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
 		return -1, err
 	}
@@ -188,7 +188,7 @@ func (db *DbResultRepo) UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx co
 
 	s := `UPDATE Risultato SET pseudo_reelo = %d  WHERE id = %d`
 	s = fmt.Sprintf(s, pr, resultID)
-	_, err = db.dbHandler.Execute(ctx, s)
+	_, err = db.dbHandler.ExecContext(ctx, s)
 	return err
 }
 
@@ -196,7 +196,7 @@ func (db *DbResultRepo) UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx co
 func (db *DbResultRepo) DeleteByGameID(ctx context.Context, id int) error {
 	s := `DELETE FROM Giochi WHERE id = %d`
 	s = fmt.Sprintf(s, id)
-	_, err := db.dbHandler.Execute(ctx, s)
+	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
 }
 
