@@ -38,7 +38,7 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, error) 
 			}
 
 			// solvedPlayer is an array of dto.Namesake objects
-			solvedPlayer, err := solvePlayer(player, history, years, comment)
+			solvedPlayer, err := solvePlayer(player, history, years, comment, i.UpdateNamesake)
 			if solvedPlayer != nil {
 				namesakes = append(namesakes, solvedPlayer...)
 			}
@@ -50,7 +50,7 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, error) 
 }
 
 // SolvePlayer executes the logic to determinate if a player has namesakes
-func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []int, comment domain.Comment) ([]usecases.Namesake, error) {
+func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []int, comment domain.Comment, autoSolver func(n usecases.Namesake) error) ([]usecases.Namesake, error) {
 	ss := solvers.New()
 	var namesakes []usecases.Namesake
 	namesakes = nil
@@ -79,6 +79,15 @@ func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []i
 				ID:      i,
 				Comment: comment,
 			})
+		}
+		if ss.ShouldBeManual() {
+			return namesakes, nil
+		}
+		for _, n := range namesakes {
+			err := autoSolver(n)
+			if err != nil {
+				return namesakes, err
+			}
 		}
 	}
 	return namesakes, nil
