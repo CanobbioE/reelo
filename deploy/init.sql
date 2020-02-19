@@ -28,6 +28,7 @@ CREATE TABLE `Giocatore` (
   `nome` varchar(255) NOT NULL,
   `cognome` varchar(255) NOT NULL,
   `reelo` float DEFAULT NULL,
+  `accent` varchar(255),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
