@@ -1,28 +1,42 @@
 export default class Globals {
-	static port = '8080';
-	static baseURL = `${window.location.protocol}//${window.location.hostname}:${Globals.port}`;
+    static port = "8080";
+    static baseURL = `${window.location.protocol}//${window.location.hostname}:${Globals.port}`;
 
-	// All the APIs endpoints
-	static API = {
-		login: '/admin',
-		upload: '/upload',
-		ranks: '/ranks',
-		force: '/force-reelo',
-		algorithm: '/algorithm',
-		count: '/count',
-		years: '/years',
-		exist: '/upload/exist',
-		namesakes: '/namesakes',
-		comment: '/namesakes/comment',
-	};
+    // All the APIs endpoints
+    static API = {
+        players: {
+            count: "/players/count",
+            reelo: {
+                calculate: "/players/calculate/reelo",
+            },
+            comment: "/players/comment",
+        },
+        ranks: {
+            all: "/ranks/all",
+            upload: "/ranks/upload",
+            exist: "/ranks/exist",
+            years: "/ranks/years",
+        },
+        auth: {
+            login: "/auth/login",
+        },
+        namesakes: {
+            all: "/namesakes/all",
+            update: "namesakes/update",
+        },
+        costants: {
+            all: "/costants/all",
+            update: "/costants/update",
+        },
+    };
 
-	// All the routes in this app
-	static routes = {
-		home: '/',
-		about: '/informazioni',
-		upload: '/carica',
-		admin: '/amministrazione',
-		varchange: '/modifica-algoritmo',
-		namesakes: '/omonimi',
-	};
+    // All the routes in this app
+    static routes = {
+        home: "/",
+        about: "/informazioni",
+        upload: "/carica",
+        admin: "/amministrazione",
+        varchange: "/modifica-algoritmo",
+        namesakes: "/omonimi",
+    };
 }
