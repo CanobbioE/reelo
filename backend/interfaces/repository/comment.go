@@ -61,10 +61,7 @@ func (db *DbCommentRepo) CheckExistenceByPlayerID(ctx context.Context, id int) b
 	}
 	defer rows.Close()
 
-	for rows.Next() {
-		return true
-	}
-	return false
+	return rows.Next()
 }
 
 // FindByPlayerID retrieve a comment given a player id
