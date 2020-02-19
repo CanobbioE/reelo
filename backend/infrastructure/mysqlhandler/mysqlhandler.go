@@ -70,7 +70,7 @@ func (h *Handler) ExecContext(ctx context.Context, stmt string) (repository.Resu
 
 // Query performs a query on the handler
 func (h *Handler) Query(ctx context.Context, stmt string, args ...interface{}) (repository.Row, error) {
-	rows, err := h.Conn.QueryContext(ctx, stmt, args)
+	rows, err := h.Conn.QueryContext(ctx, stmt, args...)
 	return Row{rows}, err
 }
 
