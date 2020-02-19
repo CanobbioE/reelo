@@ -13,7 +13,9 @@ func QueryRow(ctx context.Context, query string, db DbHandler, dest ...interface
 		return err
 	}
 	defer row.Close()
-
+	if !row.Next() {
+		return fmt.Errorf("no values in result set")
+	}
 	err = row.Scan(dest...)
 	return err
 }
