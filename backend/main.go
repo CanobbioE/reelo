@@ -20,18 +20,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var (
+	i  *interactor.Interactor
+	wh webinterface.WebserviceHandler
+)
+
 func init() {
 	parse.GetCities()
-	// elo.InitCostants()
-	log.Println("App initialized")
-}
-
-func main() {
-	// Backup scheduling
-	// gocron.Every(1).Days().At("03:00").Do(services.Backup)
-	// gocron.Start()
-
+	log.Println("Creating logger...")
 	logger := infrastructure.NewLogger()
+
+	log.Println("Connecting to the database...")
 	// Database set up
 	cfg := mysqlhandler.Config{
 		DbDriver:            "mysql",
@@ -46,7 +45,6 @@ func main() {
 		ConnectionsLifetime: (time.Minute * 5),
 		InstanceEsists:      false,
 	}
-
 	dbHandler, err := mysqlhandler.NewHandler(cfg)
 	if err != nil {
 		log.Fatalf("Cannot istanciate repository hanldler: %v", err)
@@ -56,7 +54,7 @@ func main() {
 		dbHandlers[repo] = dbHandler
 	}
 
-	interactor := &interactor.Interactor{
+	i = &interactor.Interactor{
 		CommentRepository:       repository.NewDbCommentRepo(dbHandlers),
 		CostantsRepository:      repository.NewDbCostantsRepo(dbHandlers),
 		GameRepository:          repository.NewDbGameRepo(dbHandlers),
@@ -67,7 +65,16 @@ func main() {
 		HistoryRepository:       repository.NewDbHistoryRepo(dbHandlers),
 		Logger:                  logger,
 	}
-	wh := webinterface.WebserviceHandler{Interactor: interactor}
+	wh = webinterface.WebserviceHandler{Interactor: i}
+	log.Println("Initializing reelo algorithm...")
+	i.InitCostants()
+	log.Println("App initialized!")
+}
+
+func main() {
+	// Backup scheduling
+	// gocron.Every(1).Days().At("03:00").Do(services.Backup)
+	// gocron.Start()
 
 	router := mux.NewRouter()
 
