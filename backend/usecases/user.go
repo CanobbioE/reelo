@@ -4,7 +4,7 @@ import "context"
 
 // User represents the user entity as it is stored in the db
 type User struct {
-	Username string `json:"username"`
+	Username string `json:"email"`
 	Password string `json:"password"`
 }
 

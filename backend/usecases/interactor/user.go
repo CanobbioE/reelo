@@ -19,7 +19,6 @@ func (i *Interactor) Login(user usecases.User) (int, string, error) {
 	var jwt string
 
 	expPassword, err := i.UserRepository.FindPasswordByUsername(context.Background(), user.Username)
-
 	if err != nil {
 		// TODO: can't compare this error
 		if err == fmt.Errorf("user not found") {
