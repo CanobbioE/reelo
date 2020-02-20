@@ -5,12 +5,12 @@ import "context"
 // Costants represent all the possible variables used when calculating the reelo
 type Costants struct {
 	ID                     int     `json:"id"`
-	StartingYear           int     `json:"year,omitempty"`
-	ExercisesCostant       float64 `json:"ex,omitempty"`
-	PFinal                 float64 `json:"final,omitempty"`
-	MultiplicativeFactor   float64 `json:"mult,omitempty"`
-	AntiExploit            float64 `json:"exp,omitempty"`
-	NoPartecipationPenalty float64 `json:"np,omitempty"`
+	StartingYear           int     `json:"year"`
+	ExercisesCostant       float64 `json:"ex"`
+	PFinal                 float64 `json:"final"`
+	MultiplicativeFactor   float64 `json:"mult"`
+	AntiExploit            float64 `json:"exp"`
+	NoPartecipationPenalty float64 `json:"np"`
 }
 
 // CostantsRepository is the interface for the persistency container

@@ -76,13 +76,14 @@ export const updateAlg = (year, ex, final, mult, exp, np, curr) => async dispatc
         if (mult === "") mult = curr.mult;
         if (exp === "") exp = curr.exp;
         if (np === "") np = curr.np;
+        console.log("aaaaaaaaaaaaaa", year, ex, final, mult, exp, np)
         const v = {
-            year: parseInt(year.replace(",", ".")),
-            ex: parseFloat(ex.replace(",", ".")),
-            final: parseFloat(final.replace(",", ".")),
-            mult: parseFloat(mult.replace(",", ".")),
-            exp: parseFloat(exp.replace(",", ".")),
-            np: parseFloat(np.replace(",", ".")),
+            year: parseInt(`${year}`.replace(",", ".")),
+            ex: parseFloat(`${ex}`.replace(",", ".")),
+            final: parseFloat(`${final}`.replace(",", ".")),
+            mult: parseFloat(`${mult}`.replace(",", ".")),
+            exp: parseFloat(`${exp}`.replace(",", ".")),
+            np: parseFloat(`${np}`.replace(",", ".")),
         };
         await axios.patch(`${Globals.baseURL}${Globals.API.costants.update}`, v, {
             headers: {
@@ -97,7 +98,7 @@ export const updateAlg = (year, ex, final, mult, exp, np, curr) => async dispatc
         console.log(e);
         dispatch({
             type: ALG_POST_FAIL,
-            payload: e && e.response && e.response.data,
+            payload: (e && e.response && e.response.data) || "Errore inaspettato",
         });
     }
 };

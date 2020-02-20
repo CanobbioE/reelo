@@ -1,6 +1,5 @@
 import React from 'react';
 import {Grid, TextField, Button, Typography} from '@material-ui/core';
-import LoadingIcon from './LoadingIcon';
 
 export const EditAlgForm = props => {
 	const handleChanges = fx => event => {
@@ -115,9 +114,7 @@ export const EditAlgForm = props => {
 							Aggiorna variabili
 						</Button>
 					</Grid>
-					<Grid item xs={1}>
-						<LoadingIcon show={props.loading} />
-					</Grid>
+
 				</Grid>
 			</Grid>
 		</form>
