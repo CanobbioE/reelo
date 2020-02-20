@@ -32,5 +32,5 @@ func NewLogger() *Logger {
 
 // Log logs a message to the configured output stream
 func (l *Logger) Log(msg string, a ...interface{}) {
-	log.Printf(msg, a)
+	log.Printf(msg, a...)
 }
