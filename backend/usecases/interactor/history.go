@@ -8,8 +8,8 @@ import (
 )
 
 // PlayerHistory returns the history details for the player
-func (i *Interactor) PlayerHistory(player domain.Player, year int) (usecases.SlimPartecipationByYear, error) {
-	return i.HistoryRepository.FindByPlayerIDAndYear(context.Background(), player.ID, year)
+func (i *Interactor) PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, error) {
+	return i.HistoryRepository.FindByPlayerID(context.Background(), player.ID)
 }
 
 // AnalysisHistory returns an analysis history

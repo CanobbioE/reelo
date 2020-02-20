@@ -30,7 +30,7 @@ type HistoryByYear map[int]History
 
 // HistoryRepository is the interface for the persistency container
 type HistoryRepository interface {
-	FindByPlayerIDAndYear(ctx context.Context, id, y int) (SlimPartecipationByYear, error)
+	FindByPlayerID(ctx context.Context, id int) (SlimPartecipationByYear, error)
 	FindByPlayerIDOrderByYear(ctx context.Context, id int) (HistoryByYear, []int, error)
 }
 

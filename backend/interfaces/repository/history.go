@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"log"
 	"sort"
 
 	"github.com/CanobbioE/reelo/backend/usecases"
@@ -57,8 +58,8 @@ func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) 
 	return historyByYear, years, nil
 }
 
-// FindByPlayerIDAndYear retrieves the history for the given player id
-func (db *DbHistoryRepo) FindByPlayerIDAndYear(ctx context.Context, id, y int) (usecases.SlimPartecipationByYear, error) {
+// FindByPlayerID retrieves the history for the given player id
+func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.SlimPartecipationByYear, error) {
 
 	ph := make(usecases.SlimPartecipationByYear)
 	q := `SELECT G.categoria, R.tempo, R.esercizi, R.punteggio, R.pseudo_reelo, R.posizione
@@ -68,7 +69,6 @@ func (db *DbHistoryRepo) FindByPlayerIDAndYear(ctx context.Context, id, y int) (
 			JOIN Giocatore U ON U.id = P.giocatore
 			WHERE U.id = %d AND G.anno = %d`
 
-	q = fmt.Sprintf(q, id, y)
 	// Find all players partecipation years
 	years, err := NewDbGameRepo(db.dbHandlers).FindDistinctYearsByPlayerID(ctx, id)
 	if err != nil {
@@ -76,42 +76,48 @@ func (db *DbHistoryRepo) FindByPlayerIDAndYear(ctx context.Context, id, y int) (
 	}
 
 	for _, y := range years {
-		rows, err := db.dbHandler.Query(ctx, q)
+		s := fmt.Sprintf(q, id, y)
+		rows, err := db.dbHandler.Query(ctx, s)
 		if err != nil {
+			log.Println("qui")
 			return ph, err
 		}
 		defer rows.Close()
 
 		for rows.Next() {
-			var res usecases.SlimPartecipation
+			var slim usecases.SlimPartecipation
 
 			// Saving most of the results
-			err := rows.Scan(&res.Category, &res.Time,
-				&res.Exercises, &res.Score,
-				&res.PseudoReelo, &res.Position)
+			err := rows.Scan(&slim.Category, &slim.Time,
+				&slim.Exercises, &slim.Score,
+				&slim.PseudoReelo, &slim.Position)
 			if err != nil {
 				return ph, err
+
 			}
 
 			// Finding other cool stuff
-			dMax, err := NewDbResultRepo(db.dbHandlers).FindMaxScoreByGameYearAndCategory(ctx, y, res.Category)
+			dMax, err := NewDbResultRepo(db.dbHandlers).FindMaxScoreByGameYearAndCategory(ctx, y, slim.Category)
 			if err != nil {
 				return ph, err
 			}
 
-			t, err := NewDbGameRepo(db.dbHandlers).FindStartByYearAndCategory(ctx, y, res.Category)
+			t, err := NewDbGameRepo(db.dbHandlers).FindStartByYearAndCategory(ctx, y, slim.Category)
 			if err != nil {
+				log.Println("blub")
 				return ph, err
 			}
 
-			n, err := NewDbGameRepo(db.dbHandlers).FindEndByYearAndCategory(ctx, y, res.Category)
+			n, err := NewDbGameRepo(db.dbHandlers).FindEndByYearAndCategory(ctx, y, slim.Category)
 			if err != nil {
+				log.Println("blab")
+
 				return ph, err
 			}
 
-			res.MaxScore = int(dMax)
-			res.MaxExercises = n - t + 1
-			ph[y] = res
+			slim.MaxScore = int(dMax)
+			slim.MaxExercises = n - t + 1
+			ph[y] = slim
 		}
 	}
 

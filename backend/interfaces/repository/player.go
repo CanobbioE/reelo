@@ -107,6 +107,37 @@ func (db *DbPlayerRepo) FindAll(ctx context.Context, page, size int) ([]domain.P
 	return players, nil
 }
 
+func (db *DbPlayerRepo) FindAllOrderByReeloDesc(ctx context.Context, page, size int) ([]domain.Player, error) {
+	var players []domain.Player
+	q := `SELECT U.id, U.nome, U.cognome, U.reelo, U.accent
+			FROM Giocatore U
+			ORDER BY U.reelo DESC
+			LIMIT ?,?`
+
+	count, err := db.FindCountAll(ctx)
+	if err != nil {
+		return players, err
+	}
+	if size < 0 {
+		size = count
+	}
+	rows, err := db.dbHandler.Query(ctx, q, (page-1)*size, size)
+	if err != nil {
+		return players, fmt.Errorf("Error getting players ordered: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p domain.Player
+		err := rows.Scan(&p.ID, &p.Name, &p.Surname, &p.Reelo, &p.Accent)
+		if err != nil {
+			return players, fmt.Errorf("Error getting players ordered: %v", err)
+		}
+		players = append(players, p)
+	}
+	return players, nil
+}
+
 // FindCountAll returns the nomber of tuples in the player's repository
 func (db *DbPlayerRepo) FindCountAll(ctx context.Context) (int, error) {
 	var count int

@@ -62,64 +62,6 @@ func (db *DbPartecipationRepo) FindCitiesByPlayerIDAndGameYearAndCategory(ctx co
 	return cities, nil
 }
 
-// FindAll retrieves all the Partecipations in the repository, paginating the results
-func (db *DbPartecipationRepo) FindAll(ctx context.Context, page, size int) ([]domain.Partecipation, error) {
-	var partecipations []domain.Partecipation
-
-	q := `SELECT
-			U.id, U.nome, U.cognome, U.reelo, U.accent,
-			G.id, G.anno, G.categoria, G.inizio, G.fine, G.internazionale,
-			R.id, R.esercizi, R.tempo, R.punteggio, R.posizione, R.pseudo_reelo,
-			P.sede
-			FROM Giocatore U
-			JOIN Partecipazione P ON P.giocatore = U.id
-			JOIN Risultato R ON R.id = P.risultato
-			JOIN Giochi G ON G.id = P.giochi
-			WHERE (G.anno, U.id) IN (
-				SELECT MAX(G.anno), U.id FROM Giochi G
-				JOIN Partecipazione P ON P.giochi = G.id
-				JOIN Giocatore U ON U.id = P.giocatore
-				GROUP BY U.id
-			)
-			ORDER BY U.reelo DESC
-			LIMIT ?, ?`
-
-	rows, err := db.dbHandler.Query(ctx, q, (page-1)*size, size)
-	if err != nil {
-		return partecipations, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var (
-			u    domain.Player
-			g    domain.Game
-			r    domain.Result
-			city string
-		)
-
-		err := rows.Scan(
-			&u.ID, &u.Name, &u.Surname, &u.Reelo, &u.Accent,
-			&g.ID, &g.Year, &g.Category, &g.Start, &g.End, &g.IsParis,
-			&r.ID, &r.Exercises, &r.Time, &r.Score, &r.Position, &r.PseudoReelo,
-			&city,
-		)
-
-		if err != nil {
-			return partecipations, err
-		}
-
-		p := domain.Partecipation{
-			Player: u,
-			Game:   g,
-			Result: r,
-			City:   city,
-		}
-		partecipations = append(partecipations, p)
-	}
-	return partecipations, nil
-}
-
 // UpdatePlayerIDByGameID updates all the parteciaptions that contains
 // the specified gameID by changing the player ID to the specified one
 func (db *DbPartecipationRepo) UpdatePlayerIDByGameID(ctx context.Context, pid, gid int) error {

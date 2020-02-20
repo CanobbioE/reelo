@@ -23,6 +23,7 @@ const INITIAL_STATE = {
 };
 
 export default (state = INITIAL_STATE, action) => {
+	console.log(action)
 	switch (action.type) {
 		case RANKS_YEARS_LOADING:
 			return {...state, loading: true, error: ''};
@@ -62,10 +63,10 @@ const ranksFetched = data => {
 	data.forEach((rank, index) => {
 		rows.push({
 			id: index,
-			name: rank.name,
-			surname: rank.surname,
-			category: rank.category,
-			reelo: rank.reelo,
+			name: rank.player.name,
+			surname: rank.player.surname,
+			category: rank.lastCategory,
+			reelo: rank.player.reelo,
 			history: rank.history,
 		});
 	});

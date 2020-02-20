@@ -48,7 +48,7 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 		i.Logger.Log("parse.File() returned warning: %v\n", warning)
 		return warning
 	}
-	i.Logger.Log("File parsed succesfully\n\n")
+	i.Logger.Log("File parsed succesfully\n")
 
 	gamesID, err := i.GameRepository.Store(ctx, game)
 	if err != nil {
@@ -74,6 +74,7 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 			}
 			playerID = int(playerID64)
 		}
+
 		playerID, err = i.PlayerRepository.FindIDByNameAndSurname(ctx, line.Name, line.Surname)
 		if err != nil {
 			return err
@@ -86,6 +87,7 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 			Position:    line.Position,
 			PseudoReelo: 0,
 		}
+
 		resultsID, err := i.ResultRepository.Store(ctx, r)
 		if err != nil {
 			return err
@@ -97,13 +99,13 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 			Result: domain.Result{ID: int(resultsID)},
 			City:   line.City,
 		}
+
 		if _, err := i.PartecipationRepository.Store(ctx, p); err != nil {
 			return err
 		}
-		return nil
 	}
 
-	i.Logger.Log("File inserted succesfully\n\n")
+	i.Logger.Log("File inserted succesfully\n")
 	return nil
 }
 
@@ -113,17 +115,17 @@ func (i *Interactor) DeleteIfAlreadyExists(game domain.Game) error {
 
 	id, err := i.GameRepository.FindIDByYearAndCategoryAndIsParis(context.Background(), game.Year, game.Category, game.IsParis)
 	if err != nil {
-		return err
-	}
-
-	if id != -1 {
-		if err := i.ResultRepository.DeleteByGameID(context.Background(), id); err != nil {
+		if err.Error() != "no values in result set" {
 			return err
 		}
-		i.Logger.Log("Deleted results with id: %v\n", id)
-	} else {
 		i.Logger.Log("Nothing to delete")
+		return nil
 	}
+
+	if err := i.ResultRepository.DeleteByGameID(context.Background(), id); err != nil {
+		return err
+	}
+	i.Logger.Log("Deleted results with id: %v\n", id)
 	return nil
 }
 
@@ -136,45 +138,4 @@ func (i *Interactor) DoesRankExist(year int, category string, isParis bool) (boo
 	}
 
 	return id != -1, nil
-}
-
-// InsertRankingFile inserts all the result contained in the already parsed file into the database by making the correct calls
-func (i *Interactor) InsertRankingFile(ctx context.Context, file []parse.LineInfo, game domain.Game) error {
-	/*
-		gamesID, err := database.Add(ctx, "giochi",
-			gameInfo.Year, gameInfo.Category, gameInfo.Start, gameInfo.End, isParis)
-		if err != nil {
-			return err
-		}
-		for _, line := range file {
-			if line.Name == "" && line.Surname == "" {
-				continue
-			}
-			city := line.City
-			if isParis {
-				city = "paris"
-			}
-			var playerID int
-			if !database.ContainsPlayer(ctx, line.Name, line.Surname) {
-				accent := CreateAccent(gameInfo.Year, 0, city)
-				playerID, err = database.Add(ctx, "giocatore", line.Name, line.Surname, accent)
-				if err != nil {
-					return err
-				}
-			}
-			playerID, err = database.PlayerID(ctx, line.Name, line.Surname)
-			if err != nil {
-				return err
-			}
-			resultsID, err := database.Add(ctx, "risultato", line.Time, line.Exercises, line.Points, line.Position, 0)
-			if err != nil {
-				return err
-			}
-			_, err = database.Add(ctx, "partecipazione", playerID, gamesID, resultsID, city)
-			if err != nil {
-				return err
-			}
-		}
-	*/
-	return nil
 }

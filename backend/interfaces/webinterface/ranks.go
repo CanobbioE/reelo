@@ -20,21 +20,27 @@ func (wh *WebserviceHandler) ListRanks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = wh.Interactor.ListRanks(page, size)
+	var ranks []dto.Rank
+
+	partecipations, err := wh.Interactor.ListRanks(page, size)
 	if err != nil {
 		log.Printf("Error getting ranks: %v", err)
 		http.Error(w, "cannot get ranks", http.StatusInternalServerError)
 		return
 	}
-	/* TODO
-	for i, p := range partecipations {
+
+	for _, p := range partecipations {
 		history, err := wh.Interactor.PlayerHistory(p.Player)
 		if err != nil {
 			log.Printf("Error getting history: %v", err)
 			http.Error(w, "cannot get history", http.StatusInternalServerError)
 			return
 		}
-		partecipations[i].History = history
+		ranks = append(ranks, dto.Rank{
+			Player:       p.Player,
+			History:      history,
+			LastCategory: p.Game.Category,
+		})
 	}
 
 	ret, err := json.Marshal(ranks)
@@ -43,9 +49,10 @@ func (wh *WebserviceHandler) ListRanks(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot marshal", http.StatusInternalServerError)
 		return
 	}
-	*/
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(nil)
+	w.Write(ret)
+
 	return
 
 }
@@ -97,7 +104,7 @@ func (wh *WebserviceHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := wh.Interactor.DeleteIfAlreadyExists(uploadInfo.Game); err != nil {
-		log.Printf("Error while checking ranks existence: %v", err)
+		log.Printf("Error while deliting ranks existence: %v", err)
 		http.Error(w, "can't check existence", http.StatusBadRequest)
 		return
 	}

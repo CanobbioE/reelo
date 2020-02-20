@@ -1,12 +1,10 @@
 package webinterface
 
 import (
-	"context"
 	"io"
 
 	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/usecases"
-	"github.com/CanobbioE/reelo/backend/utils/parse"
 )
 
 // Interactor define the usecases behaviour, using an interface allows
@@ -24,10 +22,9 @@ type Interactor interface {
 	ListRanks(page, size int) ([]domain.Partecipation, error)
 	ListYears() ([]int, error)
 	Login(user usecases.User) (int, string, error)
-	InsertRankingFile(ctx context.Context, file []parse.LineInfo, game domain.Game) error
 	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) error
 	PlayersCount() (int, error)
-	PlayerHistory(player domain.Player, year int) (usecases.SlimPartecipationByYear, error)
+	PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, error)
 	UpdateCostants(costants domain.Costants) error
 	UpdateNamesake(n usecases.Namesake) error
 }

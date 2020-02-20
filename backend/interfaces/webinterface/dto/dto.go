@@ -2,6 +2,7 @@ package dto
 
 import (
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -48,4 +49,10 @@ type HistoryByYear map[int]History
 type Claims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
+}
+
+type Rank struct {
+	LastCategory string                           `json:"lastCategory"`
+	Player       domain.Player                    `json:"player"`
+	History      usecases.SlimPartecipationByYear `json:"history"`
 }
