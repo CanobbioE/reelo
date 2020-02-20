@@ -24,7 +24,7 @@ func NewDbResultRepo(dbHandlers map[string]DbHandler) *DbResultRepo {
 // Store a new result entity in the repository
 func (db *DbResultRepo) Store(ctx context.Context, r domain.Result) (int64, error) {
 	s := `INSERT INTO Risultato (tempo, esercizi, punteggio, posizione, pseudo_reelo)
- 			VALUES (%d, %d, %d, %d, %d)`
+ 			VALUES (%d, %d, %d, %d, %f)`
 	s = fmt.Sprintf(s, r.Time, r.Exercises, r.Score, r.Position, r.PseudoReelo)
 
 	result, err := db.dbHandler.ExecContext(ctx, s)
@@ -126,7 +126,7 @@ func (db *DbResultRepo) FindAvgPseudoReeloByGameYearAndCategory(ctx context.Cont
 	q := `SELECT IFNULL(AVG(R.pseudo_reelo), -1) FROM Risultato R
 			JOIN Partecipazione P ON P.risultato = R.id
 			JOIN Giochi G ON G.id = P.giochi
-			WHERE G.anno = %d AND G.categoria = %s`
+			WHERE G.anno = %d AND G.categoria = "%s"`
 
 	q = fmt.Sprintf(q, y, c)
 	err := QueryRow(ctx, q, db.dbHandler, &avg)
@@ -140,7 +140,7 @@ func (db *DbResultRepo) FindMaxScoreByGameYearAndCategory(ctx context.Context, y
 	q := `SELECT IFNULL(MAX(R.punteggio), -1) FROM Risultato R
 			JOIN Partecipazione P ON P.risultato = R.id
 			JOIN Giochi G ON G.id = P.giochi
-			WHERE G.anno = %d AND G.categoria = %s`
+			WHERE G.anno = %d AND G.categoria = "%s"`
 
 	q = fmt.Sprintf(q, y, c)
 	err := QueryRow(ctx, q, db.dbHandler, &max)
@@ -171,7 +171,7 @@ func (db *DbResultRepo) FindIDByPlayerIDAndGameYearAndCategory(ctx context.Conte
 			JOIN Partecipazione P ON P.risultato = R.id
 			JOIN Giocatore U ON U.id = P.Giocatore
 			JOIN Giochi G ON G.id = P.giochi
-			WHERE U.id = %d AND G.anno = %d AND G.categoria = %s`
+			WHERE U.id = %d AND G.anno = %d AND G.categoria = "%s"`
 	q = fmt.Sprintf(q, id, y, c)
 
 	err := QueryRow(ctx, q, db.dbHandler, &resultID)

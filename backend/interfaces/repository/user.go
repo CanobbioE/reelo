@@ -23,7 +23,7 @@ func NewDbUserRepo(dbHandlers map[string]DbHandler) *DbUserRepo {
 // Expects the password to be hashed
 func (db *DbUserRepo) FindPasswordByUsername(ctx context.Context, u string) (string, error) {
 	var hash string
-	q := `SELECT parolachiave FROM Utenti WHERE nomeutente = %s`
+	q := `SELECT parolachiave FROM Utenti WHERE nomeutente = "%s"`
 	q = fmt.Sprintf(q, u)
 	err := QueryRow(ctx, q, db.dbHandler, &hash)
 	return hash, err

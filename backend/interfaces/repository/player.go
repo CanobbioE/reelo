@@ -25,7 +25,7 @@ func NewDbPlayerRepo(dbHandlers map[string]DbHandler) *DbPlayerRepo {
 func (db *DbPlayerRepo) Store(ctx context.Context, p domain.Player) (int64, error) {
 	s := `INSERT INTO Giocatore (nome, cognome, accent, reelo)
 			VALUES ("%s", "%s", "%s", 0)`
-	s = fmt.Sprintf(s, p.Name, p.Surname, p.Accent, p.Reelo)
+	s = fmt.Sprintf(s, p.Name, p.Surname, p.Accent)
 
 	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
@@ -38,7 +38,7 @@ func (db *DbPlayerRepo) Store(ctx context.Context, p domain.Player) (int64, erro
 // If an error occurs or the player does not exists
 func (db *DbPlayerRepo) FindIDByNameAndSurname(ctx context.Context, n, s string) (int, error) {
 	id := -1
-	q := `SELECT id FROM Giocatore WHERE nome = %s AND cognome = %s`
+	q := `SELECT id FROM Giocatore WHERE nome = "%s" AND cognome = "%s"`
 
 	q = fmt.Sprintf(q, n, s)
 	err := QueryRow(ctx, q, db.dbHandler, &id)
@@ -126,7 +126,7 @@ func (db *DbPlayerRepo) UpdateReelo(ctx context.Context, p domain.Player) error 
 
 // UpdateAccent sets a new accent for the specified player
 func (db *DbPlayerRepo) UpdateAccent(ctx context.Context, p domain.Player) error {
-	s := `UPDATE Giocatore SET accent = %s  WHERE id = %d`
+	s := `UPDATE Giocatore SET accent = "%s"  WHERE id = %d`
 	s = fmt.Sprintf(s, p.Accent, p.ID)
 	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err

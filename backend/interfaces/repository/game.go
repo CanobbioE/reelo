@@ -24,9 +24,13 @@ func NewDbGameRepo(dbHandlers map[string]DbHandler) *DbGameRepo {
 // Store creates a new game entity in the repository
 func (db *DbGameRepo) Store(ctx context.Context, g domain.Game) (int64, error) {
 	s := `INSERT INTO Giochi (anno, categoria, inizio, fine, internazionale)
- VALUES (%d, "%s", %d, %d, %t)`
+ VALUES (%d, "%s", %d, %d, %d)`
 
-	s = fmt.Sprintf(s, g.Year, g.Category, g.Start, g.End, g.IsParis)
+	var isParis int
+	if g.IsParis {
+		isParis = 1
+	}
+	s = fmt.Sprintf(s, g.Year, g.Category, g.Start, g.End, isParis)
 	result, err := db.dbHandler.ExecContext(ctx, s)
 	if err != nil {
 		return -1, err
@@ -39,9 +43,14 @@ func (db *DbGameRepo) Store(ctx context.Context, g domain.Game) (int64, error) {
 func (db *DbGameRepo) FindIDByYearAndCategoryAndIsParis(ctx context.Context, y int, c string, ip bool) (int, error) {
 	id := -1
 	q := `SELECT G.id FROM Giochi G
-WHERE G.anno = ? AND G.categoria = ? AND G.internazionale = ?`
+		WHERE G.anno = %d 
+		AND G.categoria = "%s" AND G.internazionale = %d`
 
-	q = fmt.Sprintf(q, y, c, ip)
+	var isParis int
+	if ip {
+		isParis = 1
+	}
+	q = fmt.Sprintf(q, y, c, isParis)
 	err := QueryRow(ctx, q, db.dbHandler, &id)
 	return id, err
 }
@@ -50,19 +59,14 @@ WHERE G.anno = ? AND G.categoria = ? AND G.internazionale = ?`
 func (db *DbGameRepo) FindDistinctYearsByPlayerID(ctx context.Context, id int) ([]int, error) {
 	var years []int
 
-	pID, err := NewDbPlayerRepo(db.dbHandlers).FindByID(ctx, id)
-	if err != nil {
-		return years, err
-	}
-
 	q := `SELECT DISTINCT G.anno FROM Giochi G
-JOIN Partecipazione P ON P.giochi = G.id
+			JOIN Partecipazione P ON P.giochi = G.id
 			JOIN Giocatore U ON U.id = P.giocatore
 			WHERE U.id = ?`
 
-	rows, err := db.dbHandler.Query(ctx, q, pID)
+	rows, err := db.dbHandler.Query(ctx, q, id)
 	if err != nil {
-		return years, fmt.Errorf("Error getting partcipation years: %v", err)
+		return years, fmt.Errorf("Error query partcipation years: %v", err)
 	}
 	defer rows.Close()
 
@@ -135,7 +139,7 @@ func (db *DbGameRepo) FindMaxCategoryByPlayerID(ctx context.Context, id int) (st
 // exercise for the specified year and category
 func (db *DbGameRepo) FindStartByYearAndCategory(ctx context.Context, y int, c string) (int, error) {
 	var start int
-	q := `SELECT inizio FROM Giochi WHERE anno = %d  AND categoria = %s`
+	q := `SELECT inizio FROM Giochi WHERE anno = %d  AND categoria = "%s"`
 	q = fmt.Sprintf(q, y, c)
 
 	err := QueryRow(ctx, q, db.dbHandler, &start)
@@ -146,7 +150,7 @@ func (db *DbGameRepo) FindStartByYearAndCategory(ctx context.Context, y int, c s
 // exercise for the specified year and category
 func (db *DbGameRepo) FindEndByYearAndCategory(ctx context.Context, y int, c string) (int, error) {
 	var end int
-	q := `SELECT fine FROM Giochi WHERE anno = %d  AND categoria = %s`
+	q := `SELECT fine FROM Giochi WHERE anno = %d  AND categoria = "%s"`
 	q = fmt.Sprintf(q, y, c)
 
 	err := QueryRow(ctx, q, db.dbHandler, &end)
