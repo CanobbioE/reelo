@@ -23,7 +23,6 @@ const INITIAL_STATE = {
 };
 
 export default (state = INITIAL_STATE, action) => {
-	console.log(action)
 	switch (action.type) {
 		case RANKS_YEARS_LOADING:
 			return {...state, loading: true, error: ''};

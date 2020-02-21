@@ -76,7 +76,6 @@ export const updateAlg = (year, ex, final, mult, exp, np, curr) => async dispatc
         if (mult === "") mult = curr.mult;
         if (exp === "") exp = curr.exp;
         if (np === "") np = curr.np;
-        console.log("aaaaaaaaaaaaaa", year, ex, final, mult, exp, np)
         const v = {
             year: parseInt(`${year}`.replace(",", ".")),
             ex: parseFloat(`${ex}`.replace(",", ".")),

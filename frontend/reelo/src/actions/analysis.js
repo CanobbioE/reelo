@@ -18,14 +18,12 @@ export const fetchNamesakes = (page = 1, size = -1) => async dispatch => {
         type: NAMESAKE_FETCH_LOADING,
     });
     try {
-        const start = Date.now();
         const response = await axios.get(
-            `${Globals.baseURL}${Globals.API.namesakes.all}/?page=${page}&size=${size}`,
+            `${Globals.baseURL}${Globals.API.namesakes.all}?page=${page}&size=${size}`,
             {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             },
         );
-        console.log(`Duration for ${size} players = ${Date.now() - start}ms `);
         dispatch({
             type: NAMESAKE_FETCH_SUCCESS,
             payload: response.data,
@@ -69,7 +67,10 @@ export const commentNamesake = (namesake, comment) => async dispatch => {
     try {
         await axios.post(
             `${Globals.baseURL}${Globals.API.players.comment}`,
-            { ...namesake, comment },
+            {
+                text: comment,
+                player: {...namesake.player}
+            },
             {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             },
