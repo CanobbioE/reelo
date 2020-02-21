@@ -149,7 +149,7 @@ func (db *DbPlayerRepo) FindCountAll(ctx context.Context) (int, error) {
 
 // UpdateReelo sets a new reelo for the specified player
 func (db *DbPlayerRepo) UpdateReelo(ctx context.Context, p domain.Player) error {
-	s := `UPDATE Giocatore SET reelo = %d WHERE id = %d`
+	s := `UPDATE Giocatore SET reelo = %f WHERE id = %d`
 	s = fmt.Sprintf(s, p.Reelo, p.ID)
 	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
