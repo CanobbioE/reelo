@@ -5,11 +5,19 @@ import (
 )
 
 // SlimPartecipation represents a simplified partecipation relationship
+// SlimPartecipation represents a simplified partecipation relationship
 type SlimPartecipation struct {
-	City, Category                                                 string
-	IsParis                                                        bool
-	Year, MaxExercises, MaxScore, Score, Exercises, Time, Position int
-	PseudoReelo                                                    float64
+	City         string  `json:"city"`
+	Category     string  `json:"category"`
+	IsParis      bool    `json:"isParis"`
+	Year         int     `json:"year"`
+	MaxExercises int     `json:"eMax"`
+	MaxScore     int     `json:"dMax"`
+	Score        int     `json:"d"`
+	Exercises    int     `json:"e"`
+	Time         int     `json:"time"`
+	Position     int     `json:"position"`
+	PseudoReelo  float64 `json:"pseudoReelo"`
 }
 
 // History is a collection of simplified partecipations
@@ -161,7 +169,7 @@ func (ss *Solvers) ShouldBeManual() bool {
 				}
 			}
 
-			// If I can re-arrange solver in at least two plausible ways
+			// I can re-arrange solver in at least two plausible ways
 			if ss.curr()+1 < ss.Size() {
 				next := ss.solvers[ss.current+1]
 				for _, elem := range next {

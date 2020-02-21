@@ -3,6 +3,7 @@ package interactor
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/usecases"
@@ -14,14 +15,12 @@ import (
 // is a player that has two or more results that are impossible for a single person
 // to achive. E.g. if it partecipates in two different categories the same year.
 func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, error) {
-
 	var namesakes []usecases.Namesake
 	errs, ctx := errgroup.WithContext(context.Background())
 	players, err := i.PlayerRepository.FindAll(ctx, page, size)
 	if err != nil {
 		return namesakes, err
 	}
-
 	for _, player := range players {
 		player := player
 		errs.Go(func() error {
@@ -50,7 +49,8 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, error) 
 }
 
 // SolvePlayer executes the logic to determinate if a player has namesakes
-func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []int, comment domain.Comment, autoSolver func(n usecases.Namesake) error) ([]usecases.Namesake, error) {
+func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []int,
+	comment domain.Comment, autoSolver func(n usecases.Namesake) error) ([]usecases.Namesake, error) {
 	ss := solvers.New()
 	var namesakes []usecases.Namesake
 	namesakes = nil
@@ -78,6 +78,7 @@ func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []i
 				Solver:  *solver,
 				ID:      i,
 				Comment: comment,
+				Player:  player,
 			})
 		}
 		if ss.ShouldBeManual() {
@@ -88,6 +89,7 @@ func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []i
 			if err != nil {
 				return namesakes, err
 			}
+			return []usecases.Namesake{}, nil
 		}
 	}
 	return namesakes, nil
@@ -103,11 +105,21 @@ func (i *Interactor) UpdateNamesake(n usecases.Namesake) error {
 	if err != nil {
 		return err
 	}
-	accent := fmt.Sprintf("%d %s %d", years[0], oldHistories[years[0]][0].City, n.ID)
+	if len(years) == 0 || len(oldHistories) == 0 {
+		return nil
+	}
+
+	accentID := n.ID
+repeat:
+	accent := fmt.Sprintf("%d %s %d", years[0], n.Solver[0].City, accentID)
 	p := n.Player
 	p.Accent = accent
 	newID, err := i.PlayerRepository.Store(ctx, p)
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			accentID++
+			goto repeat
+		}
 		return err
 	}
 
