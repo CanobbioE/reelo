@@ -65,10 +65,35 @@ func (db *DbPartecipationRepo) FindCitiesByPlayerIDAndGameYearAndCategory(ctx co
 // UpdatePlayerIDByGameID updates all the parteciaptions that contains
 // the specified gameID by changing the player ID to the specified one
 func (db *DbPartecipationRepo) UpdatePlayerIDByGameID(ctx context.Context, pid, gid int) error {
-	q := `UPDATE Partecipazione SET Giocatore = %d  WHERE Giochi = %d`
+	q := `UPDATE Partecipazione SET giocatore = %d  WHERE giochi = %d`
 
 	q = fmt.Sprintf(q, pid, gid)
 
 	_, err := db.dbHandler.ExecContext(ctx, q)
 	return err
+}
+
+// FindByPlayerID retrieve all the partecipations that include the given
+// player's ID. The sub-structs are populated only with the IDs
+func (db *DbPartecipationRepo) FindByPlayerID(ctx context.Context, id int) ([]domain.Partecipation, error) {
+	var partecipations []domain.Partecipation
+	q := `SELECT giocatore, giochi, risultato, sede
+			FROM Partecipazione
+			WHERE giocatore = ?`
+	rows, err := db.dbHandler.Query(ctx, q, id)
+	if err != nil {
+		return partecipations, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p domain.Partecipation
+		err := rows.Scan(&p.Player.ID, &p.Game.ID, &p.Result.ID, &p.City)
+		if err != nil {
+			return partecipations, err
+		}
+
+		partecipations = append(partecipations, p)
+	}
+	return partecipations, nil
 }
