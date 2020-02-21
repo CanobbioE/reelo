@@ -178,3 +178,11 @@ func (db *DbPlayerRepo) CheckExistenceByNameAndSurname(ctx context.Context, n, s
 	}
 	return false
 }
+
+// DeleteByID deletes a player given its ID
+func (db *DbPlayerRepo) DeleteByID(ctx context.Context, id int) error {
+	s := `DELETE FROM Giocatore WHERE id = %d`
+	s = fmt.Sprintf(s, id)
+	_, err := db.dbHandler.ExecContext(ctx, s)
+	return err
+}
