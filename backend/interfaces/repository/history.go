@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/CanobbioE/reelo/backend/usecases"
@@ -48,7 +47,7 @@ func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) 
 		var history []usecases.SlimPartecipation
 		history, ok := historyByYear[sp.Year]
 		if !ok {
-			history = []usecases.SlimPartecipation{}
+			history = make([]usecases.SlimPartecipation, 0)
 		}
 		history = append(history, sp)
 		historyByYear[sp.Year] = history
@@ -60,7 +59,6 @@ func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) 
 
 // FindByPlayerID retrieves the history for the given player id
 func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.SlimPartecipationByYear, error) {
-
 	ph := make(usecases.SlimPartecipationByYear)
 	q := `SELECT G.categoria, R.tempo, R.esercizi, R.punteggio, R.pseudo_reelo, R.posizione
 			FROM  Giochi G
@@ -79,7 +77,6 @@ func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.S
 		s := fmt.Sprintf(q, id, y)
 		rows, err := db.dbHandler.Query(ctx, s)
 		if err != nil {
-			log.Println("qui")
 			return ph, err
 		}
 		defer rows.Close()
@@ -96,7 +93,6 @@ func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.S
 
 			}
 
-			// Finding other cool stuff
 			dMax, err := NewDbResultRepo(db.dbHandlers).FindMaxScoreByGameYearAndCategory(ctx, y, slim.Category)
 			if err != nil {
 				return ph, err
@@ -104,13 +100,11 @@ func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.S
 
 			t, err := NewDbGameRepo(db.dbHandlers).FindStartByYearAndCategory(ctx, y, slim.Category)
 			if err != nil {
-				log.Println("blub")
 				return ph, err
 			}
 
 			n, err := NewDbGameRepo(db.dbHandlers).FindEndByYearAndCategory(ctx, y, slim.Category)
 			if err != nil {
-				log.Println("blab")
 
 				return ph, err
 			}
