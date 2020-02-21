@@ -22,7 +22,7 @@ export default class Globals {
         },
         namesakes: {
             all: "/namesakes/all",
-            update: "namesakes/update",
+            update: "/namesakes/update",
         },
         costants: {
             all: "/costants/all",
