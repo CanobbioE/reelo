@@ -109,7 +109,7 @@ func (i *Interactor) UpdateNamesake(n usecases.Namesake) error {
 		return nil
 	}
 
-	accentID := n.ID
+	var accentID int
 repeat:
 	accent := fmt.Sprintf("%d %s %d", years[0], n.Solver[0].City, accentID)
 	p := n.Player
@@ -138,6 +138,15 @@ repeat:
 				}
 			}
 
+		}
+	}
+	_, err = i.PartecipationRepository.FindByPlayerID(ctx, oldID)
+	if err != nil {
+		if err.Error() != "no values in result set" {
+			return err
+		}
+		if err := i.PlayerRepository.DeleteByID(ctx, oldID); err != nil {
+			return err
 		}
 	}
 	return nil
