@@ -7,7 +7,7 @@ export default class Globals {
         players: {
             count: "/players/count",
             reelo: {
-                calculate: "/players/calculate/reelo",
+                calculate: "/players/reelo/calculate",
             },
             comment: "/players/comment",
         },
