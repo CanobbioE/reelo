@@ -27,6 +27,7 @@ type Interactor interface {
 	PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, error)
 	UpdateCostants(costants domain.Costants) error
 	UpdateNamesake(n usecases.Namesake) error
+	Log(msg string, args ...interface{})
 }
 
 // WebserviceHandler represents the mechanism that transform HTTP requests to
