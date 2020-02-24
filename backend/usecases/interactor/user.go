@@ -15,28 +15,28 @@ import (
 
 // Login implements the login logic.
 // It returns an http status, the jwt and an eventual error.
-func (i *Interactor) Login(user usecases.User) (int, string, error) {
+func (i *Interactor) Login(user usecases.User) (string, fmt.Stringer) {
 	var jwt string
 
 	expPassword, err := i.UserRepository.FindPasswordByUsername(context.Background(), user.Username)
 	if err != nil {
 		// TODO: can't compare this error
-		if err == fmt.Errorf("user not found") {
-			return http.StatusUnauthorized, jwt, fmt.Errorf("user not found: %v", err)
+		if err.Error() == "user not found" {
+			return jwt, i.ErrorHandler.NewError(err, "E_NO_AUTH", http.StatusUnauthorized)
 		}
-		return http.StatusUnauthorized, jwt, fmt.Errorf("error while reading from db: %v", err)
+		return jwt, i.ErrorHandler.NewError(err, "E_UNEXPECTED", http.StatusInternalServerError)
 	}
 
 	if toHexHash(user.Password) != expPassword {
-		return http.StatusUnauthorized, jwt, fmt.Errorf("passwords don't match")
+		return jwt, i.ErrorHandler.NewError(fmt.Errorf("passwords don't match"), "E_NO_AUTH", http.StatusUnauthorized)
 	}
 
 	jwt, err = generateJWT(user.Username)
 	if err != nil {
-		return http.StatusInternalServerError, jwt, fmt.Errorf("error while generating the jwt %v", err)
+		return jwt, i.ErrorHandler.NewError(err, "E_UNEXPECTED", http.StatusInternalServerError)
 	}
 
-	return http.StatusOK, jwt, nil
+	return jwt, nil
 }
 
 func toHexHash(s string) string {

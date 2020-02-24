@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CanobbioE/reelo/backend/interfaces/webinterface/dto"
 	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/CanobbioE/reelo/backend/utils"
 )
@@ -14,14 +13,14 @@ func (wh *WebserviceHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var cred usecases.User
 
 	if err := utils.ReadBody(r.Body, &cred); err != nil {
-		wh.Interactor.Log(err.Error())
-		http.Error(w, dto.NewError(err, "E_BAD_BODY", http.StatusBadRequest).ToReturnable(), http.StatusBadRequest)
+		wh.Interactor.Log("Cannot read login request body: %v", err)
+		http.Error(w, wh.Interactor.Error(err, "E_BAD_BODY", http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	status, jwt, err := wh.Interactor.Login(cred)
+	jwt, err := wh.Interactor.Login(cred)
 	if err != nil {
-		wh.Interactor.Log(err.Error())
-		http.Error(w, dto.NewError(err, "BRUH", status).ToReturnable(), status)
+		wh.Interactor.Log("Cannot log the user in: %v", err)
+		http.Error(w, err.String(), 500)
 		return
 	}
 	w.Write([]byte(jwt))

@@ -11,9 +11,26 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils/parse"
 )
 
-// Logger is the interface for the logging utility
+// Logger is the interface for the logging utility,
+// having the interface definition here allows for dependency injection
+// and proper logging even on low level code.
 type Logger interface {
 	Log(msg string, args ...interface{})
+}
+
+// ErrorHandler is the interface for the error handling utility,
+// having the interface definition here allows for dependency injection
+// and proper error handling even on low level code.
+type ErrorHandler interface {
+	NewError(err error, code string, httpStatus int) Error
+}
+
+// Error is the interface for the application custom error
+type Error interface {
+	Code() string
+	Status() int
+	Message() string
+	String() string
 }
 
 // Interactor is used to interact with the externally injected repositories
@@ -27,6 +44,7 @@ type Interactor struct {
 	UserRepository          usecases.UserRepository
 	HistoryRepository       usecases.HistoryRepository
 	Logger                  Logger
+	ErrorHandler            ErrorHandler
 }
 
 // ParseFileWithInfo reads the content of a buffer and verifies its correctness
@@ -138,4 +156,16 @@ func (i *Interactor) DoesRankExist(year int, category string, isParis bool) (boo
 	}
 
 	return id != -1, nil
+}
+
+// Log allows for logging on low level code
+func (i *Interactor) Log(msg string, args ...interface{}) {
+	i.Logger.Log(msg, args...)
+}
+
+// Error allows for error handling on low level code
+// Technically we the interactor shouldn't be aware of the httpStatus
+// because the interactor shouldn't be limited to http requests.
+func (i *Interactor) Error(err error, code string, httpStatus int) string {
+	return i.ErrorHandler.NewError(err, code, httpStatus).String()
 }

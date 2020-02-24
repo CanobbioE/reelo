@@ -9,8 +9,10 @@ import (
 // AddComment creates or updates a comment for the given player
 func (i *Interactor) AddComment(namesake usecases.Namesake) error {
 	ctx := context.Background()
-	if i.CommentRepository.CheckExistenceByPlayerID(ctx, namesake.Comment.Player.ID) {
-		if err := i.CommentRepository.UpdateTextByPlayerID(ctx, namesake.Comment.Text, namesake.Comment.Player.ID); err != nil {
+	commentExists := i.CommentRepository.CheckExistenceByPlayerID(ctx, namesake.Comment.Player.ID)
+	if commentExists {
+		err := i.CommentRepository.UpdateTextByPlayerID(ctx, namesake.Comment.Text, namesake.Comment.Player.ID)
+		if err != nil {
 			return err
 		}
 	} else {

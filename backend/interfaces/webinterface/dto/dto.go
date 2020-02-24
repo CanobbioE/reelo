@@ -1,8 +1,6 @@
 package dto
 
 import (
-	"encoding/json"
-
 	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/dgrijalva/jwt-go"
@@ -14,15 +12,6 @@ type FileUpload struct {
 	Game   domain.Game `json:"game"`
 	Format string      `json:"format"`
 	City   string      `json:"city"`
-}
-
-// Error represents an error mesage to be returned to the front end.
-// The message should be human readable and the code should quickly
-// describe the error.
-type Error struct {
-	Message    string `json:"message"`
-	Code       string `json:"code"`
-	HTTPStatus int    `json:"status"`
 }
 
 // SlimPartecipation represents a simplified partecipation relationship
@@ -53,30 +42,9 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// Rank represents a row on the ranking list
 type Rank struct {
 	LastCategory string                           `json:"lastCategory"`
 	Player       domain.Player                    `json:"player"`
 	History      usecases.SlimPartecipationByYear `json:"history"`
-}
-
-// NewError creates a new dto error
-func NewError(err error, code string, httpStatus int) *Error {
-	return &Error{
-		Message:    err.Error(),
-		Code:       code,
-		HTTPStatus: httpStatus,
-	}
-}
-
-// ToReturnable marshals the given dto Error into an http retunable string
-func (e *Error) ToReturnable() string {
-	ret, err := json.Marshal(e)
-	if err != nil {
-		// I think we are allowed to panic if we fail to marshall an error
-		// to send to the front end. This error will only be raised
-		// by programming mistakes
-		panic(err)
-	}
-	return string(ret)
-
 }
