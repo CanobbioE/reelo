@@ -5,7 +5,8 @@ import {
     PASSWORD_SIGNIN_CHANGED,
     SIGNIN_FORM_RESET,
     AUTH_USER,
-    AUTH_ERROR,
+    ERROR,
+    ERROR_RESET,
 } from "../utils/Types";
 import Globals from "../config/Globals";
 
@@ -24,11 +25,15 @@ export const updatePassword = password => {
 };
 
 export const signin = (email, password) => async dispatch => {
+    dispatch({
+        type: ERROR_RESET,
+    });
     try {
         const response = await axios.post(`${Globals.baseURL}${Globals.API.auth.login}`, {
             email,
             password,
         });
+        localStorage.setItem("token", response.data);
         dispatch({
             type: AUTH_USER,
             payload: response.data,
@@ -36,11 +41,11 @@ export const signin = (email, password) => async dispatch => {
         dispatch({
             type: SIGNIN_FORM_RESET,
         });
-        localStorage.setItem("token", response.data);
     } catch (e) {
+        console.log(e.response.data);
         dispatch({
-            type: AUTH_ERROR,
-            payload: e && e.response && e.response.data && e.response.data.messages,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
         dispatch({
             type: SIGNIN_FORM_RESET,

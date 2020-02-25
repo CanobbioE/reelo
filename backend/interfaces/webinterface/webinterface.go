@@ -1,35 +1,34 @@
 package webinterface
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/usecases"
+	"github.com/CanobbioE/reelo/backend/utils"
 )
 
 // Interactor define the usecases behaviour, using an interface allows
 // to change implementation as needed
 type Interactor interface {
-	AnalysisHistory(player domain.Player) (usecases.HistoryByYear, []int, error)
-	AddComment(namesake usecases.Namesake) error
-	CalculateAllReelo(doPseudo bool) error
-	CalculateMaxScoreObtainable(game domain.Game) (int, error)
-	CalculatePlayerReelo(player domain.Player, doPseudo bool) error
-	DeleteIfAlreadyExists(game domain.Game) error
-	DoesRankExist(year int, category string, isParis bool) (bool, error)
-	ListCostants() (domain.Costants, error)
-	ListNamesakes(page, size int) ([]usecases.Namesake, error)
-	ListRanks(page, size int) ([]domain.Partecipation, error)
-	ListYears() ([]int, error)
-	Login(user usecases.User) (string, fmt.Stringer)
-	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) error
-	PlayersCount() (int, error)
-	PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, error)
-	UpdateCostants(costants domain.Costants) error
-	UpdateNamesake(n usecases.Namesake) error
+	AnalysisHistory(player domain.Player) (usecases.HistoryByYear, []int, utils.Error)
+	AddComment(namesake usecases.Namesake) utils.Error
+	CalculateAllReelo(doPseudo bool) utils.Error
+	CalculateMaxScoreObtainable(game domain.Game) (int, utils.Error)
+	CalculatePlayerReelo(player domain.Player, doPseudo bool) utils.Error
+	DeleteIfAlreadyExists(game domain.Game) utils.Error
+	DoesRankExist(year int, category string, isParis bool) (bool, utils.Error)
+	ListCostants() (domain.Costants, utils.Error)
+	ListNamesakes(page, size int) ([]usecases.Namesake, utils.Error)
+	ListRanks(page, size int) ([]domain.Partecipation, utils.Error)
+	ListYears() ([]int, utils.Error)
+	Login(user usecases.User) (string, utils.Error)
+	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) utils.Error
+	PlayersCount() (int, utils.Error)
+	PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, utils.Error)
+	UpdateCostants(costants domain.Costants) utils.Error
+	UpdateNamesake(n usecases.Namesake) utils.Error
 	Log(msg string, args ...interface{})
-	Error(err error, code string, httpStatus int) string
 }
 
 // WebserviceHandler represents the mechanism that transform HTTP requests to
@@ -39,7 +38,6 @@ type WebserviceHandler struct {
 }
 
 /*
-
 // UpdateDB is to be called from CLI, it is used to automate db updates.
 // In production is an empty function
 func UpdateDB(w http.ResponseWriter, r *http.Request) {

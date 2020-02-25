@@ -9,7 +9,8 @@ import {
     ALG_FETCH_SUCCESS,
     ALG_POST_SUCCESS,
     ALG_POST_LOADING,
-    ALG_POST_FAIL,
+    ERROR,
+    ERROR_RESET,
 } from "../utils/Types";
 import Globals from "../config/Globals";
 
@@ -50,6 +51,9 @@ export const updateAlgNP = np => {
     };
 };
 export const fetchVars = () => async dispatch => {
+    dispatch({
+        type: ERROR_RESET,
+    });
     try {
         const response = await axios.get(`${Globals.baseURL}${Globals.API.costants.all}`, {
             headers: {
@@ -61,12 +65,19 @@ export const fetchVars = () => async dispatch => {
             payload: response.data,
         });
     } catch (e) {
+        dispatch({
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
+        });
         console.log(e);
     }
 };
 export const updateAlg = (year, ex, final, mult, exp, np, curr) => async dispatch => {
     dispatch({
         type: ALG_POST_LOADING,
+    });
+    dispatch({
+        type: ERROR_RESET,
     });
     try {
         // TODO: OMG this is orrible please use Object.keys
@@ -96,8 +107,8 @@ export const updateAlg = (year, ex, final, mult, exp, np, curr) => async dispatc
     } catch (e) {
         console.log(e);
         dispatch({
-            type: ALG_POST_FAIL,
-            payload: (e && e.response && e.response.data) || "Errore inaspettato",
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };

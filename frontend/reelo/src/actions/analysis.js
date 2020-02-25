@@ -1,15 +1,14 @@
 import axios from "axios";
 import {
     NAMESAKE_FETCH_LOADING,
-    NAMESAKE_FETCH_ERROR,
     NAMESAKE_FETCH_SUCCESS,
     NAMESAKE_POST_LOADING,
-    NAMESAKE_POST_ERROR,
     NAMESAKE_POST_SUCCESS,
     NAMESAKE_COMMENT_LOADING,
-    NAMESAKE_COMMENT_ERROR,
     NAMESAKE_COMMENT_SUCCESS,
     NAMESAKE_UPDATE,
+    ERROR,
+    ERROR_RESET,
 } from "../utils/Types";
 import Globals from "../config/Globals";
 
@@ -30,8 +29,8 @@ export const fetchNamesakes = (page = 1, size = -1) => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: NAMESAKE_FETCH_ERROR,
-            payload: e && e.response && e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };
@@ -45,6 +44,9 @@ export const acceptNamesake = namesake => async dispatch => {
     dispatch({
         type: NAMESAKE_POST_LOADING,
     });
+    dispatch({
+        type: ERROR_RESET,
+    });
     try {
         await axios.post(`${Globals.baseURL}${Globals.API.namesakes.update}`, namesake, {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -54,8 +56,8 @@ export const acceptNamesake = namesake => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: NAMESAKE_POST_ERROR,
-            payload: e && e.response && e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };
@@ -64,12 +66,15 @@ export const commentNamesake = (namesake, comment) => async dispatch => {
     dispatch({
         type: NAMESAKE_COMMENT_LOADING,
     });
+    dispatch({
+        type: ERROR_RESET,
+    });
     try {
         await axios.post(
             `${Globals.baseURL}${Globals.API.players.comment}`,
             {
                 text: comment,
-                player: {...namesake.player}
+                player: { ...namesake.player },
             },
             {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -80,8 +85,8 @@ export const commentNamesake = (namesake, comment) => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: NAMESAKE_COMMENT_ERROR,
-            payload: e && e.response && e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };

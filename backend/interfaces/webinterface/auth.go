@@ -1,7 +1,6 @@
 package webinterface
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/CanobbioE/reelo/backend/usecases"
@@ -11,16 +10,14 @@ import (
 // Login logs a user in by adding a jwt to the cookies
 func (wh *WebserviceHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var cred usecases.User
-
 	if err := utils.ReadBody(r.Body, &cred); err != nil {
 		wh.Interactor.Log("Cannot read login request body: %v", err)
-		http.Error(w, wh.Interactor.Error(err, "E_BAD_BODY", http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, utils.NewError(err, "E_BAD_REQ", http.StatusBadRequest).String(), http.StatusBadRequest)
 		return
 	}
 	jwt, err := wh.Interactor.Login(cred)
-	if err != nil {
-		wh.Interactor.Log("Cannot log the user in: %v", err)
-		http.Error(w, err.String(), 500)
+	if !err.IsNil {
+		http.Error(w, err.String(), err.HTTPStatus)
 		return
 	}
 	w.Write([]byte(jwt))
@@ -30,6 +27,6 @@ func (wh *WebserviceHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Value: jwt,
 	})
 
-	log.Printf("User %s logged in!", cred.Username)
+	wh.Interactor.Log("User %s logged in!", cred.Username)
 	return
 }

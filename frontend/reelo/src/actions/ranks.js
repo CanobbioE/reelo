@@ -2,15 +2,14 @@ import axios from "axios";
 import {
     RANKS_FETCH_LOADING,
     RANKS_FETCH_SUCCESS,
-    RANKS_FETCH_ERROR,
     RANKS_PAGE_SET,
     RANKS_COUNT_LOADING,
-    RANKS_COUNT_ERROR,
     RANKS_SIZE_SET,
     RANKS_COUNT_SUCCESS,
     RANKS_YEARS_LOADING,
-    RANKS_YEARS_ERROR,
     RANKS_YEARS_SUCCESS,
+    ERROR_RESET,
+    ERROR,
 } from "../utils/Types";
 import Globals from "../config/Globals";
 
@@ -32,6 +31,9 @@ export const fetchTotalRanks = () => async dispatch => {
     dispatch({
         type: RANKS_COUNT_LOADING,
     });
+    dispatch({
+        type: ERROR_RESET,
+    });
     try {
         const response = await axios.get(`${Globals.baseURL}${Globals.API.players.count}`);
         dispatch({
@@ -40,8 +42,8 @@ export const fetchTotalRanks = () => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: RANKS_COUNT_ERROR,
-            payload: e && e.response && e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };
@@ -49,6 +51,9 @@ export const fetchTotalRanks = () => async dispatch => {
 export const fetchAllYears = () => async dispatch => {
     dispatch({
         type: RANKS_YEARS_LOADING,
+    });
+    dispatch({
+        type: ERROR_RESET,
     });
     try {
         const response = await axios.get(`${Globals.baseURL}${Globals.API.ranks.years}`);
@@ -58,8 +63,8 @@ export const fetchAllYears = () => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: RANKS_YEARS_ERROR,
-            payload: e && e.response && e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };
@@ -67,6 +72,9 @@ export const fetchAllYears = () => async dispatch => {
 export const fetchRanks = (page = 1, size = -1) => async dispatch => {
     dispatch({
         type: RANKS_FETCH_LOADING,
+    });
+    dispatch({
+        type: ERROR_RESET,
     });
     try {
         const response = await axios.get(
@@ -83,8 +91,8 @@ export const fetchRanks = (page = 1, size = -1) => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: RANKS_FETCH_ERROR,
-            payload: e && e.response && e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };
@@ -92,6 +100,9 @@ export const fetchRanks = (page = 1, size = -1) => async dispatch => {
 export const forceReelo = () => async dispatch => {
     dispatch({
         type: RANKS_FETCH_LOADING,
+    });
+    dispatch({
+        type: ERROR_RESET,
     });
     try {
         await axios.put(`${Globals.baseURL}${Globals.API.players.reelo.calculate}`, null, {
@@ -101,8 +112,8 @@ export const forceReelo = () => async dispatch => {
         });
     } catch (e) {
         dispatch({
-            type: RANKS_FETCH_ERROR,
-            payload: e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };

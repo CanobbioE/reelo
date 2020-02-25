@@ -4,39 +4,43 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
 	"github.com/CanobbioE/reelo/backend/interfaces/webinterface/dto"
 	"github.com/CanobbioE/reelo/backend/usecases"
+	"github.com/CanobbioE/reelo/backend/utils"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
 // Login implements the login logic.
 // It returns an http status, the jwt and an eventual error.
-func (i *Interactor) Login(user usecases.User) (string, fmt.Stringer) {
+func (i *Interactor) Login(user usecases.User) (string, utils.Error) {
 	var jwt string
 
 	expPassword, err := i.UserRepository.FindPasswordByUsername(context.Background(), user.Username)
 	if err != nil {
 		// TODO: can't compare this error
-		if err.Error() == "user not found" {
-			return jwt, i.ErrorHandler.NewError(err, "E_NO_AUTH", http.StatusUnauthorized)
+		if err.Error() == "no values in result set" {
+			i.Logger.Log("Login: cannot find user: %v", err)
+			return jwt, utils.NewError(fmt.Errorf("user does not exist"), "E_NO_AUTH", 401)
 		}
-		return jwt, i.ErrorHandler.NewError(err, "E_UNEXPECTED", http.StatusInternalServerError)
+		i.Logger.Log("Login: cannot find password: %v", err)
+		return jwt, utils.NewError(err, "E_GENERIC", 500)
 	}
 
 	if toHexHash(user.Password) != expPassword {
-		return jwt, i.ErrorHandler.NewError(fmt.Errorf("passwords don't match"), "E_NO_AUTH", http.StatusUnauthorized)
+		i.Logger.Log("Login: wrong password")
+		return jwt, utils.NewError(fmt.Errorf("wrong password"), "E_NO_AUTH", 401)
 	}
 
 	jwt, err = generateJWT(user.Username)
 	if err != nil {
-		return jwt, i.ErrorHandler.NewError(err, "E_UNEXPECTED", http.StatusInternalServerError)
+		i.Logger.Log("Login: cannot generate JWT: %v", err)
+		return jwt, utils.NewError(err, "E_GENERIC", 500)
 	}
 
-	return jwt, nil
+	return jwt, utils.NewNilError()
 }
 
 func toHexHash(s string) string {

@@ -78,7 +78,7 @@ const Namesakes = props => {
     const renderError = () => (
         <Grid item xs={12}>
             <Typography color="error" align="center">
-                {props.analysis.error}
+                {props.errors.codeAsMessage}
             </Typography>
         </Grid>
     );
@@ -192,8 +192,8 @@ const Namesakes = props => {
                         Azioni
                     </Typography>
                 </Grid>
-                {props.analysis.loading && !props.analysis.error.length ? null : renderNamesakes()}
-                {props.analysis.error.length ? renderError() : null}
+                {props.analysis.loading && props.errors.message === "" ? null : renderNamesakes()}
+                {props.errors.message !== "" ? renderError() : null}
                 <Grid item xs={1}>
                     <LoadingIcon show={props.analysis.loading} />
                 </Grid>
@@ -202,8 +202,8 @@ const Namesakes = props => {
     );
 };
 
-function mapStateToProps({ uploadForm, analysis }) {
-    return { uploadForm, analysis };
+function mapStateToProps({ uploadForm, analysis, errors }) {
+    return { uploadForm, analysis, errors };
 }
 
 const composedComponent = compose(

@@ -5,12 +5,12 @@ import {
     YEAR_UPLOAD_CHANGED,
     RANK_UPLOAD_SUCCESS,
     RANK_UPLOAD_LOADING,
-    RANK_UPLOAD_FAIL,
     FORMAT_UPLOAD_CHANGED,
     PARIS_UPLOAD_CHANGED,
-    RANK_UPLOAD_ERROR_RESET,
     START_UPLOAD_CHANGED,
     END_UPLOAD_CHANGED,
+    ERROR_RESET,
+    ERROR,
 } from "../utils/Types";
 import Globals from "../config/Globals";
 
@@ -28,13 +28,13 @@ export const checkExistence = (year, category, isParis) => async dispatch => {
             },
         );
         dispatch({
-            type: RANK_UPLOAD_ERROR_RESET,
+            type: ERROR_RESET,
         });
         return response.data;
     } catch (e) {
         dispatch({
-            type: RANK_UPLOAD_FAIL,
-            payload: e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };
@@ -48,7 +48,7 @@ export const updateUploadFile = file => {
 
 export const resetUploadForm = () => {
     return {
-        type: RANK_UPLOAD_ERROR_RESET,
+        type: ERROR_RESET,
     };
 };
 
@@ -124,6 +124,9 @@ export const uploadFile = (file, category, year, isParis, format, start, end) =>
     dispatch({
         type: RANK_UPLOAD_LOADING,
     });
+    dispatch({
+        type: ERROR_RESET,
+    });
     try {
         const jwt = localStorage.getItem("token");
         const mappedFormat = format
@@ -158,8 +161,8 @@ export const uploadFile = (file, category, year, isParis, format, start, end) =>
     } catch (e) {
         console.log(e);
         dispatch({
-            type: RANK_UPLOAD_FAIL,
-            payload: e.response.data,
+            type: ERROR,
+            payload: (e && e.response && e.response.data) || "server offline",
         });
     }
 };

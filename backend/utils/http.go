@@ -23,19 +23,19 @@ func ReadBody(r io.Reader, entity interface{}) error {
 }
 
 // Paginate extrapolate the page's number and size from the given http request
-func Paginate(r *http.Request) (page, size int, err error) {
+func Paginate(r *http.Request) (page, size int, e Error) {
 	pageString := r.URL.Query().Get("page")
 	sizeString := r.URL.Query().Get("size")
 
-	page, err = strconv.Atoi(string(pageString))
+	page, err := strconv.Atoi(string(pageString))
 	if err != nil {
-		return page, size, fmt.Errorf("error converting page: %v", err)
+		return page, size, NewError(fmt.Errorf("error converting page: %v", err), "E_BAD_REQ", http.StatusBadRequest)
 	}
 
 	size, err = strconv.Atoi(string(sizeString))
 	if err != nil {
-		return page, size, fmt.Errorf("error converting size: %v", err)
+		return page, size, NewError(fmt.Errorf("error converting size: %v", err), "E_BAD_REQ", http.StatusBadRequest)
 	}
 
-	return page, size, nil
+	return page, size, NewNilError()
 }

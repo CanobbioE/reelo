@@ -1,11 +1,13 @@
 package middlewares
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/CanobbioE/reelo/backend/utils"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -17,7 +19,7 @@ func RequireAuth(next http.Handler) http.HandlerFunc {
 		token = strings.ReplaceAll(token, "Bearer ", "")
 		if token == "" || token == "null" {
 			log.Println("Missing token")
-			http.Error(w, "missing token", http.StatusUnauthorized)
+			http.Error(w, utils.NewError(fmt.Errorf("missing token"), "E_NO_AUTH", http.StatusUnauthorized).String(), http.StatusUnauthorized)
 			return
 		}
 

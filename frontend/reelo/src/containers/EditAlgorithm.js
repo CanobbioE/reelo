@@ -44,7 +44,7 @@ function EditAlgorithm(props) {
             props.algorithm.np,
             props.algorithm.currentValues,
         );
-        if (props.algorithm.error === "") {
+        if (props.errors.message === "") {
             setDone(true);
         }
         props.history.push(Globals.routes.varchange);
@@ -76,8 +76,8 @@ function EditAlgorithm(props) {
                 <Dialog open={done} keepMounted onClose={handleClose}>
                     <DialogContent>
                         <LoadingIcon show={props.loading} />
-                        {props.algorithm.error ? (
-                            <Typography color="error"> {props.algorithm.error}</Typography>
+                        {props.errors.message !== "" ? (
+                            <Typography color="error"> {props.errors.codeAsMessage}</Typography>
                         ) : (
                             <Typography>Modifica avvenuta con successo</Typography>
                         )}
@@ -111,8 +111,8 @@ function EditAlgorithm(props) {
         </Grid>
     );
 }
-function mapStateToProps({ algorithm }) {
-    return { algorithm };
+function mapStateToProps({ algorithm, errors }) {
+    return { algorithm, errors };
 }
 
 const composedComponent = compose(

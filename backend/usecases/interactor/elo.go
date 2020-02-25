@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/utils"
 	"github.com/CanobbioE/reelo/backend/utils/category"
 )
 
@@ -40,7 +41,7 @@ func (i *Interactor) InitCostants() {
 // PseudoReelo calculates a basic version of a player's ELO.
 // This score does not take aging, anti-exploit and category
 // promotion into consideration.
-func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year int) error {
+func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year int) utils.Error {
 	var isParis bool
 
 	//### Steps from 1 to 5
@@ -48,14 +49,16 @@ func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year
 	// this could happen in case of namesakes or international results
 	categories, err := i.GameRepository.FindCategoriesByYearAndPlayer(ctx, player.ID, year)
 	if err != nil {
-		return err
+		i.Logger.Log("PseudoReelo: cannot find categories: %v", err)
+		return utils.NewError(err, "E_DB_FIND", 500)
 	}
 
 	var parisIndex int
 	for index, c := range categories {
 		cities, err := i.PartecipationRepository.FindCitiesByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c)
 		if err != nil {
-			return err
+			i.Logger.Log("PseudoReelo: cannot find cities: %v", err)
+			return utils.NewError(err, "E_DB_FIND", 500)
 		}
 
 		for _, city := range cities {
@@ -74,20 +77,21 @@ func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year
 	categories = dumbNamesakeGuard(categories, parisIndex, isParis)
 
 	for _, c := range categories {
-		reelo, err := i.oneYearScore(ctx, player, c, year, isParis)
-		if err != nil {
-			return err
+		reelo, e := i.oneYearScore(ctx, player, c, year, isParis)
+		if !e.IsNil {
+			return e
 		}
-		err = i.ResultRepository.UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c, reelo)
+		err := i.ResultRepository.UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c, reelo)
 		if err != nil {
-			return err
+			i.Logger.Log("PseudoReelo: failed to update pseudo reelo: %v", err)
+			return utils.NewError(err, "E_DB_UPDATE", 500)
 		}
 	}
-	return nil
+	return utils.NewNilError()
 }
 
 // Reelo calculates a player's ELO using a custom algorithm
-func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, error) {
+func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, utils.Error) {
 	var reelo float64
 	var sumOfWeights float64
 
@@ -98,20 +102,23 @@ func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, 
 	// anti-exploit mechanism should take effect.
 	years, err := i.GameRepository.FindDistinctYearsByPlayerID(ctx, player.ID)
 	if err != nil {
-		return reelo, err
+		i.Logger.Log("Reelo: cannot find partecipation years: %v", err)
+		return reelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// The last category known in which the player has partecipated.
 	// It's used to check for category promotion.
 	lastKnownCategoryForPlayer, err := i.GameRepository.FindMaxCategoryByPlayerID(ctx, player.ID)
 	if err != nil {
-		return reelo, err
+		i.Logger.Log("Reelo: cannot find max max category: %v", err)
+		return reelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// The last year known in which the player has partecipated.
 	// It is used to calculate the aging factor and if the anti-exploit mechanism
 	// should take effect.
 	lastKnownYear, err := i.GameRepository.FindMaxYear(ctx)
 	if err != nil {
-		return reelo, err
+		i.Logger.Log("Reelo: cannot find max year: %v", err)
+		return reelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 
 	// Every year a player has played should have a pseudo-Reelo, which needs
@@ -122,25 +129,29 @@ func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, 
 		// pseudo-Reelo is basically a glorified version of the K*E+D formula.
 		pseudoReelo, err := i.ResultRepository.FindPseudoReeloByPlayerIDAndGameYear(ctx, player.ID, year)
 		if err != nil {
-			return reelo, err
+			i.Logger.Log("Reelo: cannot find max year: %v", err)
+			return reelo, utils.NewError(err, "E_DB_FIND", 500)
 		}
 		// the category for the current year, used to check for category promotion
 		cat, err := i.GameRepository.FindCategoryByPlayerIDAndGameYear(ctx, player.ID, year)
 		if err != nil {
-			return reelo, err
+			i.Logger.Log("Reelo: cannot find category for player %v: %v", player.ID, err)
+			return reelo, utils.NewError(err, "E_DB_FIND", 500)
 		}
 		oldAvg, err := i.ResultRepository.FindAvgPseudoReeloByGameYearAndCategory(context.Background(), year, cat)
 		if err != nil {
-			return reelo, err
+			i.Logger.Log("Reelo: cannot find old average pseudo reelo: %v", err)
+			return reelo, utils.NewError(err, "E_DB_FIND", 500)
 		}
 
 		newAvg, err := i.ResultRepository.FindAvgPseudoReeloByGameYearAndCategory(context.Background(), year, lastKnownCategoryForPlayer)
 		if err != nil {
-			return reelo, err
+			i.Logger.Log("Reelo: cannot find new average pseudo reelo: %v", err)
+			return reelo, utils.NewError(err, "E_DB_FIND", 500)
 		}
-		newMax, err := i.maxPseudoReelo(year, lastKnownCategoryForPlayer)
-		if err != nil {
-			return reelo, err
+		newMax, e := i.maxPseudoReelo(year, lastKnownCategoryForPlayer)
+		if !e.IsNil {
+			return reelo, e
 		}
 		stepSix(&pseudoReelo, lastKnownCategoryForPlayer, cat, year, newAvg, oldAvg, newMax)
 		stepSeven(&pseudoReelo, &sumOfWeights, lastKnownYear, year)
@@ -151,52 +162,57 @@ func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, 
 	stepNine(&reelo, years, lastKnownYear)
 	stepTen(&reelo, years, lastKnownYear)
 
-	return reelo, nil
+	return reelo, utils.NewNilError()
 }
 
 // oneYearScore is used to calculate a baseScore using steps from 1 to 5.
 // This baseScore (a.k.a. pseudo-Reelo) refers to a single year.
 // This needs to be calculated for every year the player has played.
 func (i *Interactor) oneYearScore(ctx context.Context, player domain.Player, cat string,
-	year int, isParis bool) (float64, error) {
+	year int, isParis bool) (float64, utils.Error) {
 	var baseScore float64
 
 	// the first exercise a player is supposed to solve for the given category
 	t, err := i.GameRepository.FindStartByYearAndCategory(ctx, year, cat)
 	if err != nil {
-		return baseScore, err
+		i.Logger.Log("oneYearScore: cannot find starting exercise: %v", err)
+		return baseScore, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// the last exercise a player is supposed to solve for the given category
 	n, err := i.GameRepository.FindEndByYearAndCategory(ctx, year, cat)
 	if err != nil {
-		return baseScore, err
+		i.Logger.Log("oneYearScore: cannot find ending exercise: %v", err)
+		return baseScore, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// the maximum number of solvable exercises for the given category
 	eMax := float64(n - t + 1)
 	maxScoreForCat, err := i.ResultRepository.FindMaxScoreByGameYearAndCategory(ctx, year, cat)
 	if err != nil {
-		return baseScore, err
+		i.Logger.Log("oneYearScore: cannot find max score: %v", err)
+		return baseScore, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// the maximum score obtainable in the given category
 	dMax := float64(maxScoreForCat)
 	// the player's score for this year-category
 	d, err := i.ResultRepository.FindScoreByYearAndPlayerIDAndGameIsParis(ctx, year, player.ID, isParis)
 	if err != nil {
-		return baseScore, err
+		i.Logger.Log("oneYearScore: cannot find score for year %v: %v", year, err)
+		return baseScore, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// the number of exercises solved by the player for this year-category
 	exercises, err := i.ResultRepository.FindExercisesByYearAndPlayerIDAndGameIsParis(ctx, year, player.ID, isParis)
 	if err != nil {
-		return baseScore, err
+		i.Logger.Log("oneYearScore: cannot find exercises for year %v: %v", year, err)
+		return baseScore, utils.NewError(err, "E_DB_FIND", 500)
 	}
 
 	// This two checks DO NOT solve the problem, it needs manual intervention
 	if float64(exercises) > eMax {
-		log.Printf("Player %s %s has solved too many exercises (%v > %v) in year %d and category %v\n", player.Name, player.Surname, exercises, eMax, year, cat)
+		i.Logger.Log("Player %s %s has solved too many exercises (%v > %v) in year %d and category %v\n", player.Name, player.Surname, exercises, eMax, year, cat)
 		exercises = 0
 	}
 	if d > dMax {
-		log.Printf("Player %s %s has scored too many  points (%v > %v) in year %d and category %v\n", player.Name, player.Surname, d, dMax, year, cat)
+		i.Logger.Log("Player %s %s has scored too many  points (%v > %v) in year %d and category %v\n", player.Name, player.Surname, d, dMax, year, cat)
 		d = 0
 	}
 	e := float64(exercises)
@@ -206,24 +222,27 @@ func (i *Interactor) oneYearScore(ctx context.Context, player domain.Player, cat
 	stepThree(&baseScore, t, n, d, e, eMax, dMax)
 	avgCatScore, err := i.ResultRepository.FindAvgScoreByGameYear(context.Background(), year, int(exercisesCostant))
 	if err != nil {
-		return baseScore, err
+		i.Logger.Log("oneYearScore: cannot find average score: %v", err)
+		return baseScore, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	stepFour(&baseScore, year, avgCatScore)
 	stepFive(&baseScore)
 
-	return baseScore, nil
+	return baseScore, utils.NewNilError()
 }
 
-func (i *Interactor) maxPseudoReelo(year int, cat string) (float64, error) {
+func (i *Interactor) maxPseudoReelo(year int, cat string) (float64, utils.Error) {
 	var pseudoReelo float64
 
 	t, err := i.GameRepository.FindStartByYearAndCategory(context.Background(), year, cat)
 	if err != nil {
-		return pseudoReelo, err
+		i.Logger.Log("maxPseudoReelo: cannot find starting exercise: %v", err)
+		return pseudoReelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	n, err := i.GameRepository.FindEndByYearAndCategory(context.Background(), year, cat)
 	if err != nil {
-		return pseudoReelo, err
+		i.Logger.Log("maxPseudoReelo: cannot find ending exercise: %v", err)
+		return pseudoReelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 
 	// Here eMax correspond to e
@@ -232,7 +251,8 @@ func (i *Interactor) maxPseudoReelo(year int, cat string) (float64, error) {
 	// Here dMax correspond to d
 	maxScoreForCat, err := i.ResultRepository.FindMaxScoreByGameYearAndCategory(context.Background(), year, cat)
 	if err != nil {
-		return pseudoReelo, err
+		i.Logger.Log("maxPseudoReelo: cannot find max score: %v", err)
+		return pseudoReelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// the maximum score obtainable in the given category
 	dMax := float64(maxScoreForCat)
@@ -243,12 +263,13 @@ func (i *Interactor) maxPseudoReelo(year int, cat string) (float64, error) {
 	stepThree(&pseudoReelo, t, n, d, e, eMax, dMax)
 	avgCatScore, err := i.ResultRepository.FindAvgScoreByGameYear(context.Background(), year, int(exercisesCostant))
 	if err != nil {
-		return pseudoReelo, err
+		i.Logger.Log("maxPseudoReelo: cannot find average score: %v", err)
+		return pseudoReelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	stepFour(&pseudoReelo, year, avgCatScore)
 	stepFive(&pseudoReelo)
 
-	return pseudoReelo, nil
+	return pseudoReelo, utils.NewNilError()
 }
 
 func contains(array []int, item int) bool {

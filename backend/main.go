@@ -64,7 +64,6 @@ func init() {
 		UserRepository:          repository.NewDbUserRepo(dbHandlers),
 		HistoryRepository:       repository.NewDbHistoryRepo(dbHandlers),
 		Logger:                  logger,
-		ErrorHandler:            infrastructure.NewErrorHandler(),
 	}
 	wh = webinterface.WebserviceHandler{Interactor: i}
 	log.Println("Initializing reelo algorithm...")
