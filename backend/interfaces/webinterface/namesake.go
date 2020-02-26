@@ -10,9 +10,9 @@ import (
 )
 
 // ListNamesakes identifies and returns a list of all the namesakes
-// Paging is available and optional, beware that the page size is not used for
-// the number of namesakes that we want to return but for how many players
-// will be players analyzed.
+// that cannot be automatically solved.
+// Paging is available and optional.
+// Page and size indicate how many players will be analyzed.
 func (wh *WebserviceHandler) ListNamesakes(w http.ResponseWriter, r *http.Request) {
 	page, size, err := utils.Paginate(r)
 	if !err.IsNil {
