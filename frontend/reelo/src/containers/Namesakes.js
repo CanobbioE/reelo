@@ -40,6 +40,7 @@ const Namesakes = props => {
     };
 
     const handleMerge = i => merge => {
+        setSelection([])
         const ret = merge(props.analysis.namesakes[i + 1]);
         if (ret) {
             props.updateNamesake(i, ret);
@@ -52,9 +53,7 @@ const Namesakes = props => {
         }
         selection.forEach(async namesake => await props.acceptNamesake(namesake));
         props.fetchNamesakes(1, -1);
-        if (props.analysis.error && props.analysis.error !== "") {
-            window.alert(props.analysis.error);
-        }
+        setSelection([])
     };
 
     const handleComment = async (namesake, comment) => {
@@ -78,7 +77,10 @@ const Namesakes = props => {
     const renderError = () => (
         <Grid item xs={12}>
             <Typography color="error" align="center">
-                {props.errors.codeAsMessage}
+                {props.errors.codeAsMessage} <br />
+                {props.errors.code === "E_NO_AUTH" || props.errors.code === "E_BAD_REQ"
+                    ? props.errors.message
+                    : null}
             </Typography>
         </Grid>
     );
@@ -158,7 +160,7 @@ const Namesakes = props => {
                             size="small"
                             disabled={selection.length <= 0}
                             onClick={handleAccept}>
-                            Accetta selezionati
+                            Accetta selezionati ({selection.length})
                         </Button>
                     </Grid>
                     <Grid item xs={12}>
@@ -192,11 +194,11 @@ const Namesakes = props => {
                         Azioni
                     </Typography>
                 </Grid>
-                {props.analysis.loading && props.errors.message === "" ? null : renderNamesakes()}
                 {props.errors.message !== "" ? renderError() : null}
                 <Grid item xs={1}>
                     <LoadingIcon show={props.analysis.loading} />
                 </Grid>
+                {props.analysis.loading && props.errors.message === "" ? null : renderNamesakes()}
             </Grid>
         </Grid>
     );
