@@ -28,6 +28,7 @@ type Interactor interface {
 	PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, utils.Error)
 	UpdateCostants(costants domain.Costants) utils.Error
 	UpdateNamesake(n usecases.Namesake) utils.Error
+	PlayersCleanUp() utils.Error
 	Log(msg string, args ...interface{})
 }
 

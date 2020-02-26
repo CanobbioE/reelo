@@ -186,3 +186,28 @@ func (db *DbPlayerRepo) DeleteByID(ctx context.Context, id int) error {
 	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
 }
+
+// FindAllIDsWhereIDNotInPartecipation retrieves all the ids of
+// players that do not have any stored partecipation.
+func (db *DbPlayerRepo) FindAllIDsWhereIDNotInPartecipation(ctx context.Context) ([]int, error) {
+	var ids []int
+	q := `SELECT id from Giocatore
+			WHERE id NOT IN (SELECT giocatore from Partecipazione)`
+
+	rows, err := db.dbHandler.Query(ctx, q)
+	if err != nil {
+		return ids, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id int
+		err := rows.Scan(&id)
+		if err != nil {
+			return ids, err
+		}
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}

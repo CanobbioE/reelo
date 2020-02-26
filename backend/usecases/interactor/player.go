@@ -90,8 +90,27 @@ func (i *Interactor) CalculatePlayerReelo(player domain.Player, doPseudo bool) u
 	player.Reelo = elo
 	err := i.PlayerRepository.UpdateReelo(ctx, player)
 	if err != nil {
-		i.Logger.Log("Error updating reelo: %v", err)
+		i.Logger.Log("CalculatePlayerReelo: cannot update reelo: %v", err)
 		return utils.NewError(err, "E_DB_UPDATE", 500)
+	}
+	return utils.NewNilError()
+}
+
+// PlayersCleanUp removes all the players that don't have any
+// stored partecipation.
+func (i *Interactor) PlayersCleanUp() utils.Error {
+	ids, err := i.PlayerRepository.FindAllIDsWhereIDNotInPartecipation(context.Background())
+	if err != nil {
+		i.Logger.Log("PlayersCleanUp: cannot find ids: %v", err)
+		return utils.NewError(err, "E_DB_FIND", 500)
+	}
+
+	for _, id := range ids {
+		err := i.PlayerRepository.DeleteByID(context.Background(), id)
+		if err != nil {
+			i.Logger.Log("PlayersCleanUp: cannot delete player %d: %v", id, err)
+			return utils.NewError(err, "E_DB_DELETE", 500)
+		}
 	}
 	return utils.NewNilError()
 }
