@@ -22,16 +22,17 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, utils.E
 	if err != nil {
 		return namesakes, utils.NewError(err, "E_DB_FIND", 500)
 	}
+
 	for _, player := range players {
-		player := player
+		player := player // we need this here
 		errs.Go(func() error {
 			history, years, err := i.HistoryRepository.FindByPlayerIDOrderByYear(ctx, player.ID)
 			if err != nil {
 				return err
 			}
-			comment := domain.Comment{Text: ""}
-			if i.CommentRepository.CheckExistenceByPlayerID(context.Background(), player.ID) {
-				i.Logger.Log("ListNamesakes: cannot check comment existence: %v", err)
+			var comment domain.Comment
+			commentExists := i.CommentRepository.CheckExistenceByPlayerID(context.Background(), player.ID)
+			if commentExists {
 				comment, err = i.CommentRepository.FindByPlayerID(context.Background(), player.ID)
 				if err != nil {
 					i.Logger.Log("ListNamesakes: cannot find comment for player %v: %v", player.ID, err)
@@ -39,12 +40,16 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, utils.E
 				}
 			}
 
-			// solvedPlayer is an array of dto.Namesake objects
+			// solvedPlayer is an array of Namesakes
 			solvedPlayer, err := solvePlayer(player, history, years, comment, i.UpdateNamesake)
+			if err != nil {
+				i.Logger.Log("ListNamesakes: cannot solve player %v: %v", player.ID, err)
+				return err
+			}
 			if solvedPlayer != nil {
 				namesakes = append(namesakes, solvedPlayer...)
 			}
-			return err
+			return nil
 		})
 	}
 
@@ -53,8 +58,12 @@ func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, utils.E
 }
 
 // SolvePlayer executes the logic to determinate if a player has namesakes
-func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []int,
-	comment domain.Comment, autoSolver func(n usecases.Namesake) utils.Error) ([]usecases.Namesake, error) {
+func solvePlayer(
+	player domain.Player, history usecases.HistoryByYear,
+	years []int, comment domain.Comment,
+	autoSolver func(n usecases.Namesake) utils.Error,
+) ([]usecases.Namesake, error) {
+
 	ss := solvers.New()
 	var namesakes []usecases.Namesake
 	namesakes = nil
@@ -74,6 +83,8 @@ func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []i
 		}
 	}
 
+	// a player that has multiple possible histories
+	// is what we want to return
 	if ss.Size() > 1 {
 		ss.ResetCursor()
 		for i := 0; ss.Next(); i++ {
@@ -93,7 +104,7 @@ func solvePlayer(player domain.Player, history usecases.HistoryByYear, years []i
 			if !err.IsNil {
 				return namesakes, fmt.Errorf(err.Message)
 			}
-			return []usecases.Namesake{}, nil
+			return nil, nil
 		}
 	}
 	return namesakes, nil
@@ -125,12 +136,12 @@ repeat:
 			accentID++
 			goto repeat
 		}
-		i.Logger.Log("UpdateNamesake: cannot store player %v: %v", p.ID, err)
+		i.Logger.Log("UpdateNamesake: cannot store player %v: %v", p.Accent, err)
 		return utils.NewError(err, "E_DB_STORE", 500)
-
 	}
 
 	// Edit the old player's history by reassigning her/his results to the new player's ID
+	// according to what the solver specifies
 	for _, newEntry := range n.Solver.ToHistory() {
 		if oldHistory, ok := oldHistories[newEntry.Year]; ok {
 			for _, oldEntry := range oldHistory {
@@ -140,7 +151,7 @@ repeat:
 						i.Logger.Log("UpdateNamesake: cannot find result's ID: %v", err)
 						return utils.NewError(err, "E_DB_FIND", 500)
 					}
-					if err := i.PartecipationRepository.UpdatePlayerIDByGameID(ctx, int(newID), oldEntryID); err != nil {
+					if err := i.PartecipationRepository.UpdatePlayerIDByResultID(ctx, int(newID), oldEntryID); err != nil {
 						i.Logger.Log("UpdateNamesake: cannot update partecipation player's ID: %v", err)
 						return utils.NewError(err, "E_DB_UPDATE", 500)
 					}
@@ -149,16 +160,26 @@ repeat:
 
 		}
 	}
-	_, err = i.PartecipationRepository.FindByPlayerID(ctx, oldID)
+
+	// Remove the old player entry if it has no entry in its history
+	var mustDelete bool
+	history, err := i.PartecipationRepository.FindByPlayerID(ctx, oldID)
 	if err != nil {
-		if err.Error() != "no values in result set" {
-			i.Logger.Log("UpdateNamesake: cannot find partecipation: %v", err)
-			return utils.NewError(err, "E_DB_FIND", 500)
+		if strings.Contains(err.Error(), "no values in result set") {
+			mustDelete = true
+			goto delete
 		}
+		i.Logger.Log("UpdateNamesake: cannot find partecipation: %v", err)
+		return utils.NewError(err, "E_DB_FIND", 500)
+	}
+
+delete:
+	if len(history) == 0 || mustDelete {
 		if err := i.PlayerRepository.DeleteByID(ctx, oldID); err != nil {
 			i.Logger.Log("UpdateNamesake: cannot delete player %v: %v", oldID, err)
 			return utils.NewError(err, "E_DB_DELETE", 500)
 		}
 	}
+
 	return utils.NewNilError()
 }

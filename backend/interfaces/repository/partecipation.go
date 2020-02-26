@@ -62,12 +62,12 @@ func (db *DbPartecipationRepo) FindCitiesByPlayerIDAndGameYearAndCategory(ctx co
 	return cities, nil
 }
 
-// UpdatePlayerIDByGameID updates all the parteciaptions that contains
-// the specified gameID by changing the player ID to the specified one
-func (db *DbPartecipationRepo) UpdatePlayerIDByGameID(ctx context.Context, pid, gid int) error {
-	q := `UPDATE Partecipazione SET giocatore = %d  WHERE giochi = %d`
+// UpdatePlayerIDByResultID updates all the parteciaptions that contains
+// the specified result's ID by changing the player ID to the specified one
+func (db *DbPartecipationRepo) UpdatePlayerIDByResultID(ctx context.Context, pid, rid int) error {
+	q := `UPDATE Partecipazione SET giocatore = %d  WHERE risultato = %d`
 
-	q = fmt.Sprintf(q, pid, gid)
+	q = fmt.Sprintf(q, pid, rid)
 
 	_, err := db.dbHandler.ExecContext(ctx, q)
 	return err
