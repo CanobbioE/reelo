@@ -30,14 +30,14 @@ func RequireAuth(next http.Handler) http.HandlerFunc {
 			})
 		if !tkn.Valid {
 			log.Println("Invalid token")
-			http.Error(w, "Autenticazione non valida - esci dall'applicazione e autenticati nuovamente", http.StatusUnauthorized)
+			err := fmt.Errorf("autenticazione non valida: esci dall'applicazione e autenticati nuovamente")
+			http.Error(w, utils.NewError(err, "E_NO_AUTH", http.StatusUnauthorized).String(), http.StatusUnauthorized)
 			return
 		}
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
-
 				log.Println("Invalid signature")
-				http.Error(w, "invalid signature", http.StatusUnauthorized)
+				http.Error(w, utils.NewError(err, "E_NO_AUTH", http.StatusUnauthorized).String(), http.StatusUnauthorized)
 				return
 			}
 
