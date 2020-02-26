@@ -12,7 +12,7 @@ import (
 // to change implementation as needed
 type Interactor interface {
 	AnalysisHistory(player domain.Player) (usecases.HistoryByYear, []int, utils.Error)
-	AddComment(namesake usecases.Namesake) utils.Error
+	AddComment(c domain.Comment) utils.Error
 	CalculateAllReelo(doPseudo bool) utils.Error
 	CalculateMaxScoreObtainable(game domain.Game) (int, utils.Error)
 	CalculatePlayerReelo(player domain.Player, doPseudo bool) utils.Error

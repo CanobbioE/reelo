@@ -67,15 +67,9 @@ func (db *DbCommentRepo) CheckExistenceByPlayerID(ctx context.Context, id int) b
 // FindByPlayerID retrieve a comment given a player id
 func (db *DbCommentRepo) FindByPlayerID(ctx context.Context, id int) (domain.Comment, error) {
 	var c domain.Comment
-	q := `SELECT id, testo FROM Commenti WHERE giocatore = ?`
+	q := `SELECT id, testo FROM Commenti WHERE giocatore = %d`
+	q = fmt.Sprintf(q, id)
 
-	row, err := db.dbHandler.Query(ctx, q, id)
-	if err != nil {
-		return c, err
-	}
-	err = row.Scan(&c.ID, &c.Text)
-	if err != nil {
-		return c, err
-	}
+	QueryRow(ctx, q, db.dbHandler, &c.ID, &c.Text)
 	return c, nil
 }

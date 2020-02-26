@@ -3,22 +3,22 @@ package interactor
 import (
 	"context"
 
-	"github.com/CanobbioE/reelo/backend/usecases"
+	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
 // AddComment creates or updates a comment for the given player
-func (i *Interactor) AddComment(namesake usecases.Namesake) utils.Error {
+func (i *Interactor) AddComment(c domain.Comment) utils.Error {
 	ctx := context.Background()
-	commentExists := i.CommentRepository.CheckExistenceByPlayerID(ctx, namesake.Comment.Player.ID)
+	commentExists := i.CommentRepository.CheckExistenceByPlayerID(ctx, c.Player.ID)
 	if commentExists {
-		err := i.CommentRepository.UpdateTextByPlayerID(ctx, namesake.Comment.Text, namesake.Comment.Player.ID)
+		err := i.CommentRepository.UpdateTextByPlayerID(ctx, c.Text, c.Player.ID)
 		if err != nil {
 			i.Logger.Log("AddComment: cannot update text: %v", err)
 			return utils.NewError(err, "E_DB_UPDATE", 500)
 		}
 	} else {
-		if _, err := i.CommentRepository.Store(ctx, namesake.Comment); err != nil {
+		if _, err := i.CommentRepository.Store(ctx, c); err != nil {
 			i.Logger.Log("AddComment: cannot store comment: %v", err)
 			return utils.NewError(err, "E_DB_CREATE", 500)
 		}

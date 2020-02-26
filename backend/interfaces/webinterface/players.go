@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/CanobbioE/reelo/backend/usecases"
+	"github.com/CanobbioE/reelo/backend/domain"
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
@@ -43,22 +43,22 @@ func (wh *WebserviceHandler) ForcePseudoReelo(w http.ResponseWriter, r *http.Req
 	return
 }
 
-// AddComment adds a comment to a namesake
+// AddComment adds a comment to a player.
 func (wh *WebserviceHandler) AddComment(w http.ResponseWriter, r *http.Request) {
-	var n usecases.Namesake
+	var c domain.Comment
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		wh.Interactor.Log("AddComment: cannot read body: %v", err)
 		http.Error(w, utils.NewError(err, "E_BAD_REQ", http.StatusBadRequest).String(), http.StatusBadRequest)
 		return
 	}
-	err = json.Unmarshal(body, &n)
+	err = json.Unmarshal(body, &c)
 	if err != nil {
 		wh.Interactor.Log("AddComment: cannot unmarshal body: %v", err)
 		http.Error(w, utils.NewError(err, "E_BAD_REQ", http.StatusBadRequest).String(), http.StatusBadRequest)
 		return
 	}
-	if e := wh.Interactor.AddComment(n); !e.IsNil {
+	if e := wh.Interactor.AddComment(c); !e.IsNil {
 		http.Error(w, e.String(), e.HTTPStatus)
 		return
 	}
