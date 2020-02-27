@@ -78,7 +78,7 @@ func (db *DbResultRepo) FindScoreByYearAndPlayerIDAndGameIsParis(ctx context.Con
 			JOIN Partecipazione P ON P.risultato = R.id
 			JOIN Giochi G ON G.id = P.giochi
 			JOIN Giocatore U ON U.id = P.giocatore
-			WHERE U.id = ? AND G.anno = ?`
+			WHERE U.id = %d AND G.anno = %d`
 
 	q = adaptToParis(q, ip)
 
@@ -95,7 +95,7 @@ func (db *DbResultRepo) FindExercisesByYearAndPlayerIDAndGameIsParis(ctx context
 			JOIN Partecipazione P ON P.risultato = R.id
 			JOIN Giochi G ON G.id = P.giochi
 			JOIN Giocatore U ON U.id = P.giocatore
-			WHERE U.id = ? AND G.anno = ?`
+			WHERE U.id = %d AND G.anno = %d`
 
 	q = adaptToParis(q, ip)
 	q = fmt.Sprintf(q, id, y)
@@ -186,7 +186,7 @@ func (db *DbResultRepo) UpdatePseudoReeloByPlayerIDAndGameYearAndCategory(ctx co
 		return err
 	}
 
-	s := `UPDATE Risultato SET pseudo_reelo = %d  WHERE id = %d`
+	s := `UPDATE Risultato SET pseudo_reelo = %v  WHERE id = %d`
 	s = fmt.Sprintf(s, pr, resultID)
 	_, err = db.dbHandler.ExecContext(ctx, s)
 	return err

@@ -135,13 +135,15 @@ export const uploadFile = (file, category, year, isParis, format, start, end) =>
             .map(field => fieldConverter(field.toLowerCase()))
             .reduce((f1, f2) => f1 + " " + f2);
         const data = JSON.stringify({
-            category: category,
-            year: year,
-            isParis: isParis,
+            game: {
+                category: category,
+                year: parseInt(year),
+                isParis: isParis,
+                start: parseInt(start),
+                end: parseInt(end),
+            },
             token: jwt,
             format: mappedFormat.trim(),
-            start: start,
-            end: end,
         });
         const formData = new FormData();
         formData.append("file", file);
