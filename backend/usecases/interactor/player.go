@@ -26,22 +26,18 @@ func (i *Interactor) PlayersCount() (int, utils.Error) {
 func (i *Interactor) CalculateAllReelo(doPseudo bool) utils.Error {
 	start := time.Now()
 	errs, ctx := errgroup.WithContext(context.Background())
-	if doPseudo {
-		i.Logger.Log("(Re)calculating pseudo-Reelo...")
-	}
-	i.Logger.Log("(Re)calculating Reelo...")
 
 	i.InitCostants()
 	ids, err := i.PlayerRepository.FindAllIDs(ctx)
 	if err != nil {
-		i.Logger.Log("PlayersCount: cannot find players count: %v", err)
+		i.Logger.Log("CalculateAllReelo: cannot find all players ids: %v", err)
 		return utils.NewError(err, "E_DB_FIND", 500)
 	}
 
 	for _, id := range ids {
 		player, err := i.PlayerRepository.FindByID(ctx, id)
 		if err != nil {
-			i.Logger.Log("PlayersCount: cannot find players count: %v", err)
+			i.Logger.Log("CalculateAllReelo: cannot find player by id %d: %v", id, err)
 			return utils.NewError(err, "E_DB_FIND", 500)
 		}
 		if player.Name == "" || player.Surname == "" {
@@ -59,7 +55,7 @@ func (i *Interactor) CalculateAllReelo(doPseudo bool) utils.Error {
 
 	err = errs.Wait()
 	end := time.Now()
-	i.Logger.Log("recalculating reelo for %v players took %v", len(ids), end.Sub(start))
+	i.Logger.Log("CalculateAllReelo: recalculating reelo for %v players took %v", len(ids), end.Sub(start))
 	return utils.NewError(err, "E_GENERIC", 500)
 
 }
@@ -67,14 +63,12 @@ func (i *Interactor) CalculateAllReelo(doPseudo bool) utils.Error {
 // CalculatePlayerReelo recalculates the reelo for a single user
 func (i *Interactor) CalculatePlayerReelo(player domain.Player, doPseudo bool) utils.Error {
 	ctx := context.Background()
-
 	if doPseudo {
 		years, err := i.GameRepository.FindDistinctYearsByPlayerID(ctx, player.ID)
 		if err != nil {
 			i.Logger.Log("CalculatePlayerReelo: cannot find years for %v: %v", player.ID, err)
 			return utils.NewError(err, "E_DB_FIND", 500)
 		}
-
 		for _, year := range years {
 			err := i.PseudoReelo(ctx, player, year)
 			if !err.IsNil {
@@ -82,7 +76,6 @@ func (i *Interactor) CalculatePlayerReelo(player domain.Player, doPseudo bool) u
 			}
 		}
 	}
-
 	elo, e := i.Reelo(ctx, player)
 	if !e.IsNil {
 		return e

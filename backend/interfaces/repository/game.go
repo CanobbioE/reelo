@@ -84,11 +84,7 @@ func (db *DbGameRepo) FindDistinctYearsByPlayerID(ctx context.Context, id int) (
 // FindCategoriesByYearAndPlayer does stuff
 func (db *DbGameRepo) FindCategoriesByYearAndPlayer(ctx context.Context, y, id int) ([]string, error) {
 	var categories []string
-	q := `SELECT R.punteggio FROM Risultato R
-			JOIN Partecipazione P ON P.risultato = R.id
-			JOIN Giochi G ON G.id = P.giochi
-			JOIN Giocatore U ON U.id = P.giocatore
-			WHERE U.id = ? AND G.anno = ?`
+	q := `SELECT G.categoria FROM Giochi G JOIN Giocatore U ON U.id = ? WHERE G.anno = ?`
 
 	rows, err := db.dbHandler.Query(ctx, q, id, y)
 	if err != nil {

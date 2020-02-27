@@ -26,8 +26,8 @@ func (i *Interactor) InitCostants() {
 
 	c, err := i.CostantsRepository.FindAll(context.Background())
 	if err != nil {
-		log.Printf("Error initializing costants: %v", err)
-		log.Println("Falling back to the hardcoded configuration")
+		i.Logger.Log("Error initializing costants: %v", err)
+		i.Logger.Log("Falling back to the hardcoded configuration\n")
 		return
 	}
 	startingYear = c.StartingYear
@@ -47,14 +47,15 @@ func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year
 	//### Steps from 1 to 5
 	// There could be more than one category for a year,
 	// this could happen in case of namesakes or international results
-	categories, err := i.GameRepository.FindCategoriesByYearAndPlayer(ctx, player.ID, year)
+	categories, err := i.GameRepository.FindCategoriesByYearAndPlayer(ctx, year, player.ID)
 	if err != nil {
 		i.Logger.Log("PseudoReelo: cannot find categories: %v", err)
 		return utils.NewError(err, "E_DB_FIND", 500)
 	}
 
-	var parisIndex int
-	for index, c := range categories {
+	//var parisIndex int
+	for _, c := range categories {
+
 		cities, err := i.PartecipationRepository.FindCitiesByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c)
 		if err != nil {
 			i.Logger.Log("PseudoReelo: cannot find cities: %v", err)
@@ -68,13 +69,15 @@ func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year
 			}
 		}
 
-		if isParis {
-			parisIndex = index
-			break
-		}
+		// if isParis {
+		// 	parisIndex = index
+		// 	break
+		// }
 	}
 
-	categories = dumbNamesakeGuard(categories, parisIndex, isParis)
+	//categories = dumbNamesakeGuard(categories, parisIndex, isParis)
+	if len(categories) > 0 {
+	}
 
 	for _, c := range categories {
 		reelo, e := i.oneYearScore(ctx, player, c, year, isParis)
@@ -109,7 +112,7 @@ func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, 
 	// It's used to check for category promotion.
 	lastKnownCategoryForPlayer, err := i.GameRepository.FindMaxCategoryByPlayerID(ctx, player.ID)
 	if err != nil {
-		i.Logger.Log("Reelo: cannot find max max category: %v", err)
+		i.Logger.Log("Reelo: cannot find max max category for player %d: %v", player.ID, err)
 		return reelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	// The last year known in which the player has partecipated.
@@ -236,7 +239,7 @@ func (i *Interactor) maxPseudoReelo(year int, cat string) (float64, utils.Error)
 
 	t, err := i.GameRepository.FindStartByYearAndCategory(context.Background(), year, cat)
 	if err != nil {
-		i.Logger.Log("maxPseudoReelo: cannot find starting exercise: %v", err)
+		i.Logger.Log("maxPseudoReelo: cannot find starting exercise for year/category (%d/%s): %v", year, cat, err)
 		return pseudoReelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
 	n, err := i.GameRepository.FindEndByYearAndCategory(context.Background(), year, cat)
