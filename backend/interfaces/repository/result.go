@@ -80,7 +80,7 @@ func (db *DbResultRepo) FindScoreByYearAndPlayerIDAndGameIsParis(ctx context.Con
 			JOIN Giocatore U ON U.id = P.giocatore
 			WHERE U.id = ? AND G.anno = ?`
 
-	// TODO q = utils.adaptToParis(q, ip)
+	q = adaptToParis(q, ip)
 
 	q = fmt.Sprintf(q, id, y)
 	err := QueryRow(ctx, q, db.dbHandler, &score)
@@ -97,7 +97,7 @@ func (db *DbResultRepo) FindExercisesByYearAndPlayerIDAndGameIsParis(ctx context
 			JOIN Giocatore U ON U.id = P.giocatore
 			WHERE U.id = ? AND G.anno = ?`
 
-	// TODO adaptToParis(q, ip)
+	q = adaptToParis(q, ip)
 	q = fmt.Sprintf(q, id, y)
 	err := QueryRow(ctx, q, db.dbHandler, &ex)
 	return ex, err

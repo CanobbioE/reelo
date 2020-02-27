@@ -144,7 +144,10 @@ func (i *Interactor) DoesRankExist(year int, category string, isParis bool) (boo
 
 	id, err := i.GameRepository.FindIDByYearAndCategoryAndIsParis(context.Background(), year, category, isParis)
 	if err != nil {
-		i.Logger.Log("DoesRankExist: cannot find game's ID %d: %v", err)
+		if strings.Contains(err.Error(), "no values in result set") {
+			return false, utils.NewNilError()
+		}
+		i.Logger.Log("DoesRankExist: cannot find game's ID: %v", err)
 		return false, utils.NewError(err, "E_DB_FIND", 500)
 	}
 
