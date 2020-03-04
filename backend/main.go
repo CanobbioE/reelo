@@ -4,39 +4,74 @@ package main
  * change elo service to use only IDs and not name/surname
  */
 import (
-	"io"
 	"log"
 	"net/http"
-	"os"
+	"time"
 
-	"github.com/CanobbioE/reelo/backend/controllers"
-	"github.com/CanobbioE/reelo/backend/middlewares"
-	"github.com/CanobbioE/reelo/backend/services/elo"
+	"github.com/CanobbioE/reelo/backend/infrastructure"
+	"github.com/CanobbioE/reelo/backend/infrastructure/mysqlhandler"
+	"github.com/CanobbioE/reelo/backend/interfaces/repository"
+	"github.com/CanobbioE/reelo/backend/interfaces/webinterface"
+	mw "github.com/CanobbioE/reelo/backend/interfaces/webinterface/middlewares"
+	"github.com/CanobbioE/reelo/backend/usecases/interactor"
 	"github.com/CanobbioE/reelo/backend/utils/parse"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
+var (
+	i  *interactor.Interactor
+	wh webinterface.WebserviceHandler
+)
+
 func init() {
 	parse.GetCities()
-	elo.InitCostants()
-	log.Println("App initialized")
+	log.Println("Creating logger...")
+	logger := infrastructure.NewLogger()
+
+	log.Println("Connecting to the database...")
+	// Database set up
+	cfg := mysqlhandler.Config{
+		DbDriver:            "mysql",
+		User:                "reeloUser",
+		Password:            "password",
+		Host:                "localhost:3306",
+		DbName:              "reelo",
+		BkpDir:              "bkp",
+		MaxConnections:      5,
+		MaxIdleConnections:  5,
+		MaxConnTries:        10,
+		ConnectionsLifetime: (time.Minute * 5),
+		InstanceEsists:      false,
+	}
+	dbHandler, err := mysqlhandler.NewHandler(cfg)
+	if err != nil {
+		log.Fatalf("Cannot istanciate repository hanldler: %v", err)
+	}
+	dbHandlers := make(map[string]repository.DbHandler)
+	for _, repo := range repository.All() {
+		dbHandlers[repo] = dbHandler
+	}
+
+	i = &interactor.Interactor{
+		CommentRepository:       repository.NewDbCommentRepo(dbHandlers),
+		CostantsRepository:      repository.NewDbCostantsRepo(dbHandlers),
+		GameRepository:          repository.NewDbGameRepo(dbHandlers),
+		PartecipationRepository: repository.NewDbPartecipationRepo(dbHandlers),
+		PlayerRepository:        repository.NewDbPlayerRepo(dbHandlers),
+		ResultRepository:        repository.NewDbResultRepo(dbHandlers),
+		UserRepository:          repository.NewDbUserRepo(dbHandlers),
+		HistoryRepository:       repository.NewDbHistoryRepo(dbHandlers),
+		Logger:                  logger,
+	}
+	wh = webinterface.WebserviceHandler{Interactor: i}
+	log.Println("Initializing reelo algorithm...")
+	i.InitCostants()
+	log.Println("App initialized!")
 }
 
 func main() {
-	// Configure Logging
-	// logFilePath := "log.txt"
-	logFilePath := os.Getenv("LOG_FILE_PATH")
-	if logFilePath != "" {
-		f, err := os.OpenFile("./"+logFilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			log.Fatalf("error opening file: %v", err)
-		}
-		defer f.Close()
-		wrt := io.MultiWriter(os.Stdout, f)
-		log.SetOutput(wrt)
-	}
-
 	// Backup scheduling
 	// gocron.Every(1).Days().At("03:00").Do(services.Backup)
 	// gocron.Start()
@@ -44,25 +79,34 @@ func main() {
 	router := mux.NewRouter()
 
 	// Routing
-	router.HandleFunc("/update-database", controllers.UpdateDB).Methods("GET")
-	router.HandleFunc("/ranks/", controllers.GetRanks).Methods("GET")
-	router.HandleFunc("/years", controllers.GetYears).Methods("GET")
-	router.HandleFunc("/count", controllers.GetPlayersCount).Methods("GET")
-	router.HandleFunc("/admin", controllers.Login).Methods("POST")
-	router.HandleFunc("/upload", middlewares.Auth(
-		http.HandlerFunc(controllers.Upload))).Methods("POST")
-	router.HandleFunc("/force-reelo", middlewares.Auth(
-		http.HandlerFunc(controllers.ForcePseudoReelo))).Methods("PUT")
-	router.HandleFunc("/algorithm", middlewares.Auth(
-		http.HandlerFunc(controllers.HandleAlgorithm))).Methods("PATCH", "GET")
-	router.HandleFunc("/upload/exist/", middlewares.Auth(
-		http.HandlerFunc(controllers.CheckRankExistence))).Methods("GET")
-	router.Handle("/namesakes/", middlewares.Auth(
-		http.HandlerFunc(controllers.GetNamesakes))).Methods("GET")
-	router.Handle("/namesakes", middlewares.Auth(
-		http.HandlerFunc(controllers.UpdateNamesake))).Methods("POST")
-	router.Handle("/namesakes/comment", middlewares.Auth(
-		http.HandlerFunc(controllers.CommentNamesake))).Methods("POST", "PATCH")
+	// endpoint /players
+	router.HandleFunc("/players/count", wh.PlayersCount).Methods("GET")
+	router.HandleFunc("/players/reelo/calculate", mw.RequireAuth(
+		http.HandlerFunc(wh.ForcePseudoReelo))).Methods("POST", "PUT")
+	router.HandleFunc("/players/comment", mw.RequireAuth(
+		http.HandlerFunc(wh.AddComment))).Methods("POST")
+
+	// endpoint /ranks
+	router.HandleFunc("/ranks/all/", wh.ListRanks).Methods("GET")
+	router.HandleFunc("/ranks/upload", mw.RequireAuth(
+		http.HandlerFunc(wh.Upload))).Methods("POST")
+	router.HandleFunc("/ranks/exist/", wh.RankExistence).Methods("GET")
+	router.HandleFunc("/ranks/years", wh.ListYears).Methods("GET")
+
+	// endpoint /auth
+	router.HandleFunc("/auth/login", wh.Login).Methods("POST")
+
+	// endpoint /namesakes
+	router.HandleFunc("/namesakes/all", mw.RequireAuth(
+		http.HandlerFunc(wh.ListNamesakes))).Methods("GET")
+	router.HandleFunc("/namesakes/update", mw.RequireAuth(
+		http.HandlerFunc(wh.UpdateNamesake))).Methods("POST")
+
+	// endpoint /costants
+	router.HandleFunc("/costants/all", mw.RequireAuth(
+		http.HandlerFunc(wh.ListCostants))).Methods("GET")
+	router.HandleFunc("/costants/update", mw.RequireAuth(
+		http.HandlerFunc(wh.UpdateCostants))).Methods("POST", "PATCH")
 
 	// Serving
 	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(

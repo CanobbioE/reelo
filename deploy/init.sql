@@ -1,13 +1,19 @@
--- BACKUP DATABASE reelo
---  TO DISK = ''
---  WITH DIFFERENTIAL
-
-GRANT ALL PRIVILEGES ON reelo.* TO 'reeloUser'@'localhost' IDENTIFIED BY 'password';
+-- Adminer 4.7.5 MySQL dump
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
 SET foreign_key_checks = 0;
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
+DROP TABLE IF EXISTS `Commenti`;
+CREATE TABLE `Commenti` (
+  `testo` text,
+  `giocatore` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `giocatore` (`giocatore`),
+  CONSTRAINT `Commenti_ibfk_1` FOREIGN KEY (`giocatore`) REFERENCES `Giocatore` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `Costanti`;
 CREATE TABLE `Costanti` (
@@ -21,6 +27,8 @@ CREATE TABLE `Costanti` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `Costanti` (`id`, `anno_inizio`, `k_esercizi`, `finale`, `fattore_moltiplicativo`, `exploit`, `no_partecipazione`) VALUES
+(1,	2002,	20,	1.5,	10000,	1,	1);
 
 DROP TABLE IF EXISTS `Giocatore`;
 CREATE TABLE `Giocatore` (
@@ -28,9 +36,10 @@ CREATE TABLE `Giocatore` (
   `nome` varchar(255) NOT NULL,
   `cognome` varchar(255) NOT NULL,
   `reelo` float DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `Accent` varchar(64) DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Accent_nome_cognome` (`Accent`,`nome`,`cognome`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 DROP TABLE IF EXISTS `Giochi`;
 CREATE TABLE `Giochi` (
@@ -43,7 +52,6 @@ CREATE TABLE `Giochi` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `duplicate_giochi` (`anno`,`categoria`,`internazionale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 DROP TABLE IF EXISTS `Partecipazione`;
 CREATE TABLE `Partecipazione` (
@@ -59,7 +67,6 @@ CREATE TABLE `Partecipazione` (
   CONSTRAINT `Partecipazione_ibfk_5` FOREIGN KEY (`giocatore`) REFERENCES `Giocatore` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 DROP TABLE IF EXISTS `Risultato`;
 CREATE TABLE `Risultato` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -71,7 +78,6 @@ CREATE TABLE `Risultato` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 DROP TABLE IF EXISTS `Utenti`;
 CREATE TABLE `Utenti` (
   `nomeutente` varchar(255) NOT NULL,
@@ -79,28 +85,7 @@ CREATE TABLE `Utenti` (
   PRIMARY KEY (`nomeutente`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- INIT VALUES
-SET collation_connection = 'utf8_general_ci';
+INSERT INTO `Utenti` (`nomeutente`, `parolachiave`) VALUES
+('admin@reelo.it',	'6fbf93526147af36cf1e2d38653e61052992af951e79fcf1e87814d879666357');
 
-ALTER DATABASE reelo CHARACTER SET utf8 COLLATE utf8_general_ci;
-
-ALTER TABLE  Giochi CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE Giocatore CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE Risultato CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE Utenti CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE Costanti CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE Partecipazione CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-
-
-INSERT INTO Costanti (
-	anno_inizio,
-	k_esercizi,
-	finale,
-	fattore_moltiplicativo,
-	exploit,
-	no_partecipazione
-) VALUES (2002, 20.0, 0, 10000.0, 0.9, 0.9);
-
-INSERT INTO Utenti (nomeutente, parolachiave)
-VALUES ('admin@reelo.it', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
-
+-- 2020-02-19 18:41:32
