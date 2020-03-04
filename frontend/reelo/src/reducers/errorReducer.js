@@ -40,6 +40,8 @@ const parseError = ({ message, code, status }) => {
             return { ...err, codeAsMessage: "richiesta non valida" };
         case "E_PARSE_WARN":
             return { ...err, codeAsMessage: "impossibile analizzare il documento" };
+        case "NO_CONN":
+            return {...err, codeAsMessage: "non riesco a connettermi al servitore"}
         default:
             return { ...err, codeAsMessage: "errore inaspettato" };
     }

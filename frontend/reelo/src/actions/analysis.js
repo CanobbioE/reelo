@@ -30,7 +30,7 @@ export const fetchNamesakes = (page = 1, size = -1) => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
@@ -57,7 +57,7 @@ export const acceptNamesake = namesake => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
@@ -86,7 +86,7 @@ export const commentNamesake = (namesake, comment) => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };

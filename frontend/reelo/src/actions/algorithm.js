@@ -67,7 +67,7 @@ export const fetchVars = () => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
         console.log(e);
     }
@@ -108,7 +108,7 @@ export const updateAlg = (year, ex, final, mult, exp, np, curr) => async dispatc
         console.log(e);
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };

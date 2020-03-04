@@ -43,7 +43,7 @@ export const fetchTotalRanks = () => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
@@ -64,7 +64,7 @@ export const fetchAllYears = () => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
@@ -92,7 +92,7 @@ export const fetchRanks = (page = 1, size = -1) => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
@@ -113,7 +113,7 @@ export const forceReelo = () => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };

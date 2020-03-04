@@ -45,10 +45,7 @@ export const signin = (email, password) => async dispatch => {
         console.log(e.response.data);
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
-        });
-        dispatch({
-            type: SIGNIN_FORM_RESET,
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };

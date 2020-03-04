@@ -34,7 +34,7 @@ export const checkExistence = (year, category, isParis) => async dispatch => {
     } catch (e) {
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
@@ -164,7 +164,7 @@ export const uploadFile = (file, category, year, isParis, format, start, end) =>
         console.log(e);
         dispatch({
             type: ERROR,
-            payload: (e && e.response && e.response.data) || "server offline",
+            payload: (e && e.response && e.response.data) || {code: "NO_CONN"},
         });
     }
 };
