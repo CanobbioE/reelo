@@ -2,20 +2,19 @@
 
 Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's term that means "real number".
 
-## TODOS
-## Technologies
+## Tech stack
 
 ### Front end
 
-The UI uses React.js with Redux and Hooks. It follows the material UI standards. Everything else is just plain old CSS+HTML.
+The UI uses ReactJS with Redux and Hooks. It follows the material UI standards.
 
 ### Back end
 
-The logic behind the application is written in [Go](https://golang.org/). Data is being stored in a MySql database. It follows the REST architecture.
+The logic behind the application is written in [Go](https://golang.org/). Data is being stored in a MySQL database. It follows the REST architecture.
 
 ### Devops
 
-For an easy deploy the application is being containerized with Docker. Finally everything is being put together with docker-compose.
+For an easy deploy the application is being containerized with Docker, and everything is put together with docker-compose.
 
 ## Usage
 
@@ -63,19 +62,17 @@ Inside the [deploy folder](./deploy) you can find three configuration files:
 ### Back end
 
 - API limiter (?)
-- Better error handling
 - Better auth handling
 - Paris
-- Back end structure should be refactored
 
 ### Front end
 
 - i18n (?)
-- Caching ~
+- Caching (~)
 - Better cookies handling
 - A bit of refactoring wouldn't hurt
 - Ranks filters (order by, search, show only category, show year)
-- Reorder namesakes history
+- TypeScript (?)
 
 ## Credits
 
