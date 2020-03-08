@@ -45,7 +45,7 @@ func InitRepoHandler() (*Handler, error) {
 	if os.Getenv("ENV") == "prod" {
 		cfg.DbDriver = os.Getenv("DB_DRIVER")
 		cfg.User = os.Getenv("DB_USER")
-		cfg.Password = os.Getenv("DB_USER")
+		cfg.Password = os.Getenv("DB_PASSWORD")
 		cfg.Host = os.Getenv("DB_HOST")
 		cfg.BkpDir = os.Getenv("DB_BKP_PATH")
 	}
