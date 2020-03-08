@@ -6,7 +6,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/CanobbioE/reelo/backend/infrastructure"
 	"github.com/CanobbioE/reelo/backend/infrastructure/mysqlhandler"
@@ -31,21 +30,7 @@ func init() {
 	logger := infrastructure.NewLogger()
 
 	log.Println("Connecting to the database...")
-	// Database set up
-	cfg := mysqlhandler.Config{
-		DbDriver:            "mysql",
-		User:                "reeloUser",
-		Password:            "password",
-		Host:                "localhost:3306",
-		DbName:              "reelo",
-		BkpDir:              "bkp",
-		MaxConnections:      5,
-		MaxIdleConnections:  5,
-		MaxConnTries:        10,
-		ConnectionsLifetime: (time.Minute * 5),
-		InstanceEsists:      false,
-	}
-	dbHandler, err := mysqlhandler.NewHandler(cfg)
+	dbHandler, err := mysqlhandler.InitRepoHandler()
 	if err != nil {
 		log.Fatalf("Cannot istanciate repository hanldler: %v", err)
 	}

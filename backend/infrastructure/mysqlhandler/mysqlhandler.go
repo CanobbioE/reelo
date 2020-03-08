@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/CanobbioE/reelo/backend/interfaces/repository"
@@ -25,9 +26,35 @@ type Config struct {
 	InstanceEsists                                   bool
 }
 
+// InitRepoHandler initialize the repository connection using the hardcoded
+// values or the environments variables
+func InitRepoHandler() (*Handler, error) {
+	cfg := Config{
+		DbDriver:            "mysql",
+		User:                "reeloUser",
+		Password:            "password",
+		Host:                "localhost:3306",
+		DbName:              "reelo",
+		BkpDir:              "bkp",
+		MaxConnections:      5,
+		MaxIdleConnections:  5,
+		MaxConnTries:        10,
+		ConnectionsLifetime: (time.Minute * 5),
+		InstanceEsists:      false,
+	}
+	if os.Getenv("ENV") == "prod" {
+		cfg.DbDriver = os.Getenv("DB_DRIVER")
+		cfg.User = os.Getenv("DB_USER")
+		cfg.Password = os.Getenv("DB_USER")
+		cfg.Host = os.Getenv("DB_HOST")
+		cfg.BkpDir = os.Getenv("DB_BKP_PATH")
+	}
+
+	return NewHandler(cfg)
+}
+
 // NewHandler istanciates a connection to a mysql database
 func NewHandler(cfg Config) (*Handler, error) {
-
 	var handler *Handler
 
 	dbConfig := mysql.NewConfig()
