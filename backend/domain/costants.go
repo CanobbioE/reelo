@@ -10,7 +10,7 @@ type Costants struct {
 	PFinal                 float64 `json:"final"`
 	MultiplicativeFactor   float64 `json:"mult"`
 	AntiExploit            float64 `json:"exp"`
-	NoPartecipationPenalty float64 `json:"np"`
+	NoParticipationPenalty float64 `json:"np"`
 }
 
 // CostantsRepository is the interface for the persistency container

@@ -37,7 +37,7 @@ func (db *DbCostantsRepo) UpdateAll(ctx context.Context, c domain.Costants) erro
 		c.PFinal,
 		c.MultiplicativeFactor,
 		c.AntiExploit,
-		c.NoPartecipationPenalty)
+		c.NoParticipationPenalty)
 
 	_, err := db.dbHandler.ExecContext(ctx, s)
 	return err
@@ -61,7 +61,7 @@ func (db *DbCostantsRepo) FindAll(ctx context.Context) (domain.Costants, error) 
 		&c.PFinal,
 		&c.MultiplicativeFactor,
 		&c.AntiExploit,
-		&c.NoPartecipationPenalty,
+		&c.NoParticipationPenalty,
 	)
 	return c, err
 }

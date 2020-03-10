@@ -14,7 +14,7 @@ import (
 
 // ListNamesakes recognize and returns the majority of namesakes. A namesake
 // is a player that has two or more results that are impossible for a single person
-// to achive. E.g. if it partecipates in two different categories the same year.
+// to achieve. E.g. if it participates in two different categories the same year.
 func (i *Interactor) ListNamesakes(page, size int) ([]usecases.Namesake, utils.Error) {
 	var namesakes []usecases.Namesake
 	errs, ctx := errgroup.WithContext(context.Background())
@@ -72,11 +72,11 @@ func solvePlayer(
 	for _, y := range years {
 		for _, result := range history[y] {
 			for ss.Next() {
-				if ss.Current().CanAccept(solvers.SlimPartecipation(result)) {
-					ss.AppendToCurrent(solvers.SlimPartecipation(result))
+				if ss.Current().CanAccept(solvers.SlimParticipation(result)) {
+					ss.AppendToCurrent(solvers.SlimParticipation(result))
 					break
 				} else if !ss.HasNext() {
-					ss.NewSolver(solvers.SlimPartecipation(result))
+					ss.NewSolver(solvers.SlimParticipation(result))
 				}
 			}
 			ss.ResetCursor()
@@ -145,14 +145,14 @@ repeat:
 	for _, newEntry := range n.Solver.ToHistory() {
 		if oldHistory, ok := oldHistories[newEntry.Year]; ok {
 			for _, oldEntry := range oldHistory {
-				if oldEntry.IsEqual(usecases.SlimPartecipation(newEntry)) {
+				if oldEntry.IsEqual(usecases.SlimParticipation(newEntry)) {
 					oldEntryID, err := i.ResultRepository.FindIDByPlayerIDAndGameYearAndCategory(ctx, oldID, oldEntry.Year, oldEntry.Category)
 					if err != nil {
 						i.Logger.Log("UpdateNamesake: cannot find result's ID: %v", err)
 						return utils.NewError(err, "E_DB_FIND", 500)
 					}
-					if err := i.PartecipationRepository.UpdatePlayerIDByResultID(ctx, int(newID), oldEntryID); err != nil {
-						i.Logger.Log("UpdateNamesake: cannot update partecipation player's ID: %v", err)
+					if err := i.ParticipationRepository.UpdatePlayerIDByResultID(ctx, int(newID), oldEntryID); err != nil {
+						i.Logger.Log("UpdateNamesake: cannot update participation player's ID: %v", err)
 						return utils.NewError(err, "E_DB_UPDATE", 500)
 					}
 				}
@@ -163,13 +163,13 @@ repeat:
 
 	// Remove the old player entry if it has no entry in its history
 	var mustDelete bool
-	history, err := i.PartecipationRepository.FindByPlayerID(ctx, oldID)
+	history, err := i.ParticipationRepository.FindByPlayerID(ctx, oldID)
 	if err != nil {
 		if strings.Contains(err.Error(), "no values in result set") {
 			mustDelete = true
 			goto delete
 		}
-		i.Logger.Log("UpdateNamesake: cannot find partecipation: %v", err)
+		i.Logger.Log("UpdateNamesake: cannot find participation: %v", err)
 		return utils.NewError(err, "E_DB_FIND", 500)
 	}
 

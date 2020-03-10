@@ -43,11 +43,10 @@ func init() {
 		MaxIdleConnections:  5,
 		MaxConnTries:        10,
 		ConnectionsLifetime: (time.Minute * 5),
-		InstanceEsists:      false,
 	}
 	dbHandler, err := mysqlhandler.NewHandler(cfg)
 	if err != nil {
-		log.Fatalf("Cannot istanciate repository hanldler: %v", err)
+		log.Fatalf("Cannot instantiate repository handler: %v", err)
 	}
 	dbHandlers := make(map[string]repository.DbHandler)
 	for _, repo := range repository.All() {
@@ -58,7 +57,7 @@ func init() {
 		CommentRepository:       repository.NewDbCommentRepo(dbHandlers),
 		CostantsRepository:      repository.NewDbCostantsRepo(dbHandlers),
 		GameRepository:          repository.NewDbGameRepo(dbHandlers),
-		PartecipationRepository: repository.NewDbPartecipationRepo(dbHandlers),
+		ParticipationRepository: repository.NewDbParticipationRepo(dbHandlers),
 		PlayerRepository:        repository.NewDbPlayerRepo(dbHandlers),
 		ResultRepository:        repository.NewDbResultRepo(dbHandlers),
 		UserRepository:          repository.NewDbUserRepo(dbHandlers),

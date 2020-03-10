@@ -24,7 +24,7 @@ type Interactor struct {
 	CommentRepository       domain.CommentRepository
 	CostantsRepository      domain.CostantsRepository
 	GameRepository          domain.GameRepository
-	PartecipationRepository domain.PartecipationRepository
+	ParticipationRepository domain.ParticipationRepository
 	PlayerRepository        domain.PlayerRepository
 	ResultRepository        domain.ResultRepository
 	UserRepository          usecases.UserRepository
@@ -51,7 +51,7 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 		i.Logger.Log("ParseFileWithInfo: parse.File warning: %v", warning)
 		return utils.NewError(warning, "E_PARSE_WARN", 500)
 	}
-	i.Logger.Log("File parsed succesfully\n")
+	i.Logger.Log("File parsed successfully\n")
 
 	gamesID, err := i.GameRepository.Store(ctx, game)
 	if err != nil {
@@ -100,20 +100,20 @@ func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, f
 			return utils.NewError(err, "E_DB_STORE", 500)
 		}
 
-		p := domain.Partecipation{
+		p := domain.Participation{
 			Player: domain.Player{ID: playerID},
 			Game:   domain.Game{ID: int(gamesID)},
 			Result: domain.Result{ID: int(resultsID)},
 			City:   line.City,
 		}
 
-		if _, err := i.PartecipationRepository.Store(ctx, p); err != nil {
-			i.Logger.Log("ParseFileWithInfo: cannot store partecipation: %v", err)
+		if _, err := i.ParticipationRepository.Store(ctx, p); err != nil {
+			i.Logger.Log("ParseFileWithInfo: cannot store participation: %v", err)
 			return utils.NewError(err, "E_DB_STORE", 500)
 		}
 	}
 
-	i.Logger.Log("File inserted succesfully\n")
+	i.Logger.Log("File inserted successfully\n")
 	return utils.NewNilError()
 }
 

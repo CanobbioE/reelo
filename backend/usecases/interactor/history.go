@@ -9,7 +9,7 @@ import (
 )
 
 // PlayerHistory returns the history details for the player
-func (i *Interactor) PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, utils.Error) {
+func (i *Interactor) PlayerHistory(player domain.Player) (usecases.SlimParticipationByYear, utils.Error) {
 	history, err := i.HistoryRepository.FindByPlayerID(context.Background(), player.ID)
 	if err != nil {
 		i.Log("PlayerHistory: cannot find for player %v: %v", player.ID, err)

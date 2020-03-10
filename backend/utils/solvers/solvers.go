@@ -4,9 +4,8 @@ import (
 	"fmt"
 )
 
-// SlimPartecipation represents a simplified partecipation relationship
-// SlimPartecipation represents a simplified partecipation relationship
-type SlimPartecipation struct {
+// SlimParticipation represents a simplified participation relationship
+type SlimParticipation struct {
 	City         string  `json:"city"`
 	Category     string  `json:"category"`
 	IsParis      bool    `json:"isParis"`
@@ -20,8 +19,8 @@ type SlimPartecipation struct {
 	PseudoReelo  float64 `json:"pseudoReelo"`
 }
 
-// History is a collection of simplified partecipations
-type History []SlimPartecipation
+// History is a collection of simplified participations
+type History []SlimParticipation
 
 // Solver is an array of histories
 type Solver History
@@ -93,7 +92,7 @@ func (ss *Solvers) SetCurrent(s Solver) {
 
 // NewSolver allocates a new solver containing one value and moves the cursor
 // to the newly added value
-func (ss *Solvers) NewSolver(val SlimPartecipation) {
+func (ss *Solvers) NewSolver(val SlimParticipation) {
 	solver := Solver{val}
 	ss.solvers = append(ss.solvers, solver)
 	ss.size++
@@ -101,7 +100,7 @@ func (ss *Solvers) NewSolver(val SlimPartecipation) {
 }
 
 // AppendToCurrent appends the given value to the current solver
-func (ss *Solvers) AppendToCurrent(val SlimPartecipation) {
+func (ss *Solvers) AppendToCurrent(val SlimParticipation) {
 	ss.solvers[ss.curr()] = append(ss.solvers[ss.curr()], val)
 }
 
@@ -114,9 +113,9 @@ func (ss *Solvers) HasNext() bool {
 }
 
 // CanAccept checks if a given value belongs to the current solver.
-// The value's cosistency is checked against the last inserted value
+// The value's consistency is checked against the last inserted value
 // in the current solver. We expect to get the results in chronological order.
-func (s *Solver) CanAccept(val SlimPartecipation) bool {
+func (s *Solver) CanAccept(val SlimParticipation) bool {
 	history := *s
 	// If there are no results, accept anything
 	if len(history) == 0 {
@@ -137,11 +136,11 @@ func (s *Solver) CanAccept(val SlimPartecipation) bool {
 	// Categories growth
 	lastResult := history[len(history)-1]
 	deltaYears := val.Year - lastResult.Year
-	boundries, ok := deltaMap[lastResult.Category][val.Category]
+	boundaries, ok := deltaMap[lastResult.Category][val.Category]
 	if !ok {
 		return false
 	}
-	if deltaYears > boundries.Max || deltaYears < boundries.Min {
+	if deltaYears > boundaries.Max || deltaYears < boundaries.Min {
 		return false
 	}
 
@@ -189,15 +188,15 @@ func (s *Solver) ToHistory() History {
 }
 
 // CanAcceptAnyOrder checks if a given value belongs to the current solver.
-// The value's cosistency is checked against every value in the current solver.
-func (s *Solver) CanAcceptAnyOrder(val SlimPartecipation) bool {
+// The value's consistency is checked against every value in the current solver.
+func (s *Solver) CanAcceptAnyOrder(val SlimParticipation) bool {
 	history := *s
 	// If there are no results, accept anything
 	if len(history) == 0 {
 		return true
 	}
 
-	var isAccettable bool
+	var isAcceptable bool
 	for _, result := range history {
 		// Do not accept two results in one year
 		if result.Year == val.Year && !(result.IsParis || val.IsParis) {
@@ -210,15 +209,15 @@ func (s *Solver) CanAcceptAnyOrder(val SlimPartecipation) bool {
 
 		// Categories growth
 		deltaYears := val.Year - result.Year
-		boundries, ok := deltaMap[result.Category][val.Category]
+		boundaries, ok := deltaMap[result.Category][val.Category]
 		if !ok {
 			continue
 		}
-		if deltaYears > boundries.Max || deltaYears < boundries.Min {
+		if deltaYears > boundaries.Max || deltaYears < boundaries.Min {
 			continue
 		}
-		isAccettable = true
+		isAcceptable = true
 	}
 
-	return isAccettable
+	return isAcceptable
 }

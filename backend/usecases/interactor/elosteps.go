@@ -22,7 +22,7 @@ func stepTwo(baseScore *float64, isParis bool) {
 
 //### 3. Categories homogenization:
 // For each exercises a player is not supposed to solve we calculate
-// her/his probabilty of solving it.
+// her/his probability of solving it.
 // To the base score we should add:
 // (K + i) * {1 - [i/N+1] * [1 - (K*e+d)/(KeMax+dMax)]}
 //
@@ -41,7 +41,7 @@ func stepThree(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 	}
 }
 
-//### 4. Score normailzation:
+//### 4. Score normalization:
 // Scores are normalized to the average of averages of this year's categories
 func stepFour(baseScore *float64, year int, avgCatScore float64) {
 	*baseScore = *baseScore / avgCatScore
@@ -107,7 +107,7 @@ func stepEight(baseScore *float64, sumOfWeights float64) {
 }
 
 //### 9. Anti-Exploit:
-// To avoid single year partecipation's exploit: if the player has only
+// To avoid single year participation's exploit: if the player has only
 // one result and it's in the most recent year, then her/his REELO is worth less
 func stepNine(baseScore *float64, years []int, lastKnownYear int) {
 	if len(years) == 1 && lastKnownYear == years[0] {
@@ -115,10 +115,10 @@ func stepNine(baseScore *float64, years []int, lastKnownYear int) {
 	}
 }
 
-//### 10. No-partecipation penalty:
-// If the player didn't partecipate in the most recent year, his REELO is worth less
+//### 10. No-participation penalty:
+// If the player didn't participate in the most recent year, his REELO is worth less
 func stepTen(baseScore *float64, years []int, lastKnownYear int) {
 	if !contains(years, lastKnownYear) {
-		*baseScore *= noPartecipationPenalty
+		*baseScore *= noParticipationPenalty
 	}
 }

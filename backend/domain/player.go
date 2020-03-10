@@ -24,5 +24,5 @@ type PlayerRepository interface {
 	UpdateReelo(ctx context.Context, p Player) error
 	UpdateAccent(ctx context.Context, p Player) error
 	CheckExistenceByNameAndSurname(ctx context.Context, n, s string) bool
-	FindAllIDsWhereIDNotInPartecipation(ctx context.Context) ([]int, error)
+	FindAllIDsWhereIDNotInParticipation(ctx context.Context) ([]int, error)
 }

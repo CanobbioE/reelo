@@ -15,7 +15,7 @@ var (
 	pFinal                 = 1.5
 	multiplicativeFactor   = 10000.0
 	antiExploit            = 0.9
-	noPartecipationPenalty = 0.9
+	noParticipationPenalty = 0.9
 )
 
 // InitCostants retrieves the costants in the database, if anything goes wrong
@@ -35,7 +35,7 @@ func (i *Interactor) InitCostants() {
 	pFinal = c.PFinal
 	multiplicativeFactor = c.MultiplicativeFactor
 	antiExploit = c.AntiExploit
-	noPartecipationPenalty = c.NoPartecipationPenalty
+	noParticipationPenalty = c.NoParticipationPenalty
 }
 
 // PseudoReelo calculates a basic version of a player's ELO.
@@ -56,7 +56,7 @@ func (i *Interactor) PseudoReelo(ctx context.Context, player domain.Player, year
 	//var parisIndex int
 	for _, c := range categories {
 
-		cities, err := i.PartecipationRepository.FindCitiesByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c)
+		cities, err := i.ParticipationRepository.FindCitiesByPlayerIDAndGameYearAndCategory(ctx, player.ID, year, c)
 		if err != nil {
 			i.Logger.Log("PseudoReelo: cannot find cities: %v", err)
 			return utils.NewError(err, "E_DB_FIND", 500)
@@ -100,22 +100,22 @@ func (i *Interactor) Reelo(ctx context.Context, player domain.Player) (float64, 
 
 	// Get some usefull values from db:
 	//
-	// A list of years in which the player has partecipated
+	// A list of years in which the player has participated
 	// It's used to iterate over the results as well as to check if the
 	// anti-exploit mechanism should take effect.
 	years, err := i.GameRepository.FindDistinctYearsByPlayerID(ctx, player.ID)
 	if err != nil {
-		i.Logger.Log("Reelo: cannot find partecipation years: %v", err)
+		i.Logger.Log("Reelo: cannot find participation years: %v", err)
 		return reelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
-	// The last category known in which the player has partecipated.
+	// The last category known in which the player has participated.
 	// It's used to check for category promotion.
 	lastKnownCategoryForPlayer, err := i.GameRepository.FindMaxCategoryByPlayerID(ctx, player.ID)
 	if err != nil {
 		i.Logger.Log("Reelo: cannot find max max category for player %d: %v", player.ID, err)
 		return reelo, utils.NewError(err, "E_DB_FIND", 500)
 	}
-	// The last year known in which the player has partecipated.
+	// The last year known in which the player has participated.
 	// It is used to calculate the aging factor and if the anti-exploit mechanism
 	// should take effect.
 	lastKnownYear, err := i.GameRepository.FindMaxYear(ctx)

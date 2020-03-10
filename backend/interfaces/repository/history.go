@@ -11,10 +11,10 @@ import (
 // HISTORYREPO is the handler name
 const HISTORYREPO = "historyRepo"
 
-// DbHistoryRepo id the repository for Historys
+// DbHistoryRepo id the repository for Histories
 type DbHistoryRepo DbRepo
 
-// NewDbHistoryRepo istanciates and returns a History repository
+// NewDbHistoryRepo instantiates and returns a History repository
 func NewDbHistoryRepo(dbHandlers map[string]DbHandler) *DbHistoryRepo {
 	return &DbHistoryRepo{
 		dbHandlers: dbHandlers,
@@ -39,15 +39,15 @@ func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) 
 	defer rows.Close()
 
 	for rows.Next() {
-		var sp usecases.SlimPartecipation
+		var sp usecases.SlimParticipation
 		err := rows.Scan(&sp.Year, &sp.Category, &sp.IsParis, &sp.City)
 		if err != nil {
 			return historyByYear, years, err
 		}
-		var history []usecases.SlimPartecipation
+		var history []usecases.SlimParticipation
 		history, ok := historyByYear[sp.Year]
 		if !ok {
-			history = make([]usecases.SlimPartecipation, 0)
+			history = make([]usecases.SlimParticipation, 0)
 		}
 		history = append(history, sp)
 		historyByYear[sp.Year] = history
@@ -58,8 +58,8 @@ func (db *DbHistoryRepo) FindByPlayerIDOrderByYear(ctx context.Context, id int) 
 }
 
 // FindByPlayerID retrieves the history for the given player id
-func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.SlimPartecipationByYear, error) {
-	ph := make(usecases.SlimPartecipationByYear)
+func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.SlimParticipationByYear, error) {
+	ph := make(usecases.SlimParticipationByYear)
 	q := `SELECT G.categoria, R.tempo, R.esercizi, R.punteggio, R.pseudo_reelo, R.posizione
 			FROM  Giochi G
 			JOIN Partecipazione P ON P.giochi = G.id
@@ -67,7 +67,7 @@ func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.S
 			JOIN Giocatore U ON U.id = P.giocatore
 			WHERE U.id = %d AND G.anno = %d`
 
-	// Find all players partecipation years
+	// Find all players participation years
 	years, err := NewDbGameRepo(db.dbHandlers).FindDistinctYearsByPlayerID(ctx, id)
 	if err != nil {
 		return ph, err
@@ -82,7 +82,7 @@ func (db *DbHistoryRepo) FindByPlayerID(ctx context.Context, id int) (usecases.S
 		defer rows.Close()
 
 		for rows.Next() {
-			var slim usecases.SlimPartecipation
+			var slim usecases.SlimParticipation
 
 			// Saving most of the results
 			err := rows.Scan(&slim.Category, &slim.Time,

@@ -13,7 +13,7 @@ const PLAYERREPO = "playerRepo"
 // DbPlayerRepo id the repository for Players
 type DbPlayerRepo DbRepo
 
-// NewDbPlayerRepo istanciates and returns a Player repository
+// NewDbPlayerRepo instantiates and returns a Player repository
 func NewDbPlayerRepo(dbHandlers map[string]DbHandler) *DbPlayerRepo {
 	return &DbPlayerRepo{
 		dbHandlers: dbHandlers,
@@ -138,7 +138,7 @@ func (db *DbPlayerRepo) FindAllOrderByReeloDesc(ctx context.Context, page, size 
 	return players, nil
 }
 
-// FindCountAll returns the nomber of tuples in the player's repository
+// FindCountAll returns the number of tuples in the player's repository
 func (db *DbPlayerRepo) FindCountAll(ctx context.Context) (int, error) {
 	var count int
 
@@ -187,9 +187,9 @@ func (db *DbPlayerRepo) DeleteByID(ctx context.Context, id int) error {
 	return err
 }
 
-// FindAllIDsWhereIDNotInPartecipation retrieves all the ids of
-// players that do not have any stored partecipation.
-func (db *DbPlayerRepo) FindAllIDsWhereIDNotInPartecipation(ctx context.Context) ([]int, error) {
+// FindAllIDsWhereIDNotInParticipation retrieves all the ids of
+// players that do not have any stored participation.
+func (db *DbPlayerRepo) FindAllIDsWhereIDNotInParticipation(ctx context.Context) ([]int, error) {
 	var ids []int
 	q := `SELECT id from Giocatore
 			WHERE id NOT IN (SELECT giocatore from Partecipazione)`

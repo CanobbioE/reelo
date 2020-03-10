@@ -22,7 +22,7 @@ func (i *Interactor) PlayersCount() (int, utils.Error) {
 
 // CalculateAllReelo recalculates the Reelo score
 // for every single player in the database.
-// If the doPseudo is true, then the pseudo-reelo gets recalculated aswell
+// If the doPseudo is true, then the pseudo-reelo gets recalculated as well
 func (i *Interactor) CalculateAllReelo(doPseudo bool) utils.Error {
 	start := time.Now()
 	errs, ctx := errgroup.WithContext(context.Background())
@@ -90,9 +90,9 @@ func (i *Interactor) CalculatePlayerReelo(player domain.Player, doPseudo bool) u
 }
 
 // PlayersCleanUp removes all the players that don't have any
-// stored partecipation.
+// stored participation.
 func (i *Interactor) PlayersCleanUp() utils.Error {
-	ids, err := i.PlayerRepository.FindAllIDsWhereIDNotInPartecipation(context.Background())
+	ids, err := i.PlayerRepository.FindAllIDsWhereIDNotInParticipation(context.Background())
 	if err != nil {
 		i.Logger.Log("PlayersCleanUp: cannot find ids: %v", err)
 		return utils.NewError(err, "E_DB_FIND", 500)

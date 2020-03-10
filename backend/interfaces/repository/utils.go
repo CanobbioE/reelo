@@ -29,5 +29,5 @@ func adaptToParis(query string, isParis bool) string {
 
 // All returns all the repositories' name
 func All() []string {
-	return []string{COMMENTREPO, COSTANTSREPO, GAMEREPO, HISTORYREPO, PARTECIPATIONREPO, PLAYERREPO, RESULTREPO, USERREPO}
+	return []string{COMMENTREPO, COSTANTSREPO, GAMEREPO, HISTORYREPO, PARTICIPATIONREPO, PLAYERREPO, RESULTREPO, USERREPO}
 }

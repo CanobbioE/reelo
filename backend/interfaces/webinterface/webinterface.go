@@ -8,7 +8,7 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// Interactor define the usecases behaviour, using an interface allows
+// Interactor define the usecases behavior, using an interface allows
 // to change implementation as needed
 type Interactor interface {
 	AnalysisHistory(player domain.Player) (usecases.HistoryByYear, []int, utils.Error)
@@ -20,12 +20,12 @@ type Interactor interface {
 	DoesRankExist(year int, category string, isParis bool) (bool, utils.Error)
 	ListCostants() (domain.Costants, utils.Error)
 	ListNamesakes(page, size int) ([]usecases.Namesake, utils.Error)
-	ListRanks(page, size int) ([]domain.Partecipation, utils.Error)
+	ListRanks(page, size int) ([]domain.Participation, utils.Error)
 	ListYears() ([]int, utils.Error)
 	Login(user usecases.User) (string, utils.Error)
 	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) utils.Error
 	PlayersCount() (int, utils.Error)
-	PlayerHistory(player domain.Player) (usecases.SlimPartecipationByYear, utils.Error)
+	PlayerHistory(player domain.Player) (usecases.SlimParticipationByYear, utils.Error)
 	UpdateCostants(costants domain.Costants) utils.Error
 	UpdateNamesake(n usecases.Namesake) utils.Error
 	PlayersCleanUp() utils.Error

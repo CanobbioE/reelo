@@ -7,22 +7,22 @@ import (
 	"github.com/CanobbioE/reelo/backend/domain"
 )
 
-// PARTECIPATIONREPO is the handler name
-const PARTECIPATIONREPO = "PartecipationRepo"
+// PARTICIPATIONREPO is the handler name
+const PARTICIPATIONREPO = "ParticipationRepo"
 
-// DbPartecipationRepo id the repository for Partecipations
-type DbPartecipationRepo DbRepo
+// DbParticipationRepo id the repository for Participations
+type DbParticipationRepo DbRepo
 
-// NewDbPartecipationRepo istanciates and returns a Partecipation repository
-func NewDbPartecipationRepo(dbHandlers map[string]DbHandler) *DbPartecipationRepo {
-	return &DbPartecipationRepo{
+// NewDbParticipationRepo instantiates and returns a Participation repository
+func NewDbParticipationRepo(dbHandlers map[string]DbHandler) *DbParticipationRepo {
+	return &DbParticipationRepo{
 		dbHandlers: dbHandlers,
-		dbHandler:  dbHandlers[PARTECIPATIONREPO],
+		dbHandler:  dbHandlers[PARTICIPATIONREPO],
 	}
 }
 
-// Store creates a new partecipation relationship in the repository
-func (db *DbPartecipationRepo) Store(ctx context.Context, p domain.Partecipation) (int64, error) {
+// Store creates a new Participation relationship in the repository
+func (db *DbParticipationRepo) Store(ctx context.Context, p domain.Participation) (int64, error) {
 	s := `INSERT INTO Partecipazione (giocatore, giochi, risultato, sede)
 			VALUES (%d, %d, %d, "%s")`
 	s = fmt.Sprintf(s, p.Player.ID, p.Game.ID, p.Result.ID, p.City)
@@ -35,7 +35,7 @@ func (db *DbPartecipationRepo) Store(ctx context.Context, p domain.Partecipation
 
 // FindCitiesByPlayerIDAndGameYearAndCategory returns a list of cities for
 // the given player's ID, game's year and game's category
-func (db *DbPartecipationRepo) FindCitiesByPlayerIDAndGameYearAndCategory(ctx context.Context, id, y int, c string) ([]string, error) {
+func (db *DbParticipationRepo) FindCitiesByPlayerIDAndGameYearAndCategory(ctx context.Context, id, y int, c string) ([]string, error) {
 	var cities []string
 
 	q := `SELECT P.sede FROM Partecipazione P
@@ -62,9 +62,9 @@ func (db *DbPartecipationRepo) FindCitiesByPlayerIDAndGameYearAndCategory(ctx co
 	return cities, nil
 }
 
-// UpdatePlayerIDByResultID updates all the parteciaptions that contains
+// UpdatePlayerIDByResultID updates all the participations that contains
 // the specified result's ID by changing the player ID to the specified one
-func (db *DbPartecipationRepo) UpdatePlayerIDByResultID(ctx context.Context, pid, rid int) error {
+func (db *DbParticipationRepo) UpdatePlayerIDByResultID(ctx context.Context, pid, rid int) error {
 	q := `UPDATE Partecipazione SET giocatore = %d  WHERE risultato = %d`
 
 	q = fmt.Sprintf(q, pid, rid)
@@ -73,27 +73,27 @@ func (db *DbPartecipationRepo) UpdatePlayerIDByResultID(ctx context.Context, pid
 	return err
 }
 
-// FindByPlayerID retrieve all the partecipations that include the given
+// FindByPlayerID retrieve all the participations that include the given
 // player's ID. The sub-structs are populated only with the IDs
-func (db *DbPartecipationRepo) FindByPlayerID(ctx context.Context, id int) ([]domain.Partecipation, error) {
-	var partecipations []domain.Partecipation
+func (db *DbParticipationRepo) FindByPlayerID(ctx context.Context, id int) ([]domain.Participation, error) {
+	var participations []domain.Participation
 	q := `SELECT giocatore, giochi, risultato, sede
 			FROM Partecipazione
 			WHERE giocatore = ?`
 	rows, err := db.dbHandler.Query(ctx, q, id)
 	if err != nil {
-		return partecipations, err
+		return participations, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var p domain.Partecipation
+		var p domain.Participation
 		err := rows.Scan(&p.Player.ID, &p.Game.ID, &p.Result.ID, &p.City)
 		if err != nil {
-			return partecipations, err
+			return participations, err
 		}
 
-		partecipations = append(partecipations, p)
+		participations = append(participations, p)
 	}
-	return partecipations, nil
+	return participations, nil
 }
