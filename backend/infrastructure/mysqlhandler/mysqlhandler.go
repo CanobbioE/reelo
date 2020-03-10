@@ -81,10 +81,10 @@ func NewHandler(cfg Config) (*Handler, error) {
 				return handler, err
 			}
 			tries++
-			time.Sleep(time.Duration(tries*100) * time.Millisecond)
 		} else {
 			break
 		}
+		time.Sleep(time.Duration(tries*500) * time.Millisecond)
 	}
 	return handler, nil
 }
