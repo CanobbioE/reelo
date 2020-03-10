@@ -14,7 +14,7 @@ The logic behind the application is written in [Go](https://golang.org/). Data i
 
 ### Devops
 
-For an easy deploy the application is being containerized with Docker, and everything is put together with docker-compose.
+For an easy deploy the application is containerized with Docker, and everything is put together with docker-compose.
 
 ## Usage
 
