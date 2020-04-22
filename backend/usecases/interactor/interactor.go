@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/pkg/parse"
 	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/CanobbioE/reelo/backend/utils"
-	"github.com/CanobbioE/reelo/backend/utils/parse"
 )
 
 // Logger is the interface for the logging utility,

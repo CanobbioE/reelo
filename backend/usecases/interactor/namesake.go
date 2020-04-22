@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/pkg/solvers"
 	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/CanobbioE/reelo/backend/utils"
-	"github.com/CanobbioE/reelo/backend/utils/solvers"
 	"golang.org/x/sync/errgroup"
 )
 

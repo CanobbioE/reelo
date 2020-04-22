@@ -3,7 +3,7 @@ package interactor
 import (
 	"math"
 
-	"github.com/CanobbioE/reelo/backend/utils/category"
+	"github.com/CanobbioE/reelo/backend/pkg/category"
 )
 
 //### 1. Base score:

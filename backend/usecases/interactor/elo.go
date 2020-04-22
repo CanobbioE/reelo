@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/pkg/category"
 	"github.com/CanobbioE/reelo/backend/utils"
-	"github.com/CanobbioE/reelo/backend/utils/category"
 )
 
 var (

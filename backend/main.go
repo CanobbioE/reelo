@@ -12,8 +12,8 @@ import (
 	"github.com/CanobbioE/reelo/backend/interfaces/repository"
 	"github.com/CanobbioE/reelo/backend/interfaces/webinterface"
 	mw "github.com/CanobbioE/reelo/backend/interfaces/webinterface/middlewares"
+	"github.com/CanobbioE/reelo/backend/pkg/parse"
 	"github.com/CanobbioE/reelo/backend/usecases/interactor"
-	"github.com/CanobbioE/reelo/backend/utils/parse"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"

@@ -2,7 +2,7 @@ package usecases
 
 import (
 	"github.com/CanobbioE/reelo/backend/domain"
-	"github.com/CanobbioE/reelo/backend/utils/solvers"
+	"github.com/CanobbioE/reelo/backend/pkg/solvers"
 )
 
 // Namesake represents a namesake
