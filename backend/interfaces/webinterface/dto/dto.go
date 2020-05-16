@@ -6,15 +6,14 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// FileUpload represents the information associated w/
-// an uploaded ranking file.
+// FileUpload represents the information associated with an uploaded ranking file.
 type FileUpload struct {
 	Game   domain.Game `json:"game"`
 	Format string      `json:"format"`
 	City   string      `json:"city"`
 }
 
-// SlimParticipation represents a simplified participation relationship
+// SlimParticipation represents an expanded and simplified participation relationship.
 type SlimParticipation struct {
 	City         string  `json:"city"`
 	Category     string  `json:"category"`

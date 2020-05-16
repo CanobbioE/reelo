@@ -65,12 +65,12 @@ func main() {
 	// endpoint /players
 	router.HandleFunc("/players/count", wh.PlayersCount).Methods("GET")
 	router.HandleFunc("/players/reelo/calculate", mw.RequireAuth(
-		http.HandlerFunc(wh.ForcePseudoReelo))).Methods("POST", "PUT")
+		http.HandlerFunc(wh.CalculateReelo))).Methods("POST", "PUT")
 	router.HandleFunc("/players/comment", mw.RequireAuth(
 		http.HandlerFunc(wh.AddComment))).Methods("POST")
 
 	// endpoint /ranks
-	router.HandleFunc("/ranks/all/", wh.ListRanks).Methods("GET")
+	router.HandleFunc("/ranks/all/", wh.ListPartecipations).Methods("GET")
 	router.HandleFunc("/ranks/upload", mw.RequireAuth(
 		http.HandlerFunc(wh.Upload))).Methods("POST")
 	router.HandleFunc("/ranks/exist/", wh.RankExistence).Methods("GET")

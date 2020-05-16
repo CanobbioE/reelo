@@ -18,7 +18,7 @@ type Interactor interface {
 	DoesRankExist(year int, category string, isParis bool) (bool, utils.Error)
 	ListCostants() (domain.Costants, utils.Error)
 	ListNamesakes(page, size int) ([]usecases.Namesake, utils.Error)
-	ListRanks(page, size int) ([]domain.Participation, utils.Error)
+	ListPartecipations(page, size int) ([]domain.Participation, utils.Error)
 	ListYears() ([]int, utils.Error)
 	Login(user usecases.User) (string, utils.Error)
 	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) utils.Error

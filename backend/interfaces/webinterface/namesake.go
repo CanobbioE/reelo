@@ -40,6 +40,7 @@ func (wh *WebserviceHandler) ListNamesakes(w http.ResponseWriter, r *http.Reques
 }
 
 // UpdateNamesake changes the history for a given player
+// TODO: soon obsolete
 func (wh *WebserviceHandler) UpdateNamesake(w http.ResponseWriter, r *http.Request) {
 	var n usecases.Namesake
 	body, err := ioutil.ReadAll(r.Body)

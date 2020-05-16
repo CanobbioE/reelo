@@ -7,7 +7,8 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// Login logs a user in by adding a jwt to the cookies
+// Login logs a user in by adding a jwt to the cookies.
+// Called when a user tries to access the application's admin panel.
 func (wh *WebserviceHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var cred usecases.User
 	if err := utils.ReadBody(r.Body, &cred); err != nil {

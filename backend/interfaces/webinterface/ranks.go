@@ -10,8 +10,8 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// ListRanks returns a list of all the ranks
-func (wh *WebserviceHandler) ListRanks(w http.ResponseWriter, r *http.Request) {
+// ListPartecipations returns a list of all the ranks
+func (wh *WebserviceHandler) ListPartecipations(w http.ResponseWriter, r *http.Request) {
 	page, size, err := utils.Paginate(r)
 	if !err.IsNil {
 		wh.Interactor.Log("ListRanks: error paginating: %v", err.String())
@@ -20,7 +20,7 @@ func (wh *WebserviceHandler) ListRanks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var ranks []dto.Rank
-	partecipations, err := wh.Interactor.ListRanks(page, size)
+	partecipations, err := wh.Interactor.ListPartecipations(page, size)
 	if !err.IsNil {
 		http.Error(w, err.String(), err.HTTPStatus)
 		return

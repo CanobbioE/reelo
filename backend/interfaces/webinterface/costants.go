@@ -9,7 +9,7 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// ListCostants fetch the current values for the constants used in the reelo algorithm
+// ListCostants fetch the current values used in the Reelo's algorithm.
 func (wh *WebserviceHandler) ListCostants(w http.ResponseWriter, r *http.Request) {
 	constants, e := wh.Interactor.ListCostants()
 	if !e.IsNil {
@@ -28,7 +28,7 @@ func (wh *WebserviceHandler) ListCostants(w http.ResponseWriter, r *http.Request
 	return
 }
 
-// UpdateCostants updates some constants used for the reelo algorithm
+// UpdateCostants updates some of the values used to calculate the players Reelo.
 func (wh *WebserviceHandler) UpdateCostants(w http.ResponseWriter, r *http.Request) {
 	var c domain.Costants
 	body, err := ioutil.ReadAll(r.Body)

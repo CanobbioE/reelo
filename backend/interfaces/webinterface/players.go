@@ -9,7 +9,7 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// PlayersCount returns how many players are stored in the DB
+// PlayersCount returns the number of player the application is storing.
 func (wh *WebserviceHandler) PlayersCount(w http.ResponseWriter, r *http.Request) {
 	count, err := wh.Interactor.PlayersCount()
 	if !err.IsNil {
@@ -29,9 +29,9 @@ func (wh *WebserviceHandler) PlayersCount(w http.ResponseWriter, r *http.Request
 	return
 }
 
-// ForcePseudoReelo forces the system to recalculate all the "pseudo reelo"
+// CalculateReelo forces the system to recalculate all the "pseudo reelo"
 // and reelo scores
-func (wh *WebserviceHandler) ForcePseudoReelo(w http.ResponseWriter, r *http.Request) {
+func (wh *WebserviceHandler) CalculateReelo(w http.ResponseWriter, r *http.Request) {
 	err := wh.Interactor.CalculateAllReelo()
 	if !err.IsNil {
 		http.Error(w, err.String(), err.HTTPStatus)
