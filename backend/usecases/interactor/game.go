@@ -6,7 +6,8 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// ListYears returns an array with all the years that are stored in the repository
+// ListYears returns an array of integers representing all the years that are
+// stored in the repository.
 func (i *Interactor) ListYears() ([]int, utils.Error) {
 	years, err := i.GameRepository.FindAllYears(context.Background())
 	if err != nil {

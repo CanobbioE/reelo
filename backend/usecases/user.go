@@ -2,7 +2,9 @@ package usecases
 
 import "context"
 
-// User represents the user entity as it is stored in the db
+// User represents the user entity as it is stored in the db.
+// A user is someone that has an account to access the application's administration panel.
+// No new user can be registered via the application.
 type User struct {
 	Username string `json:"email"`
 	Password string `json:"password"`

@@ -12,6 +12,8 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// TODO: soon obsolete
+
 // ListNamesakes recognize and returns the majority of namesakes. A namesake
 // is a player that has two or more results that are impossible for a single person
 // to achieve. E.g. if it participates in two different categories the same year.

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// PlayersCount returns how many players are stored in the DB
+// PlayersCount returns how many players are stored in the DB.
 func (i *Interactor) PlayersCount() (int, utils.Error) {
 	count, err := i.PlayerRepository.FindCountAll(context.Background())
 	if err != nil {
@@ -53,6 +53,7 @@ func (i *Interactor) CalculateAllReelo() utils.Error {
 	return utils.NewNilError()
 }
 
+// execFuncOnAllPlayers execute a given function to all the players in the database.
 func execFuncOnAllPlayers(fx func(i *Interactor, p domain.Player) utils.Error, i *Interactor) utils.Error {
 	var g errgroup.Group
 	ctx := context.Background()

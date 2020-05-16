@@ -15,6 +15,8 @@ import (
 
 // Login implements the login logic.
 // It returns an http status, the jwt and an eventual error.
+// The function is called when a User tries to access the application's
+// administration panel.
 func (i *Interactor) Login(user usecases.User) (string, utils.Error) {
 	var jwt string
 

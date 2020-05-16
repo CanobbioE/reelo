@@ -6,6 +6,7 @@ import (
 )
 
 // Namesake represents a namesake
+// TODO: soon obsolete
 type Namesake struct {
 	Comment domain.Comment `json:"comment"`
 	Solver  solvers.Solver `json:"solver"`

@@ -7,7 +7,7 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// AddComment creates or updates a comment for the given player
+// AddComment creates or updates a comment for the given player.
 func (i *Interactor) AddComment(c domain.Comment) utils.Error {
 	ctx := context.Background()
 	commentExists := i.CommentRepository.CheckExistenceByPlayerID(ctx, c.Player.ID)

@@ -35,6 +35,7 @@ type Interactor struct {
 // ParseFileWithInfo reads the content of a buffer and verifies its correctness
 // and tries to parse each line into an entity to be saved in the database
 // appending the data defined in the upload info
+// TODO: store the entities in an in-memory db and fix the data, then store into the actual db
 func (i *Interactor) ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) utils.Error {
 	ctx := context.Background()
 	var lines []parse.LineInfo

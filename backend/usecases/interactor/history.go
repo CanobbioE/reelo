@@ -8,7 +8,8 @@ import (
 	"github.com/CanobbioE/reelo/backend/utils"
 )
 
-// PlayerHistory returns the history details for the player
+// PlayerHistory returns the history details for the player.
+// TODO: soon obsolete
 func (i *Interactor) PlayerHistory(player domain.Player) (usecases.SlimParticipationByYear, utils.Error) {
 	history, err := i.HistoryRepository.FindByPlayerID(context.Background(), player.ID)
 	if err != nil {
@@ -18,7 +19,8 @@ func (i *Interactor) PlayerHistory(player domain.Player) (usecases.SlimParticipa
 	return history, utils.NewNilError()
 }
 
-// AnalysisHistory returns an analysis history
+// AnalysisHistory returns an analysis history.
+// TODO: soon obsolete
 func (i *Interactor) AnalysisHistory(player domain.Player) (usecases.HistoryByYear, []int, utils.Error) {
 	history, years, err := i.HistoryRepository.FindByPlayerIDOrderByYear(context.Background(), player.ID)
 	if err != nil {

@@ -4,6 +4,8 @@ import (
 	"context"
 )
 
+// TODO: soon obsolete
+
 // SlimParticipation represents a simplified participation relationship
 type SlimParticipation struct {
 	City         string  `json:"city"`
