@@ -2,7 +2,8 @@ package domain
 
 import "context"
 
-// Game represents the game entity as it is stored in the db
+// Game represents the game entity as it is stored in the db.
+// A Game is populated when a new ranking file is uploaded to the system.
 type Game struct {
 	ID       int    `json:"id"`
 	Year     int    `json:"year"`

@@ -2,7 +2,9 @@ package domain
 
 import "context"
 
-// Player represents the player entity as it is stored in the db
+// Player represents the player entity as it is stored in the db.
+// A player is someone that appear in a ranking file, therefore this entity is
+// created or updated anytime a ranking file (containing the player) is uploaded.
 type Player struct {
 	ID      int     `json:"id"`
 	Name    string  `json:"name"`

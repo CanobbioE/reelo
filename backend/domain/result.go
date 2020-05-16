@@ -4,7 +4,9 @@ import (
 	"context"
 )
 
-// Result represents the result relation as it is stored in the db
+// Result represents the result relation as it is stored in the db.
+// A result describes how a player has performed in a game.
+// It is created when a new ranking file is uploaded.
 type Result struct {
 	ID          int     `json:"id"`
 	Exercises   int     `json:"exercises"`

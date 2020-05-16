@@ -2,7 +2,9 @@ package domain
 
 import "context"
 
-// Participation represents the participation relation as it is stored in the db
+// Participation represents a partecipation relationship as it is stored in the db.
+// A partecipations correlate a player with a game and the obtained result.
+// It is updated when a new ranking file is uploaded.
 type Participation struct {
 	Player Player `json:"player"`
 	Game   Game   `json:"game"`

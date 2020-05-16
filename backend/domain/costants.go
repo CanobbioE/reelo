@@ -2,7 +2,8 @@ package domain
 
 import "context"
 
-// Costants represent all the possible variables used when calculating the reelo
+// Costants represents some of the values used to calculate a player's Reelo.
+// These are the values that can be changed to tinker with the algorithm.
 type Costants struct {
 	ID                     int     `json:"id"`
 	StartingYear           int     `json:"year"`

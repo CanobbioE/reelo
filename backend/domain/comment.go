@@ -2,7 +2,8 @@ package domain
 
 import "context"
 
-// Comment represents the comment entity as it is stored in the db
+// Comment represents the comment entity as it is stored in the db.
+// A comment is used to add additional details to a player.
 type Comment struct {
 	ID     int    `json:"id"`
 	Text   string `json:"text"`
