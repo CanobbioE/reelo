@@ -58,10 +58,14 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 	// TODO: consider if it's worth inverting format's key value order
 	for i := 0; i < len(format); i++ {
 		for fName, fIndex := range format {
+
 			if i == fIndex {
 				index = fIndex + deltaName + deltaCity + deltaSurname
 
 				var err error
+				if index >= len(splitted) {
+					panic(fmt.Errorf("index %d for input %v is out of range", index, input))
+				}
 				switch fName {
 				case "cognome":
 					result.Surname = strings.Title(splitted[index])
@@ -136,8 +140,8 @@ func parseLine(format Format, input string) (LineInfo, []string) {
 					result.City = strings.Title(splitted[index])
 					for _, c := range doubleNameCities {
 						if strings.Contains(input, strings.ToLower(c)) {
-							//log.Printf("Line with multi word city found. City is %s.", c)
-							//log.Printf("Line is %v", splitted)
+							// log.Printf("Line with multi word city found. City is %s.", c)
+							// log.Printf("Line is %v", splitted)
 
 							if strings.Contains(input, "finalista parigi") {
 								r := regexp.MustCompile("finalista parigi [0-9]{4}")

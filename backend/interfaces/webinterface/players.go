@@ -32,20 +32,13 @@ func (wh *WebserviceHandler) PlayersCount(w http.ResponseWriter, r *http.Request
 // ForcePseudoReelo forces the system to recalculate all the "pseudo reelo"
 // and reelo scores
 func (wh *WebserviceHandler) ForcePseudoReelo(w http.ResponseWriter, r *http.Request) {
-	err := wh.Interactor.PlayersCleanUp()
-	if !err.IsNil {
-		http.Error(w, err.String(), err.HTTPStatus)
-		return
-	}
-
-	err = wh.Interactor.CalculateAllReelo(true)
+	err := wh.Interactor.CalculateAllReelo()
 	if !err.IsNil {
 		http.Error(w, err.String(), err.HTTPStatus)
 		return
 	}
 	wh.Interactor.Log("Recalculated (forced) Reelo and pseudo-Reelo for all players")
 
-	// TODO wh.Interactor.Backup()
 	return
 }
 

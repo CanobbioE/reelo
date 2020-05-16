@@ -15,7 +15,7 @@ var doubleNameCities []string
 // is composed by.
 // Should be called only once on initialization of the app
 func GetCities() {
-	file, err := os.Open("./utils/parse/locations")
+	file, err := os.Open("./pkg/parse/locations")
 	if err != nil {
 		log.Fatal("Couldn't open cities file.", err)
 	}

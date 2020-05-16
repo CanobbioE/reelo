@@ -51,8 +51,6 @@ func init() {
 		Logger:                  logger,
 	}
 	wh = webinterface.WebserviceHandler{Interactor: i}
-	log.Println("Initializing reelo algorithm...")
-	i.InitCostants()
 	log.Println("App initialized!")
 }
 

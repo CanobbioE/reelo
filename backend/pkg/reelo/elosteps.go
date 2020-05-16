@@ -1,4 +1,4 @@
-package interactor
+package reelo
 
 import (
 	"math"
@@ -43,7 +43,7 @@ func stepThree(baseScore *float64, t, n int, d, e, eMax, dMax float64) {
 
 //### 4. Score normalization:
 // Scores are normalized to the average of averages of this year's categories
-func stepFour(baseScore *float64, year int, avgCatScore float64) {
+func stepFour(baseScore *float64, avgCatScore float64) {
 	*baseScore = *baseScore / avgCatScore
 }
 
@@ -121,4 +121,13 @@ func stepTen(baseScore *float64, years []int, lastKnownYear int) {
 	if !contains(years, lastKnownYear) {
 		*baseScore *= noParticipationPenalty
 	}
+}
+
+func contains(array []int, item int) bool {
+	for _, e := range array {
+		if e == item {
+			return true
+		}
+	}
+	return false
 }
