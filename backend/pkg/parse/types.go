@@ -17,6 +17,8 @@ type LineInfo struct {
 	Category  string
 	Year      int
 	Position  int
+	Start     int
+	End       int
 }
 
 // DataAll represents a collection of data divided by year

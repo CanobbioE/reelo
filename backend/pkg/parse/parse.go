@@ -25,11 +25,15 @@ func All() (DataAll, error) {
 		}
 		for _, category := range categories {
 			var err error
+			// TODO: start = starts[year][cat]
+			// TODO: end = ends[year][cat]
 			results[year], err = readRankingFile(year, category, format)
 			if err != nil {
 				log.Printf("Error parsing all files: %v", err)
 				return nil, err
 			}
+			// TODO. results[year].Start = start
+			// TODO: results[year].End = End
 		}
 	}
 
