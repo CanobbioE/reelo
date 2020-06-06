@@ -78,6 +78,8 @@ func main() {
 
 	// endpoint /auth
 	router.HandleFunc("/auth/login", wh.Login).Methods("POST")
+	router.HandleFunc("/auth/rebuild", mw.RequireAuth(
+		http.HandlerFunc(wh.RebuildDB))).Methods("POST")
 
 	// endpoint /namesakes
 	router.HandleFunc("/namesakes/all", mw.RequireAuth(
