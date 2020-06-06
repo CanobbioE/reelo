@@ -31,3 +31,13 @@ func (wh *WebserviceHandler) Login(w http.ResponseWriter, r *http.Request) {
 	wh.Interactor.Log("User %s logged in!", cred.Username)
 	return
 }
+
+// RebuildDB rebuilds the database using the stored files in the Ranks folder.
+func (wh *WebserviceHandler) RebuildDB(w http.ResponseWriter, r *http.Request) {
+	err := wh.Interactor.RebuildDB()
+	if err.IsNil {
+		http.Error(w, err.String(), http.StatusInternalServerError)
+		return
+	}
+	return
+}

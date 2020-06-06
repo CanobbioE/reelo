@@ -24,6 +24,7 @@ type Interactor interface {
 	ParseFileWithInfo(fileReader io.Reader, game domain.Game, format, city string) utils.Error
 	PlayersCount() (int, utils.Error)
 	PlayerHistory(player domain.Player) (usecases.SlimParticipationByYear, utils.Error)
+	RebuildDB() utils.Error
 	UpdateCostants(costants domain.Costants) utils.Error
 	UpdateNamesake(n usecases.Namesake) utils.Error
 	Log(msg string, args ...interface{})

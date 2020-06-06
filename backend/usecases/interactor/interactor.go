@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/CanobbioE/reelo/backend/domain"
+	"github.com/CanobbioE/reelo/backend/pkg/memdb"
 	"github.com/CanobbioE/reelo/backend/pkg/parse"
 	"github.com/CanobbioE/reelo/backend/usecases"
 	"github.com/CanobbioE/reelo/backend/utils"
@@ -30,6 +31,40 @@ type Interactor struct {
 	UserRepository          usecases.UserRepository
 	HistoryRepository       usecases.HistoryRepository
 	Logger                  Logger
+}
+
+// RebuildDB rebuilds the database using the stored files in the Ranks folder.
+// TODO: store the entities in an in-memory db and fix the data, then store into the actual db
+func (i *Interactor) RebuildDB() utils.Error {
+	// data is a map of player's results indexed by year
+	data, err := parse.All()
+	if err != nil {
+		return utils.NewError(err, "E_PARSE_RBLD", 500)
+	}
+
+	db := memdb.New()
+
+	for year, lines := range data {
+		for _, line := range lines {
+			if db.ContainsPlayer(line.Name, line.Surname) {
+				// prova a risolvere ominimia
+				// if !omonimiaRisolta
+				// 	write to JSON raw data
+				continue
+			}
+			// filter
+			// solve if needed
+			// save in memory
+			player := db.AddPlayer(line.Name, line.Surname)
+			game := db.AddGame(year, line.Category, line.Start, line.End)
+			result := db.AddResult(line.Exercises, line.Time, line.Points, line.Position)
+			db.AddParticipation(player, game, result, line.City)
+		}
+
+	}
+
+	// save in DB
+	return utils.NewNilError()
 }
 
 // ParseFileWithInfo reads the content of a buffer and verifies its correctness
