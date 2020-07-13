@@ -45,6 +45,7 @@ func (i *Interactor) RebuildDB() utils.Error {
 	db := memdb.New()
 
 	for year, lines := range data {
+		game := db.AddGame(year, lines[0].Category, lines[0].Start, lines[0].End)
 		for _, line := range lines {
 			if db.ContainsPlayer(line.Name, line.Surname) {
 				// prova a risolvere ominimia
@@ -56,13 +57,12 @@ func (i *Interactor) RebuildDB() utils.Error {
 			// solve if needed
 			// save in memory
 			player := db.AddPlayer(line.Name, line.Surname)
-			game := db.AddGame(year, line.Category, line.Start, line.End)
 			result := db.AddResult(line.Exercises, line.Time, line.Points, line.Position)
 			db.AddParticipation(player, game, result, line.City)
 		}
-
 	}
 
+	db.Show()
 	// save in DB
 	return utils.NewNilError()
 }

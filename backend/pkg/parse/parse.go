@@ -5,35 +5,51 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"os"
-	"path/filepath"
-	"strconv"
+	"strings"
 )
+
+// RankPath specifies where the ranking files are stored
+const RankPath = "./ranks"
+
+// LineInfo represents information contained in a single line of a ranking file
+type LineInfo struct {
+	Name      string
+	Surname   string
+	City      string
+	Exercises int
+	Points    int
+	Time      int
+	Category  string
+	Year      int
+	Position  int
+	Start     int
+	End       int
+}
+
+// DataAll represents a collection of data divided by year
+// map[year][]Player
+type DataAll map[int][]LineInfo
 
 // All parses all files in the ranks folder
 func All() (DataAll, error) {
 	var results = make(DataAll)
-	formats := readFormats()
 	years := findYears()
 	categories := []string{"C1", "C2", "GP", "L1", "L2"}
 
 	for _, year := range years {
-		inputFormat := retrieveFormat(year, formats)
+		inputFormat := strings.Split(formats[year], " ")
 		format, err := NewFormat(inputFormat)
 		if err != nil {
 			return nil, err
 		}
 		for _, category := range categories {
+			log.Printf("Parsing %d %s...\n", year, category)
 			var err error
-			// TODO: start = starts[year][cat]
-			// TODO: end = ends[year][cat]
 			results[year], err = readRankingFile(year, category, format)
 			if err != nil {
 				log.Printf("Error parsing all files: %v", err)
 				return nil, err
 			}
-			// TODO. results[year].Start = start
-			// TODO: results[year].End = End
 		}
 	}
 
@@ -46,6 +62,9 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 	warning := false
 	mergedErrs := fmt.Sprintf("Multiple parsing errors:")
 	expectedSize = len(format)
+
+	start := scoreHelp[year][category].Start
+	end := scoreHelp[year][category].End
 
 	r, err := RunRewriters(Rews, fileReader)
 	if err != nil {
@@ -64,6 +83,8 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 		}
 		singleLine.Category = category
 		singleLine.Year = year
+		singleLine.Start = start
+		singleLine.End = end
 
 		results = append(results, singleLine)
 	}
@@ -79,23 +100,9 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 
 func findYears() []int {
 	var years []int
-	err := filepath.Walk(RankPath, func(path string, info os.FileInfo, err error) error {
-		// TODO: improve this function.
-		if path != "./ranks" && path != "./ranks/formats" && len(path) < 14 {
-			log.Println(path)
-			year, err := strconv.Atoi(path[len("ranks/"):])
-
-			if err != nil {
-				log.Fatal("Error parsing years.", err)
-			}
-			years = append(years, year)
-		}
-		return nil
-	})
-	if err != nil {
-		log.Fatal(err)
+	for year := 2003; year < 2011; year++ {
+		years = append(years, year)
 	}
-
 	return years
 }
 

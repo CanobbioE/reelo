@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var expectedSize int
+
 type rewriter func(io.Writer, io.Reader) error
 
 // RunRewriters runs all the given rewriters on the origin reader
@@ -19,8 +21,8 @@ func RunRewriters(rews []rewriter, orig io.Reader) (io.Reader, error) {
 		err error
 	)
 	io.Copy(&src, orig)
-	for i, r := range rews {
-		log.Printf("Executing rewriter #%d", i)
+	for _, r := range rews {
+		// log.Printf("Executing rewriter #%d", i)
 		err = r(&dst, &src)
 		if err != nil {
 			return nil, err
@@ -28,7 +30,7 @@ func RunRewriters(rews []rewriter, orig io.Reader) (io.Reader, error) {
 		src.Reset()
 		dst, src = src, dst
 	}
-	log.Print("Success, returning last buffer!")
+	// log.Print("Success, returning last buffer!")
 	return &src, nil
 }
 

@@ -1,11 +1,7 @@
 package parse
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
 	"strings"
 )
 
@@ -51,36 +47,4 @@ func NewFormat(input []string) (Format, error) {
 		format[value] = index
 	}
 	return format, nil
-}
-
-// readFormats reads a json file containing the input's format
-// used by each year's ranking file and saves them in an array of yrFrmt
-func readFormats() allFormats {
-	file, err := os.Open(RankPath + "/formats.json")
-	if err != nil {
-		log.Fatal("Couldn't open formats file.", err)
-	}
-	defer file.Close()
-
-	byteValue, _ := ioutil.ReadAll(file)
-
-	var result allFormats
-
-	err = json.Unmarshal([]byte(byteValue), &result)
-	if err != nil {
-		log.Fatal("Couldn't unmarshal formats json.", err)
-	}
-
-	return result
-}
-
-// retriveFormat retrives the format from an array of yrFrmt (input)
-// and returns an array containing all the format's fields for a given year
-func retrieveFormat(year int, input allFormats) []string {
-	for _, value := range input.Formats {
-		if value.Year == year {
-			return strings.Split(value.Frmt, ", ")
-		}
-	}
-	return nil
 }
