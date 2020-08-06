@@ -2,6 +2,8 @@
 
 Reelo is an ELO system for Mathematics games. The name refers to the Esperanto's term that means "real number".
 
+# NOTE: This project has been refactored into different private repositories. This repo will be kept as a reference to the first prototype.
+
 ## Tech stack
 ### Front end
 The UI uses ReactJS with Redux and Hooks. It follows the material UI standards.
