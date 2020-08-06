@@ -100,7 +100,7 @@ func File(fileReader io.Reader, format Format, year int, category string) ([]Lin
 
 func findYears() []int {
 	var years []int
-	for year := 2003; year < 2011; year++ {
+	for year := 2013; year < 2018; year++ {
 		years = append(years, year)
 	}
 	return years
